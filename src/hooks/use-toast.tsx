@@ -109,6 +109,10 @@ const reducer = (state: State, action: Action): State => {
   }
 }
 
+// Create a mutable reference instead of a constant
+// This will allow us to update the reference without violating TypeScript rules
+let dispatchFunction: React.Dispatch<Action> | undefined = undefined
+
 function addToRemoveQueue(toastId: string) {
   if (toastTimeouts.has(toastId)) {
     return
@@ -116,10 +120,12 @@ function addToRemoveQueue(toastId: string) {
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId)
-    dispatch({
-      type: actionTypes.REMOVE_TOAST,
-      toastId: toastId,
-    })
+    if (dispatchFunction) {
+      dispatchFunction({
+        type: actionTypes.REMOVE_TOAST,
+        toastId: toastId,
+      })
+    }
   }, TOAST_REMOVE_DELAY)
 
   toastTimeouts.set(toastId, timeout)
@@ -142,10 +148,6 @@ function useToast() {
   return context
 }
 
-const dispatch = (action: Action) => {
-  // This will be set by the ToastProvider
-}
-
 const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, innerDispatch] = React.useReducer(reducer, {
     toasts: [],
@@ -159,9 +161,9 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
-  // Override the dispatch function to use the one from the reducer
+  // Update the dispatchFunction reference instead of reassigning a constant
   React.useEffect(() => {
-    dispatch = innerDispatch
+    dispatchFunction = innerDispatch
   }, [innerDispatch])
 
   const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
