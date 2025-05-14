@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
+import { StructuredCaseForm } from '@/components/cases/StructuredCaseForm';
+import { EmailSender } from '@/components/cases/EmailSender';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -13,12 +15,13 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Mail, FileText, BarChart2, Clock } from 'lucide-react';
+import { Mail, FileText, BarChart2, Clock, Calendar, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
-// サンプルデータ
+// サンプルデータ（作成日を追加）
 const caseData = [
   {
     id: "1",
@@ -31,6 +34,9 @@ const caseData = [
     company: "テクノソリューション株式会社",
     receivedDate: "2025-05-10T09:30:00",
     sender: "tanaka@technosolution.co.jp",
+    senderName: "田中 一郎",
+    createdAt: "2025-05-10",
+    keyTechnologies: "Java, SpringBoot, AWS"
   },
   {
     id: "2",
@@ -43,6 +49,9 @@ const caseData = [
     company: null,
     receivedDate: null,
     sender: null,
+    senderName: null,
+    createdAt: "2025-05-10",
+    keyTechnologies: "React, TypeScript, Next.js"
   },
   {
     id: "3",
@@ -55,6 +64,9 @@ const caseData = [
     company: "クラウドテック株式会社",
     receivedDate: "2025-05-08T14:15:00",
     sender: "suzuki@cloudtech.jp",
+    senderName: "鈴木 次郎",
+    createdAt: "2025-05-08",
+    keyTechnologies: "AWS, Docker, Kubernetes"
   },
   {
     id: "4",
@@ -67,6 +79,9 @@ const caseData = [
     company: null,
     receivedDate: null,
     sender: null,
+    senderName: null,
+    createdAt: "2025-05-07",
+    keyTechnologies: "Selenium, Jenkins, Python"
   },
   {
     id: "5",
@@ -79,7 +94,115 @@ const caseData = [
     company: "ウェブシステム株式会社",
     receivedDate: "2025-05-12T11:20:00",
     sender: "yamada@websystem.co.jp",
+    senderName: "山田 三郎",
+    createdAt: "2025-05-12",
+    keyTechnologies: "PHP, Laravel, MySQL"
   },
+  {
+    id: "6",
+    title: "Android開発エンジニア",
+    skills: ["Kotlin", "Java", "Android SDK"],
+    location: "福岡",
+    budget: "60~75万円",
+    status: "募集中",
+    source: "mail",
+    company: "モバイルソリューション株式会社",
+    receivedDate: "2025-05-11T10:15:00",
+    sender: "watanabe@mobile-solution.jp",
+    senderName: "渡辺 四郎",
+    createdAt: "2025-05-11",
+    keyTechnologies: "Kotlin, Android, Firebase"
+  },
+  {
+    id: "7",
+    title: "データサイエンティスト",
+    skills: ["Python", "R", "機械学習"],
+    location: "東京",
+    budget: "70~90万円",
+    status: "募集中",
+    source: "mail",
+    company: "AIソリューション株式会社",
+    receivedDate: "2025-05-09T15:45:00",
+    sender: "saito@ai-solution.co.jp",
+    senderName: "斉藤 五郎",
+    createdAt: "2025-05-09",
+    keyTechnologies: "Python, R, TensorFlow"
+  },
+  {
+    id: "8",
+    title: "セキュリティエンジニア",
+    skills: ["ネットワークセキュリティ", "CISSP"],
+    location: "大阪",
+    budget: "65~85万円",
+    status: "選考中",
+    source: "manual",
+    company: null,
+    receivedDate: null,
+    sender: null,
+    senderName: null,
+    createdAt: "2025-05-08",
+    keyTechnologies: "CISSP, Firewall, SIEM"
+  },
+  {
+    id: "9",
+    title: "UI/UXデザイナー",
+    skills: ["Figma", "Adobe XD", "Sketch"],
+    location: "東京",
+    budget: "55~70万円",
+    status: "提案済",
+    source: "mail",
+    company: "デザインスタジオ株式会社",
+    receivedDate: "2025-05-07T09:10:00",
+    sender: "tanaka@design-studio.jp",
+    senderName: "田中 六郎",
+    createdAt: "2025-05-07",
+    keyTechnologies: "Figma, Adobe XD, Sketch"
+  },
+  {
+    id: "10",
+    title: "DevOpsエンジニア",
+    skills: ["Jenkins", "AWS", "Terraform"],
+    location: "名古屋",
+    budget: "65~85万円",
+    status: "募集中",
+    source: "mail",
+    company: "クラウドマネジメント株式会社",
+    receivedDate: "2025-05-06T13:25:00",
+    sender: "nakamura@cloud-mgmt.co.jp",
+    senderName: "中村 七郎",
+    createdAt: "2025-05-06",
+    keyTechnologies: "Jenkins, AWS, Terraform"
+  },
+  {
+    id: "11",
+    title: "Goバックエンド開発者",
+    skills: ["Go", "PostgreSQL", "gRPC"],
+    location: "リモート",
+    budget: "70~90万円",
+    status: "募集中",
+    source: "manual",
+    company: null,
+    receivedDate: null,
+    sender: null,
+    senderName: null,
+    createdAt: "2025-05-05",
+    keyTechnologies: "Go, PostgreSQL, gRPC"
+  },
+  {
+    id: "12",
+    title: "Rubyエンジニア",
+    skills: ["Ruby", "Rails", "PostgreSQL"],
+    location: "福岡",
+    budget: "55~75万円",
+    status: "選考中",
+    source: "mail",
+    company: "ウェブアプリケーション株式会社",
+    receivedDate: "2025-05-04T11:05:00",
+    sender: "kobayashi@webapps.co.jp",
+    senderName: "小林 八郎",
+    createdAt: "2025-05-04",
+    keyTechnologies: "Ruby, Rails, PostgreSQL"
+  }
 ];
 
 // 案件のステータスに応じた色を返す関数
@@ -105,55 +228,78 @@ const getSourceIcon = (source: string) => {
   );
 };
 
-// メール案件の統計関数
-const getEmailStats = () => {
-  const mailCases = caseData.filter(item => item.source === "mail");
-  
-  // 会社ごとの案件数
-  const companyCounts = mailCases.reduce((acc, cur) => {
-    const company = cur.company || "不明";
-    acc[company] = (acc[company] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  // 送信者ごとの案件数
-  const senderCounts = mailCases.reduce((acc, cur) => {
-    const sender = cur.sender || "不明";
-    acc[sender] = (acc[sender] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  // 日付ごとの案件数
-  const dateCounts = mailCases.reduce((acc, cur) => {
-    if (cur.receivedDate) {
-      const date = new Date(cur.receivedDate).toLocaleDateString();
-      acc[date] = (acc[date] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-  
-  return {
-    total: mailCases.length,
-    companies: companyCounts,
-    senders: senderCounts,
-    dates: dateCounts
-  };
-};
-
 export function Cases() {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [techKeyword, setTechKeyword] = useState("");
+  const [dateRange, setDateRange] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [companyFilter, setCompanyFilter] = useState("all");
+  
+  // 会社のリストを取得
+  const companyList = Array.from(new Set(caseData.filter(item => item.company).map(item => item.company)));
   
   // フィルタリングされた案件を取得
   const filteredCases = caseData.filter(item => {
-    const matchesFilter = filter === "all" || item.source === filter;
+    const matchesSource = filter === "all" || item.source === filter;
+    
     const matchesSearch = searchTerm === "" || 
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.company && item.company.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesFilter && matchesSearch;
+    
+    const matchesTech = techKeyword === "" ||
+      item.skills.some(skill => skill.toLowerCase().includes(techKeyword.toLowerCase())) ||
+      (item.keyTechnologies && item.keyTechnologies.toLowerCase().includes(techKeyword.toLowerCase()));
+    
+    const matchesDate = dateRange === "" || item.createdAt === dateRange;
+
+    const matchesCompany = companyFilter === "all" || item.company === companyFilter;
+    
+    return matchesSource && matchesSearch && matchesTech && matchesDate && matchesCompany;
   });
+
+  // ページネーション用のメール案件取得
+  const mailCases = caseData.filter(item => item.source === "mail");
+  const paginatedMailCases = mailCases.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(mailCases.length / itemsPerPage);
   
-  // メール案件の統計情報
+  // メール案件の統計関数
+  const getEmailStats = () => {
+    // 会社ごとの案件数
+    const companyCounts = mailCases.reduce((acc, cur) => {
+      const company = cur.company || "不明";
+      acc[company] = (acc[company] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    // 送信者ごとの案件数
+    const senderCounts = mailCases.reduce((acc, cur) => {
+      const sender = cur.sender || "不明";
+      acc[sender] = (acc[sender] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    // 日付ごとの案件数
+    const dateCounts = mailCases.reduce((acc, cur) => {
+      if (cur.receivedDate) {
+        const date = new Date(cur.receivedDate).toLocaleDateString();
+        acc[date] = (acc[date] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return {
+      total: mailCases.length,
+      companies: companyCounts,
+      senders: senderCounts,
+      dates: dateCounts
+    };
+  };
+
   const emailStats = getEmailStats();
 
   return (
@@ -168,6 +314,7 @@ export function Cases() {
             <TabsTrigger value="list" className="japanese-text">案件一覧</TabsTrigger>
             <TabsTrigger value="upload" className="japanese-text">案件アップロード</TabsTrigger>
             <TabsTrigger value="stats" className="japanese-text">メール案件統計</TabsTrigger>
+            <TabsTrigger value="send" className="japanese-text">一括送信</TabsTrigger>
           </TabsList>
           
           <TabsContent value="list" className="space-y-6">
@@ -179,12 +326,15 @@ export function Cases() {
                 </CardDescription>
                 <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
                   <div className="flex-1">
-                    <Input
-                      placeholder="案件名または会社名で検索"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="japanese-text"
-                    />
+                    <div className="relative">
+                      <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                      <Input
+                        placeholder="案件名または会社名で検索"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="japanese-text pl-9"
+                      />
+                    </div>
                   </div>
                   <div className="w-full sm:w-40">
                     <Select value={filter} onValueChange={setFilter}>
@@ -199,6 +349,27 @@ export function Cases() {
                     </Select>
                   </div>
                 </div>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="技術キーワードで検索（例：Java, React）"
+                      value={techKeyword}
+                      onChange={(e) => setTechKeyword(e.target.value)}
+                      className="japanese-text"
+                    />
+                  </div>
+                  <div className="w-full sm:w-40">
+                    <div className="relative">
+                      <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                      <Input
+                        type="date"
+                        value={dateRange}
+                        onChange={(e) => setDateRange(e.target.value)}
+                        className="japanese-text pl-9"
+                      />
+                    </div>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border">
@@ -211,6 +382,7 @@ export function Cases() {
                         <TableHead className="japanese-text">勤務地</TableHead>
                         <TableHead className="japanese-text">単価</TableHead>
                         <TableHead className="japanese-text">会社</TableHead>
+                        <TableHead className="japanese-text">作成日</TableHead>
                         <TableHead className="japanese-text">ステータス</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -234,6 +406,7 @@ export function Cases() {
                           <TableCell className="japanese-text text-sm">
                             {item.company || "-"}
                           </TableCell>
+                          <TableCell className="japanese-text text-sm">{item.createdAt}</TableCell>
                           <TableCell>
                             <Badge className={getStatusBadgeColor(item.status)}>
                               <span className="japanese-text">{item.status}</span>
@@ -265,26 +438,11 @@ export function Cases() {
               <CardHeader>
                 <CardTitle className="japanese-text">案件情報の構造化</CardTitle>
                 <CardDescription className="japanese-text">
-                  AIにより案件情報が以下のように自動的に構造化されます
+                  AIにより案件情報が自動的に構造化されます
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md bg-muted p-4">
-                  <pre className="text-sm whitespace-pre-wrap">
-{`{
-  "title": "Java開発エンジニア",
-  "skills": ["Java", "Spring Boot", "SQL"],
-  "experience": "5年以上",
-  "location": "東京都",
-  "workType": "リモート可（週3出社）",
-  "duration": "6ヶ月〜",
-  "budget": "60万円〜80万円",
-  "japanese": "ビジネスレベル",
-  "priority": "高",
-  "description": "金融系システムの新規開発プロジェクト..."
-}`}
-                  </pre>
-                </div>
+                <StructuredCaseForm />
               </CardContent>
             </Card>
           </TabsContent>
@@ -326,6 +484,21 @@ export function Cases() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[150px] overflow-auto">
+                      <div className="mb-2">
+                        <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                          <SelectTrigger className="japanese-text text-sm">
+                            <SelectValue placeholder="会社でフィルター" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
+                            {companyList.map((company) => (
+                              <SelectItem key={company as string} value={company as string} className="japanese-text">
+                                {company as string}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <ul className="space-y-2">
                         {Object.entries(emailStats.companies).map(([company, count]) => (
                           <li key={company} className="flex justify-between items-center">
@@ -366,26 +539,83 @@ export function Cases() {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="japanese-text">送信者</TableHead>
+                          <TableHead className="japanese-text">担当者名</TableHead>
                           <TableHead className="japanese-text">会社</TableHead>
+                          <TableHead className="japanese-text">技術キーワード</TableHead>
+                          <TableHead className="japanese-text">受信日時</TableHead>
                           <TableHead className="japanese-text text-right">案件数</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {Object.entries(emailStats.senders).map(([sender, count]) => {
-                          // 送信者のドメインから会社名を取得
-                          const domain = sender.split('@')[1];
-                          const company = caseData.find(item => item.sender === sender)?.company || "-";
+                        {paginatedMailCases.map((item) => {
+                          const senderCount = mailCases.filter(c => c.sender === item.sender).length;
                           
                           return (
-                            <TableRow key={sender}>
-                              <TableCell className="font-medium">{sender}</TableCell>
-                              <TableCell className="japanese-text">{company}</TableCell>
-                              <TableCell className="text-right">{count}</TableCell>
+                            <TableRow key={item.id}>
+                              <TableCell className="font-medium">{item.sender}</TableCell>
+                              <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
+                              <TableCell className="japanese-text">{item.company || "-"}</TableCell>
+                              <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
+                              <TableCell className="japanese-text">
+                                {item.receivedDate ? new Date(item.receivedDate).toLocaleString() : "-"}
+                              </TableCell>
+                              <TableCell className="text-right">{senderCount}</TableCell>
                             </TableRow>
                           );
                         })}
                       </TableBody>
                     </Table>
+                  </div>
+                  
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }).map((_, index) => {
+                          const pageNumber = index + 1;
+                          // Show first page, current page, and last page, with ellipsis in between
+                          if (
+                            pageNumber === 1 || 
+                            pageNumber === totalPages || 
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink 
+                                  isActive={currentPage === pageNumber}
+                                  onClick={() => setCurrentPage(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 || 
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationEllipsis />
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
                   </div>
                 </div>
               </CardContent>
@@ -426,6 +656,10 @@ export function Cases() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="send" className="space-y-6">
+            <EmailSender mailCases={mailCases} />
           </TabsContent>
         </Tabs>
       </div>
