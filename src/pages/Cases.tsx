@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -234,6 +233,7 @@ export function Cases() {
   const [techKeyword, setTechKeyword] = useState("");
   const [dateRange, setDateRange] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [casesCurrentPage, setCasesCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [companyFilter, setCompanyFilter] = useState("all");
   
@@ -258,6 +258,13 @@ export function Cases() {
     
     return matchesSource && matchesSearch && matchesTech && matchesDate && matchesCompany;
   });
+
+  // 案件一覧のページネーション
+  const paginatedCases = filteredCases.slice(
+    (casesCurrentPage - 1) * itemsPerPage,
+    casesCurrentPage * itemsPerPage
+  );
+  const totalCasesPages = Math.ceil(filteredCases.length / itemsPerPage);
 
   // ページネーション用のメール案件取得
   const mailCases = caseData.filter(item => item.source === "mail");
@@ -387,7 +394,7 @@ export function Cases() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCases.map((item) => (
+                      {paginatedCases.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
                             <div className="flex items-center">
@@ -417,9 +424,60 @@ export function Cases() {
                     </TableBody>
                   </Table>
                 </div>
-              </CardContent>
-            </Card>
+              
+              {/* Add pagination for cases list */}
+              <div className="mt-4 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCasesCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className={casesCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalCasesPages }).map((_, index) => {
+                      const pageNumber = index + 1;
+                      if (
+                        pageNumber === 1 || 
+                        pageNumber === totalCasesPages || 
+                        (pageNumber >= casesCurrentPage - 1 && pageNumber <= casesCurrentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationLink 
+                              isActive={casesCurrentPage === pageNumber}
+                              onClick={() => setCasesCurrentPage(pageNumber)}
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      } else if (
+                        pageNumber === casesCurrentPage - 2 || 
+                        pageNumber === casesCurrentPage + 2
+                      ) {
+                        return (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        );
+                      }
+                      return null;
+                    })}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCasesCurrentPage(prev => Math.min(prev + 1, totalCasesPages))}
+                        className={casesCurrentPage === totalCasesPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            </CardContent>
           </TabsContent>
+          
           
           <TabsContent value="upload" className="space-y-6">
             <Card>
@@ -534,6 +592,32 @@ export function Cases() {
 
                 <div className="mt-6">
                   <h3 className="text-lg font-medium mb-4 japanese-text">メール送信者分析</h3>
+                  <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+                    <div className="flex-1">
+                      <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                        <SelectTrigger className="japanese-text">
+                          <SelectValue placeholder="会社でフィルター" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
+                          {companyList.map((company) => (
+                            <SelectItem key={company as string} value={company as string} className="japanese-text">
+                              {company as string}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="w-full sm:w-40">
+                      <Input
+                        placeholder="技術キーワード"
+                        value={techKeyword}
+                        onChange={(e) => setTechKeyword(e.target.value)}
+                        className="japanese-text"
+                      />
+                    </div>
+                  </div>
+                  
                   <div className="rounded-md border">
                     <Table>
                       <TableHeader>
