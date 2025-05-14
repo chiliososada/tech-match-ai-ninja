@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -28,7 +29,7 @@ import {
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog';
-import { Command, CommandInput } from '@/components/ui/command';
+import { Command } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 // サンプル技術者データ
@@ -409,10 +410,10 @@ export function Candidates() {
                           <SelectValue placeholder="日本語レベルを選択" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="不問" className="japanese-text">不問</SelectItem>
-                          <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
-                          <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
-                          <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                          <SelectItem value="不問">不問</SelectItem>
+                          <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                          <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                          <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -450,10 +451,10 @@ export function Candidates() {
                           <SelectValue placeholder="ステータスを選択" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="案件探し中" className="japanese-text">案件探し中</SelectItem>
-                          <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
-                          <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                          <SelectItem value="非稼働" className="japanese-text">非稼働</SelectItem>
+                          <SelectItem value="案件探し中">案件探し中</SelectItem>
+                          <SelectItem value="提案中">提案中</SelectItem>
+                          <SelectItem value="稼働中">稼働中</SelectItem>
+                          <SelectItem value="非稼働">非稼働</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
