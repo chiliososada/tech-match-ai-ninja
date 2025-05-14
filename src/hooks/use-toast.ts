@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -6,7 +7,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 5
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
@@ -74,8 +75,6 @@ const reducer = (state: State, action: Action): State => {
     case actionTypes.DISMISS_TOAST: {
       const { toastId } = action
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId)
       } else {
@@ -143,50 +142,83 @@ function useToast() {
   return context
 }
 
-const [state, dispatch] = React.useReducer(reducer, {
-  toasts: [],
-})
-
-React.useEffect(() => {
-  return () => {
-    toastTimeouts.forEach((timeout) => {
-      clearTimeout(timeout)
-    })
-  }
-}, [])
-
-function toast(props: Omit<ToasterToast, "id">) {
-  const id = genId()
-
-  const update = (props: Omit<ToasterToast, "id">) =>
-    dispatch({
-      type: actionTypes.UPDATE_TOAST,
-      toast: { ...props, id },
-    })
-
-  const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
-
-  dispatch({
-    type: actionTypes.ADD_TOAST,
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss()
-      },
-    },
+const ToastProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, dispatch] = React.useReducer(reducer, {
+    toasts: [],
   })
 
-  return {
-    id,
-    dismiss,
-    update,
+  React.useEffect(() => {
+    return () => {
+      toastTimeouts.forEach((timeout) => {
+        clearTimeout(timeout)
+      })
+    }
+  }, [])
+
+  const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
+    const id = genId()
+
+    const update = (props: Omit<ToasterToast, "id">) =>
+      dispatch({
+        type: actionTypes.UPDATE_TOAST,
+        toast: { ...props, id },
+      })
+
+    const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
+
+    dispatch({
+      type: actionTypes.ADD_TOAST,
+      toast: {
+        ...props,
+        id,
+        open: true,
+        onOpenChange: (open) => {
+          if (!open) dismiss()
+        },
+      },
+    })
+
+    return {
+      id,
+      dismiss,
+      update,
+    }
+  }, [])
+
+  const dismiss = React.useCallback((toastId?: string) => {
+    dispatch({ type: actionTypes.DISMISS_TOAST, toastId })
+  }, [])
+
+  return (
+    <ToastContext.Provider
+      value={{
+        toasts: state.toasts,
+        toast,
+        dismiss,
+      }}
+    >
+      {children}
+    </ToastContext.Provider>
+  )
+}
+
+export { ToastProvider, useToast, type ToastContextType }
+
+// 我们还需要一个导出给应用其他部分使用的简单方法
+const toast = (props: Omit<ToasterToast, "id">) => {
+  // 当直接使用 toast() 而不在 provider 内时，对调用进行保护
+  try {
+    const { toast } = useToast()
+    return toast(props)
+  } catch (e) {
+    // 如果不在 provider 内，简单地忽略
+    console.warn("Toast attempted to use outside of provider scope")
+    return {
+      id: "0",
+      dismiss: () => {},
+      update: () => {},
+    }
   }
 }
 
-function dismiss(toastId?: string) {
-  dispatch({ type: actionTypes.DISMISS_TOAST, toastId })
-}
-
-export { useToast, toast }
+export { toast }
