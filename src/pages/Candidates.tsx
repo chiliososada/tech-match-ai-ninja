@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -194,115 +193,6 @@ export function Candidates() {
           
           <TabsContent value="upload" className="space-y-6">
             <ResumeUpload />
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="japanese-text">構造化データ</CardTitle>
-                  <CardDescription className="japanese-text">
-                    AIにより抽出された候補者情報
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="japanese-text">氏名</Label>
-                        <Input value="鈴木太郎" className="japanese-text" readOnly />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="japanese-text">日本語レベル</Label>
-                        <Input value="ビジネスレベル" className="japanese-text" readOnly />
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="japanese-text">メールアドレス</Label>
-                        <Input value="taro.suzuki@example.com" readOnly />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="japanese-text">電話番号</Label>
-                        <Input value="090-1234-5678" readOnly />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="japanese-text">スキル</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex justify-between items-center border rounded-md p-2">
-                          <span>Java</span>
-                          <span>7年</span>
-                        </div>
-                        <div className="flex justify-between items-center border rounded-md p-2">
-                          <span>Spring Boot</span>
-                          <span>5年</span>
-                        </div>
-                        <div className="flex justify-between items-center border rounded-md p-2">
-                          <span>AWS</span>
-                          <span>3年</span>
-                        </div>
-                        <div className="flex justify-between items-center border rounded-md p-2">
-                          <span>Docker</span>
-                          <span>2年</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="japanese-text">希望条件</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <Input value="東京, リモート" className="japanese-text" readOnly />
-                        <Input value="60万円〜80万円" className="japanese-text" readOnly />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="japanese-text">推薦文生成</CardTitle>
-                  <CardDescription className="japanese-text">
-                    候補者の自動生成された推薦文
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="recommendation-template" className="japanese-text">テンプレート</Label>
-                    <Textarea 
-                      id="recommendation-template" 
-                      className="min-h-[150px] japanese-text"
-                      value={recommendationTemplate}
-                      onChange={(e) => setRecommendationTemplate(e.target.value)}
-                      placeholder="[名前]、[スキル]、[経験]などのプレースホルダーを使用してください"
-                    />
-                    <p className="text-xs text-muted-foreground japanese-text">
-                      推薦文のテンプレートを編集できます。[名前]、[スキル]、[経験]などのプレースホルダーを使用します。
-                    </p>
-                  </div>
-                  
-                  <Button 
-                    onClick={generateRecommendation} 
-                    variant="outline" 
-                    className="w-full japanese-text"
-                  >
-                    <Wand2 className="mr-2 h-4 w-4" />
-                    AIで推薦文を生成
-                  </Button>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="generated-recommendation" className="japanese-text">生成された推薦文</Label>
-                    <Textarea 
-                      id="generated-recommendation"
-                      readOnly 
-                      className="min-h-[150px] japanese-text" 
-                      value={recommendationText}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
           
           <TabsContent value="add" className="space-y-6">
@@ -415,6 +305,49 @@ export function Candidates() {
                     <Button type="submit" className="japanese-text">登録する</Button>
                   </div>
                 </form>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">推薦文生成</CardTitle>
+                <CardDescription className="japanese-text">
+                  候補者の自動生成された推薦文
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="recommendation-template" className="japanese-text">テンプレート</Label>
+                  <Textarea 
+                    id="recommendation-template" 
+                    className="min-h-[150px] japanese-text"
+                    value={recommendationTemplate}
+                    onChange={(e) => setRecommendationTemplate(e.target.value)}
+                    placeholder="[名前]、[スキル]、[経験]などのプレースホルダーを使用してください"
+                  />
+                  <p className="text-xs text-muted-foreground japanese-text">
+                    推薦文のテンプレートを編集できます。[名前]、[スキル]、[経験]などのプレースホルダーを使用します。
+                  </p>
+                </div>
+                
+                <Button 
+                  onClick={generateRecommendation} 
+                  variant="outline" 
+                  className="w-full japanese-text"
+                >
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  AIで推薦文を生成
+                </Button>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="generated-recommendation" className="japanese-text">生成された推薦文</Label>
+                  <Textarea 
+                    id="generated-recommendation"
+                    className="min-h-[150px] japanese-text" 
+                    value={recommendationText}
+                    onChange={(e) => setRecommendationText(e.target.value)}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
