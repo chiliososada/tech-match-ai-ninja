@@ -142,8 +142,12 @@ function useToast() {
   return context
 }
 
+const dispatch = (action: Action) => {
+  // This will be set by the ToastProvider
+}
+
 const ToastProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = React.useReducer(reducer, {
+  const [state, innerDispatch] = React.useReducer(reducer, {
     toasts: [],
   })
 
@@ -155,18 +159,23 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
+  // Override the dispatch function to use the one from the reducer
+  React.useEffect(() => {
+    dispatch = innerDispatch
+  }, [innerDispatch])
+
   const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
     const id = genId()
 
     const update = (props: Omit<ToasterToast, "id">) =>
-      dispatch({
+      innerDispatch({
         type: actionTypes.UPDATE_TOAST,
         toast: { ...props, id },
       })
 
-    const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
+    const dismiss = () => innerDispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
 
-    dispatch({
+    innerDispatch({
       type: actionTypes.ADD_TOAST,
       toast: {
         ...props,
@@ -186,7 +195,7 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const dismiss = React.useCallback((toastId?: string) => {
-    dispatch({ type: actionTypes.DISMISS_TOAST, toastId })
+    innerDispatch({ type: actionTypes.DISMISS_TOAST, toastId })
   }, [])
 
   return (
@@ -202,9 +211,7 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export { ToastProvider, useToast, type ToastContextType }
-
-// A simple export method for other parts of the application to use
+// Export the toast function for use outside the provider
 const toast = (props: Omit<ToasterToast, "id">) => {
   // Protect calls when used directly without being in a provider
   try {
@@ -221,4 +228,4 @@ const toast = (props: Omit<ToasterToast, "id">) => {
   }
 }
 
-export { toast }
+export { ToastProvider, useToast, toast, type ToastContextType }
