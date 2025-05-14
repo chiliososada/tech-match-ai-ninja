@@ -5,7 +5,7 @@ import { type ToastProps } from "@/components/ui/toast"
 export const TOAST_LIMIT = 5
 export const TOAST_REMOVE_DELAY = 5000
 
-// 导出 ToastActionElement 类型
+// Export ToastActionElement type
 export type ToastActionElement = React.ReactElement
 
 export type ToasterToast = ToastProps & {

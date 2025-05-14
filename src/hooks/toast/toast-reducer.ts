@@ -4,16 +4,27 @@ import { ToasterToast, Action, actionTypes } from "./toast-types"
 // A map of toast ids to their timeout ids
 export const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-export function reducer(state: ToasterToast[], action: Action): ToasterToast[] {
+// Update the reducer to handle state as an object with toasts array
+export function reducer(state: { toasts: ToasterToast[] }, action: Action): { toasts: ToasterToast[] } {
   switch (action.type) {
     case actionTypes.ADD_TOAST:
-      return [...state, action.toast]
+      return { toasts: [...state.toasts, action.toast] }
     case actionTypes.UPDATE_TOAST:
-      return state.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t))
+      return { 
+        toasts: state.toasts.map((t) => 
+          (t.id === action.toast.id ? { ...t, ...action.toast } : t)
+        ) 
+      }
     case actionTypes.DISMISS_TOAST:
-      return state.map((t) => (t.id === action.toastId ? { ...t, open: false } : t))
+      return { 
+        toasts: state.toasts.map((t) => 
+          (t.id === action.toastId ? { ...t, open: false } : t)
+        ) 
+      }
     case actionTypes.REMOVE_TOAST:
-      return state.filter((t) => t.id !== action.toastId)
+      return { 
+        toasts: state.toasts.filter((t) => t.id !== action.toastId) 
+      }
     default:
       return state
   }

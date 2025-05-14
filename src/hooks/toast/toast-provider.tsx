@@ -23,9 +23,10 @@ export function ToastProvider({
 }: {
   children: React.ReactNode
 }) {
+  // Fix the useReducer call to correctly type the state
   const [state, dispatch] = React.useReducer(
     reducer,
-    { toasts: [] }
+    { toasts: [] } as { toasts: ToasterToast[] }
   )
 
   const innerDispatch = React.useCallback((action: Action) => {
@@ -37,6 +38,7 @@ export function ToastProvider({
   }, [innerDispatch])
 
   const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
+    // Generate ID here since it's not in the props
     const id = genId()
 
     const update = (props: Omit<Partial<ToasterToast>, "id">) => {

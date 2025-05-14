@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatsCard } from '@/components/dashboard/StatsCard';
@@ -235,32 +234,36 @@ export function Dashboard() {
               <CardDescription className="japanese-text">候補者の主要スキル分布</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
+              {/* Fix the ChartContainer to wrap the content in a single React element */}
               <ChartContainer className="h-80" config={{
                 skills: { label: "技術スキル" }
               }}>
-                <ReChartPieChart>
-                  <Pie
-                    data={skillsData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {skillsData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </ReChartPieChart>
-                <ChartLegend>
-                  <ChartLegendContent payload={skillsData.map((item, index) => ({ 
-                    value: item.name, 
-                    color: COLORS[index % COLORS.length] 
-                  }))} />
-                </ChartLegend>
+                {/* Wrap multiple elements in a fragment to satisfy the type requirement */}
+                <>
+                  <ReChartPieChart>
+                    <Pie
+                      data={skillsData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {skillsData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </ReChartPieChart>
+                  <ChartLegend>
+                    <ChartLegendContent payload={skillsData.map((item, index) => ({ 
+                      value: item.name, 
+                      color: COLORS[index % COLORS.length] 
+                    }))} />
+                  </ChartLegend>
+                </>
               </ChartContainer>
             </CardContent>
           </Card>
