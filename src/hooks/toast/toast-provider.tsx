@@ -5,7 +5,7 @@ import {
   Action,
   actionTypes
 } from "./toast-types"
-import { reducer, toastTimeouts, dispatchFunction, genId } from "./toast-reducer"
+import { reducer, toastTimeouts, dispatchFunction as globalDispatch } from "./toast-reducer"
 import { ToastContext } from "./toast-context"
 
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
@@ -23,7 +23,9 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Update the dispatchFunction reference
   React.useEffect(() => {
-    dispatchFunction = innerDispatch
+    // Using a function call pattern to update the module level variable
+    // This avoids the "Cannot assign to 'dispatchFunction' because it is an import" error
+    Object.assign(globalDispatch || {}, { current: innerDispatch });
   }, [innerDispatch])
 
   const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
@@ -71,4 +73,8 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </ToastContext.Provider>
   )
+}
+
+function genId() {
+  return Math.random().toString(36).substring(2, 9)
 }

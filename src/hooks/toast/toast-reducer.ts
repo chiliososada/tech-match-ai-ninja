@@ -13,7 +13,7 @@ export function genId() {
 }
 
 // Mutable dispatch function reference
-export let dispatchFunction: React.Dispatch<Action> | undefined = undefined
+export const dispatchFunction: { current?: React.Dispatch<Action> } = {}
 
 export function addToRemoveQueue(toastId: string) {
   if (toastTimeouts.has(toastId)) {
@@ -22,8 +22,8 @@ export function addToRemoveQueue(toastId: string) {
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId)
-    if (dispatchFunction) {
-      dispatchFunction({
+    if (dispatchFunction.current) {
+      dispatchFunction.current({
         type: actionTypes.REMOVE_TOAST,
         toastId: toastId,
       })
