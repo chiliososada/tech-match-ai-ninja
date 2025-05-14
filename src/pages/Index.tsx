@@ -1,8 +1,13 @@
 
-import { Dashboard } from './Dashboard';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Cases } from './Cases';
 
 const Index = () => {
-  return <Dashboard />;
+  return (
+    <MainLayout>
+      <Cases />
+    </MainLayout>
+  );
 };
 
 export default Index;
