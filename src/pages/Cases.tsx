@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
 import { StructuredCaseForm } from '@/components/cases/StructuredCaseForm';
 import { EmailSender } from '@/components/cases/EmailSender';
@@ -309,377 +310,152 @@ export function Cases() {
   const emailStats = getEmailStats();
 
   return (
-    <div className="flex-1 space-y-8 p-8 pt-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight japanese-text">案件管理</h2>
-      </div>
+    <MainLayout>
+      <div className="flex-1 space-y-8 p-8 pt-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight japanese-text">案件管理</h2>
+        </div>
 
-      <Tabs defaultValue="list" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="list" className="japanese-text">案件一覧</TabsTrigger>
-          <TabsTrigger value="upload" className="japanese-text">案件アップロード</TabsTrigger>
-          <TabsTrigger value="stats" className="japanese-text">メール案件統計</TabsTrigger>
-          <TabsTrigger value="send" className="japanese-text">一括送信</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="list" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="japanese-text">案件一覧</CardTitle>
-              <CardDescription className="japanese-text">
-                登録済みの案件一覧と詳細を表示します
-              </CardDescription>
-              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                    <Input
-                      placeholder="案件名または会社名で検索"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="japanese-text pl-9"
-                    />
-                  </div>
-                </div>
-                <div className="w-full sm:w-40">
-                  <Select value={filter} onValueChange={setFilter}>
-                    <SelectTrigger className="japanese-text">
-                      <SelectValue placeholder="ソース" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all" className="japanese-text">すべて</SelectItem>
-                      <SelectItem value="mail" className="japanese-text">メール</SelectItem>
-                      <SelectItem value="manual" className="japanese-text">手動入力</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder="技術キーワードで検索（例：Java, React）"
-                    value={techKeyword}
-                    onChange={(e) => setTechKeyword(e.target.value)}
-                    className="japanese-text"
-                  />
-                </div>
-                <div className="w-full sm:w-40">
-                  <div className="relative">
-                    <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                    <Input
-                      type="date"
-                      value={dateRange}
-                      onChange={(e) => setDateRange(e.target.value)}
-                      className="japanese-text pl-9"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="japanese-text">ソース</TableHead>
-                      <TableHead className="japanese-text">案件名</TableHead>
-                      <TableHead className="japanese-text">スキル</TableHead>
-                      <TableHead className="japanese-text">勤務地</TableHead>
-                      <TableHead className="japanese-text">単価</TableHead>
-                      <TableHead className="japanese-text">会社</TableHead>
-                      <TableHead className="japanese-text">作成日</TableHead>
-                      <TableHead className="japanese-text">ステータス</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedCases.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <div className="flex items-center">
-                            {getSourceIcon(item.source)}
-                            <span className="text-xs japanese-text">
-                              {item.source === "mail" ? "メール" : "手動"}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium japanese-text">{item.title}</TableCell>
-                        <TableCell className="japanese-text text-sm">
-                          {item.skills.join(", ")}
-                        </TableCell>
-                        <TableCell className="japanese-text text-sm">{item.location}</TableCell>
-                        <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
-                        <TableCell className="japanese-text text-sm">
-                          {item.company || "-"}
-                        </TableCell>
-                        <TableCell className="japanese-text text-sm">{item.createdAt}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadgeColor(item.status)}>
-                            <span className="japanese-text">{item.status}</span>
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            
-              {/* Add pagination for cases list */}
-              <div className="mt-4 flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setCasesCurrentPage(prev => Math.max(prev - 1, 1))}
-                        className={casesCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: totalCasesPages }).map((_, index) => {
-                      const pageNumber = index + 1;
-                      if (
-                        pageNumber === 1 || 
-                        pageNumber === totalCasesPages || 
-                        (pageNumber >= casesCurrentPage - 1 && pageNumber <= casesCurrentPage + 1)
-                      ) {
-                        return (
-                          <PaginationItem key={pageNumber}>
-                            <PaginationLink 
-                              isActive={casesCurrentPage === pageNumber}
-                              onClick={() => setCasesCurrentPage(pageNumber)}
-                            >
-                              {pageNumber}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      } else if (
-                        pageNumber === casesCurrentPage - 2 || 
-                        pageNumber === casesCurrentPage + 2
-                      ) {
-                        return (
-                          <PaginationItem key={pageNumber}>
-                            <PaginationEllipsis />
-                          </PaginationItem>
-                        );
-                      }
-                      return null;
-                    })}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setCasesCurrentPage(prev => Math.min(prev + 1, totalCasesPages))}
-                        className={casesCurrentPage === totalCasesPages ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="upload" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="japanese-text">新規案件の追加</CardTitle>
-              <CardDescription className="japanese-text">
-                案件情報をアップロードまたは手動で入力して、システムに追加します
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CaseUploadForm />
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="list" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="list" className="japanese-text">案件一覧</TabsTrigger>
+            <TabsTrigger value="upload" className="japanese-text">案件アップロード</TabsTrigger>
+            <TabsTrigger value="stats" className="japanese-text">メール案件統計</TabsTrigger>
+            <TabsTrigger value="send" className="japanese-text">一括送信</TabsTrigger>
+          </TabsList>
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="japanese-text">案件情報の構造化</CardTitle>
-              <CardDescription className="japanese-text">
-                AIにより案件情報が自動的に構造化されます
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <StructuredCaseForm />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="stats" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="japanese-text">メール案件の統計情報</CardTitle>
-              <CardDescription className="japanese-text">
-                メールから取得された案件情報の分析と統計データ
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
-                  <CardHeader className="py-4">
-                    <CardTitle className="text-sm font-medium japanese-text">
-                      <div className="flex items-center">
-                        <Mail className="h-4 w-4 mr-2 text-blue-600" />
-                        メール案件総数
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{emailStats.total}</div>
-                    <p className="text-xs text-muted-foreground mt-2 japanese-text">
-                      全案件の {Math.round((emailStats.total / caseData.length) * 100)}%
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="py-4">
-                    <CardTitle className="text-sm font-medium japanese-text">
-                      <div className="flex items-center">
-                        <BarChart2 className="h-4 w-4 mr-2 text-indigo-600" />
-                        会社別案件数
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="h-[150px] overflow-auto">
-                    <div className="mb-2">
-                      <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                        <SelectTrigger className="japanese-text text-sm">
-                          <SelectValue placeholder="会社でフィルター" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-                          {companyList.map((company) => (
-                            <SelectItem key={company as string} value={company as string} className="japanese-text">
-                              {company as string}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <ul className="space-y-2">
-                      {Object.entries(emailStats.companies).map(([company, count]) => (
-                        <li key={company} className="flex justify-between items-center">
-                          <span className="text-sm truncate japanese-text">{company}</span>
-                          <Badge variant="outline">{count}</Badge>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="py-4">
-                    <CardTitle className="text-sm font-medium japanese-text">
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2 text-amber-600" />
-                        日付別案件数
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="h-[150px] overflow-auto">
-                    <ul className="space-y-2">
-                      {Object.entries(emailStats.dates).map(([date, count]) => (
-                        <li key={date} className="flex justify-between items-center">
-                          <span className="text-sm japanese-text">{date}</span>
-                          <Badge variant="outline">{count}</Badge>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-4 japanese-text">メール送信者分析</h3>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+          <TabsContent value="list" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">案件一覧</CardTitle>
+                <CardDescription className="japanese-text">
+                  登録済みの案件一覧と詳細を表示します
+                </CardDescription>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
                   <div className="flex-1">
-                    <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                    <div className="relative">
+                      <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                      <Input
+                        placeholder="案件名または会社名で検索"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="japanese-text pl-9"
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full sm:w-40">
+                    <Select value={filter} onValueChange={setFilter}>
                       <SelectTrigger className="japanese-text">
-                        <SelectValue placeholder="会社でフィルター" />
+                        <SelectValue placeholder="ソース" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-                        {companyList.map((company) => (
-                          <SelectItem key={company as string} value={company as string} className="japanese-text">
-                            {company as string}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="all" className="japanese-text">すべて</SelectItem>
+                        <SelectItem value="mail" className="japanese-text">メール</SelectItem>
+                        <SelectItem value="manual" className="japanese-text">手動入力</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="w-full sm:w-40">
+                </div>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
+                  <div className="flex-1">
                     <Input
-                      placeholder="技術キーワード"
+                      placeholder="技術キーワードで検索（例：Java, React）"
                       value={techKeyword}
                       onChange={(e) => setTechKeyword(e.target.value)}
                       className="japanese-text"
                     />
                   </div>
+                  <div className="w-full sm:w-40">
+                    <div className="relative">
+                      <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                      <Input
+                        type="date"
+                        value={dateRange}
+                        onChange={(e) => setDateRange(e.target.value)}
+                        className="japanese-text pl-9"
+                      />
+                    </div>
+                  </div>
                 </div>
-                
+              </CardHeader>
+              <CardContent>
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="japanese-text">送信者</TableHead>
-                        <TableHead className="japanese-text">担当者名</TableHead>
+                        <TableHead className="japanese-text">ソース</TableHead>
+                        <TableHead className="japanese-text">案件名</TableHead>
+                        <TableHead className="japanese-text">スキル</TableHead>
+                        <TableHead className="japanese-text">勤務地</TableHead>
+                        <TableHead className="japanese-text">単価</TableHead>
                         <TableHead className="japanese-text">会社</TableHead>
-                        <TableHead className="japanese-text">技術キーワード</TableHead>
-                        <TableHead className="japanese-text">受信日時</TableHead>
-                        <TableHead className="japanese-text text-right">案件数</TableHead>
+                        <TableHead className="japanese-text">作成日</TableHead>
+                        <TableHead className="japanese-text">ステータス</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {paginatedMailCases.map((item) => {
-                        const senderCount = mailCases.filter(c => c.sender === item.sender).length;
-                        
-                        return (
-                          <TableRow key={item.id}>
-                            <TableCell className="font-medium">{item.sender}</TableCell>
-                            <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
-                            <TableCell className="japanese-text">{item.company || "-"}</TableCell>
-                            <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
-                            <TableCell className="japanese-text">
-                              {item.receivedDate ? new Date(item.receivedDate).toLocaleString() : "-"}
-                            </TableCell>
-                            <TableCell className="text-right">{senderCount}</TableCell>
-                          </TableRow>
-                        );
-                      })}
+                      {paginatedCases.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>
+                            <div className="flex items-center">
+                              {getSourceIcon(item.source)}
+                              <span className="text-xs japanese-text">
+                                {item.source === "mail" ? "メール" : "手動"}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium japanese-text">{item.title}</TableCell>
+                          <TableCell className="japanese-text text-sm">
+                            {item.skills.join(", ")}
+                          </TableCell>
+                          <TableCell className="japanese-text text-sm">{item.location}</TableCell>
+                          <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
+                          <TableCell className="japanese-text text-sm">
+                            {item.company || "-"}
+                          </TableCell>
+                          <TableCell className="japanese-text text-sm">{item.createdAt}</TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadgeColor(item.status)}>
+                              <span className="japanese-text">{item.status}</span>
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
-                
+              
+                {/* Add pagination for cases list */}
                 <div className="mt-4 flex justify-center">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
                         <PaginationPrevious 
-                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          onClick={() => setCasesCurrentPage(prev => Math.max(prev - 1, 1))}
+                          className={casesCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
                         />
                       </PaginationItem>
                       
-                      {Array.from({ length: totalPages }).map((_, index) => {
+                      {Array.from({ length: totalCasesPages }).map((_, index) => {
                         const pageNumber = index + 1;
-                        // Show first page, current page, and last page, with ellipsis in between
                         if (
                           pageNumber === 1 || 
-                          pageNumber === totalPages || 
-                          (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          pageNumber === totalCasesPages || 
+                          (pageNumber >= casesCurrentPage - 1 && pageNumber <= casesCurrentPage + 1)
                         ) {
                           return (
                             <PaginationItem key={pageNumber}>
                               <PaginationLink 
-                                isActive={currentPage === pageNumber}
-                                onClick={() => setCurrentPage(pageNumber)}
+                                isActive={casesCurrentPage === pageNumber}
+                                onClick={() => setCasesCurrentPage(pageNumber)}
                               >
                                 {pageNumber}
                               </PaginationLink>
                             </PaginationItem>
                           );
                         } else if (
-                          pageNumber === currentPage - 2 || 
-                          pageNumber === currentPage + 2
+                          pageNumber === casesCurrentPage - 2 || 
+                          pageNumber === casesCurrentPage + 2
                         ) {
                           return (
                             <PaginationItem key={pageNumber}>
@@ -692,59 +468,286 @@ export function Cases() {
                       
                       <PaginationItem>
                         <PaginationNext 
-                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                          onClick={() => setCasesCurrentPage(prev => Math.min(prev + 1, totalCasesPages))}
+                          className={casesCurrentPage === totalCasesPages ? "pointer-events-none opacity-50" : ""}
                         />
                       </PaginationItem>
                     </PaginationContent>
                   </Pagination>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="japanese-text">メール取得の最適化</CardTitle>
-              <CardDescription className="japanese-text">
-                メール案件の取得精度と効率を向上させるための設定
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2 japanese-text">優先キーワード設定</h4>
-                  <Input 
-                    placeholder="Java, エンジニア, 募集, 案件など（カンマ区切り）" 
-                    className="japanese-text"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1 japanese-text">
-                    これらのキーワードを含むメールを優先的に処理します
-                  </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="upload" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">新規案件の追加</CardTitle>
+                <CardDescription className="japanese-text">
+                  案件情報をアップロードまたは手動で入力して、システムに追加します
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CaseUploadForm />
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">案件情報の構造化</CardTitle>
+                <CardDescription className="japanese-text">
+                  AIにより案件情報が自動的に構造化されます
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StructuredCaseForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="stats" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">メール案件の統計情報</CardTitle>
+                <CardDescription className="japanese-text">
+                  メールから取得された案件情報の分析と統計データ
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <Card>
+                    <CardHeader className="py-4">
+                      <CardTitle className="text-sm font-medium japanese-text">
+                        <div className="flex items-center">
+                          <Mail className="h-4 w-4 mr-2 text-blue-600" />
+                          メール案件総数
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{emailStats.total}</div>
+                      <p className="text-xs text-muted-foreground mt-2 japanese-text">
+                        全案件の {Math.round((emailStats.total / caseData.length) * 100)}%
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="py-4">
+                      <CardTitle className="text-sm font-medium japanese-text">
+                        <div className="flex items-center">
+                          <BarChart2 className="h-4 w-4 mr-2 text-indigo-600" />
+                          会社別案件数
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="h-[150px] overflow-auto">
+                      <div className="mb-2">
+                        <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                          <SelectTrigger className="japanese-text text-sm">
+                            <SelectValue placeholder="会社でフィルター" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
+                            {companyList.map((company) => (
+                              <SelectItem key={company as string} value={company as string} className="japanese-text">
+                                {company as string}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <ul className="space-y-2">
+                        {Object.entries(emailStats.companies).map(([company, count]) => (
+                          <li key={company} className="flex justify-between items-center">
+                            <span className="text-sm truncate japanese-text">{company}</span>
+                            <Badge variant="outline">{count}</Badge>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="py-4">
+                      <CardTitle className="text-sm font-medium japanese-text">
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-amber-600" />
+                          日付別案件数
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="h-[150px] overflow-auto">
+                      <ul className="space-y-2">
+                        {Object.entries(emailStats.dates).map(([date, count]) => (
+                          <li key={date} className="flex justify-between items-center">
+                            <span className="text-sm japanese-text">{date}</span>
+                            <Badge variant="outline">{count}</Badge>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
                 </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2 japanese-text">優先送信者設定</h4>
-                  <Input 
-                    placeholder="tanaka@example.com, @techcompany.co.jp" 
-                    className="japanese-text"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1 japanese-text">
-                    特定の送信者やドメインからのメールを優先的に処理します
-                  </p>
-                </div>
-                
-                <Button className="mt-2 japanese-text">設定を保存</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="send" className="space-y-6">
-          <EmailSender mailCases={mailCases} />
-        </TabsContent>
-      </Tabs>
-    </div>
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium mb-4 japanese-text">メール送信者分析</h3>
+                  <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+                    <div className="flex-1">
+                      <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                        <SelectTrigger className="japanese-text">
+                          <SelectValue placeholder="会社でフィルター" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
+                          {companyList.map((company) => (
+                            <SelectItem key={company as string} value={company as string} className="japanese-text">
+                              {company as string}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="w-full sm:w-40">
+                      <Input
+                        placeholder="技術キーワード"
+                        value={techKeyword}
+                        onChange={(e) => setTechKeyword(e.target.value)}
+                        className="japanese-text"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="japanese-text">送信者</TableHead>
+                          <TableHead className="japanese-text">担当者名</TableHead>
+                          <TableHead className="japanese-text">会社</TableHead>
+                          <TableHead className="japanese-text">技術キーワード</TableHead>
+                          <TableHead className="japanese-text">受信日時</TableHead>
+                          <TableHead className="japanese-text text-right">案件数</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedMailCases.map((item) => {
+                          const senderCount = mailCases.filter(c => c.sender === item.sender).length;
+                          
+                          return (
+                            <TableRow key={item.id}>
+                              <TableCell className="font-medium">{item.sender}</TableCell>
+                              <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
+                              <TableCell className="japanese-text">{item.company || "-"}</TableCell>
+                              <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
+                              <TableCell className="japanese-text">
+                                {item.receivedDate ? new Date(item.receivedDate).toLocaleString() : "-"}
+                              </TableCell>
+                              <TableCell className="text-right">{senderCount}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }).map((_, index) => {
+                          const pageNumber = index + 1;
+                          // Show first page, current page, and last page, with ellipsis in between
+                          if (
+                            pageNumber === 1 || 
+                            pageNumber === totalPages || 
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink 
+                                  isActive={currentPage === pageNumber}
+                                  onClick={() => setCurrentPage(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 || 
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationEllipsis />
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">メール取得の最適化</CardTitle>
+                <CardDescription className="japanese-text">
+                  メール案件の取得精度と効率を向上させるための設定
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2 japanese-text">優先キーワード設定</h4>
+                    <Input 
+                      placeholder="Java, エンジニア, 募集, 案件など（カンマ区切り）" 
+                      className="japanese-text"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1 japanese-text">
+                      これらのキーワードを含むメールを優先的に処理します
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium mb-2 japanese-text">優先送信者設定</h4>
+                    <Input 
+                      placeholder="tanaka@example.com, @techcompany.co.jp" 
+                      className="japanese-text"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1 japanese-text">
+                      特定の送信者やドメインからのメールを優先的に処理します
+                    </p>
+                  </div>
+                  
+                  <Button className="mt-2 japanese-text">設定を保存</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="send" className="space-y-6">
+            <EmailSender mailCases={mailCases} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </MainLayout>
   );
 }
 
