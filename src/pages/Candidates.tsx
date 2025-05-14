@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileDown, Edit, Trash2, Wand2 } from 'lucide-react';
+import { FileDown, Edit, Trash2, Wand2, Save } from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -123,14 +123,14 @@ export function Candidates() {
     setTimeout(() => {
       // テンプレートに基づいて推薦文を生成（実際はAI APIを呼び出す）
       const newText = recommendationTemplate
-        .replace('[名前]', '鈴木さん')
-        .replace('[スキル]', 'JavaとSpring Boot')
-        .replace('[経験]', '7')
-        .replace('[日本語レベル]', 'ビジネスレベル')
+        .replace('[名前]', `${newEngineer.name || '候補者'}さん`)
+        .replace('[スキル]', newEngineer.skills || 'プログラミング言語')
+        .replace('[経験]', newEngineer.experience || '5')
+        .replace('[日本語レベル]', newEngineer.japaneseLevel)
         .replace('[得意分野]', '金融系のプロジェクト')
-        .replace('[ツール]', 'AWSやDocker')
-        .replace('[勤務地]', '東京またはリモートワーク')
-        .replace('[単価]', '60万円〜80万円');
+        .replace('[ツール]', 'クラウドサービス')
+        .replace('[勤務地]', newEngineer.desiredConditions.split(',')[0] || '東京/リモート')
+        .replace('[単価]', newEngineer.desiredConditions.split(',')[1] || '60~80万円');
         
       setRecommendationText(newText);
       toast.success('推薦文が生成されました');
@@ -146,7 +146,7 @@ export function Candidates() {
       return;
     }
     
-    toast.success('技術者が追加されました', {
+    toast.success('技術者と推薦文が登録されました', {
       description: `${newEngineer.name}さんのプロフィールが登録されました`
     });
     
@@ -160,6 +160,7 @@ export function Candidates() {
       status: '案件探し中',
       desiredConditions: ''
     });
+    setRecommendationText("");
   };
   
   // 技術者の削除（シミュレーション）
@@ -300,10 +301,6 @@ export function Candidates() {
                       className="japanese-text"
                     />
                   </div>
-                  
-                  <div className="flex justify-end">
-                    <Button type="submit" className="japanese-text">登録する</Button>
-                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -349,6 +346,12 @@ export function Candidates() {
                   />
                 </div>
               </CardContent>
+              <CardFooter className="flex justify-end">
+                <Button onClick={handleAddEngineer} type="submit" className="japanese-text">
+                  <Save className="mr-2 h-4 w-4" />
+                  技術者と推薦文を登録
+                </Button>
+              </CardFooter>
             </Card>
           </TabsContent>
           
