@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { FileUp, Save } from 'lucide-react';
+import { FileUp, Save, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 export function ResumeUpload() {
   const [isUploading, setIsUploading] = useState(false);
   
-  // 构造化データ的可编辑表单数据
+  // 技術者情報抽出の編集可能なフォームデータ
   const [candidateData, setCandidateData] = useState({
     name: '鈴木太郎',
     japaneseLevel: 'ビジネスレベル',
@@ -27,6 +28,17 @@ export function ResumeUpload() {
     rate: '60万円〜80万円'
   });
 
+  // 推薦文生成関連
+  const [recommendationTemplate, setRecommendationTemplate] = useState(
+    `[名前]は[スキル]を中心に[経験]年の開発経験があり、日本語は[日本語レベル]です。
+[得意分野]に強みがあり、[ツール]などの技術も習得しています。
+チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。
+希望条件は[勤務地]で、単価は[単価]です。`
+  );
+  const [recommendationText, setRecommendationText] = useState(
+    "鈴木さんはJavaとSpring Bootを中心に7年以上の開発経験があり、日本語はビジネスレベルです。金融系のプロジェクトに強みがあり、AWSやDockerなどのクラウド技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。直近では大手金融機関のオンラインバンキングシステム開発に5年間携わっており、セキュリティに関する知識も豊富です。希望条件は東京またはリモートワークで、単価は60万円〜80万円です。"
+  );
+  
   // 处理表单变更
   const handleFormChange = (field: string, value: string) => {
     setCandidateData(prev => ({ ...prev, [field]: value }));
@@ -41,9 +53,30 @@ export function ResumeUpload() {
     });
   };
 
+  // 生成推薦文
+  const generateRecommendation = () => {
+    toast.success('推薦文を生成中...', { duration: 2000 });
+    
+    setTimeout(() => {
+      // テンプレートに基づいて推薦文を生成
+      const newText = recommendationTemplate
+        .replace('[名前]', `${candidateData.name}さん`)
+        .replace('[スキル]', candidateData.skills.map(s => s.name).join('と'))
+        .replace('[経験]', candidateData.skills[0]?.years || '5')
+        .replace('[日本語レベル]', candidateData.japaneseLevel)
+        .replace('[得意分野]', '金融系のプロジェクト')
+        .replace('[ツール]', candidateData.skills.slice(2).map(s => s.name).join('や'))
+        .replace('[勤務地]', candidateData.location)
+        .replace('[単価]', candidateData.rate);
+        
+      setRecommendationText(newText);
+      toast.success('推薦文が生成されました');
+    }, 2000);
+  };
+
   // 保存候选人数据
   const handleSaveCandidate = () => {
-    toast.success('候補者情報が保存されました', {
+    toast.success('候補者情報と推薦文が保存されました', {
       description: `${candidateData.name}さんのプロフィールが登録されました`
     });
   };
@@ -118,7 +151,7 @@ export function ResumeUpload() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="japanese-text">構造化データ</CardTitle>
+          <CardTitle className="japanese-text">技術者情報抽出</CardTitle>
           <CardDescription className="japanese-text">
             AIにより抽出された候補者情報を編集できます
           </CardDescription>
@@ -209,10 +242,53 @@ export function ResumeUpload() {
             </div>
           </div>
         </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="japanese-text">推薦文生成</CardTitle>
+          <CardDescription className="japanese-text">
+            候補者の自動生成された推薦文
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="recommendation-template" className="japanese-text">テンプレート</Label>
+            <Textarea 
+              id="recommendation-template" 
+              className="min-h-[150px] japanese-text"
+              value={recommendationTemplate}
+              onChange={(e) => setRecommendationTemplate(e.target.value)}
+              placeholder="[名前]、[スキル]、[経験]などのプレースホルダーを使用してください"
+            />
+            <p className="text-xs text-muted-foreground japanese-text">
+              推薦文のテンプレートを編集できます。[名前]、[スキル]、[経験]などのプレースホルダーを使用します。
+            </p>
+          </div>
+          
+          <Button 
+            onClick={generateRecommendation} 
+            variant="outline" 
+            className="w-full japanese-text"
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            AIで推薦文を生成
+          </Button>
+          
+          <div className="space-y-2">
+            <Label htmlFor="generated-recommendation" className="japanese-text">生成された推薦文</Label>
+            <Textarea 
+              id="generated-recommendation"
+              className="min-h-[150px] japanese-text" 
+              value={recommendationText}
+              onChange={(e) => setRecommendationText(e.target.value)}
+            />
+          </div>
+        </CardContent>
         <CardFooter className="flex justify-end">
           <Button onClick={handleSaveCandidate} className="japanese-text">
             <Save className="mr-2 h-4 w-4" />
-            候補者を保存
+            候補者と推薦文を保存
           </Button>
         </CardFooter>
       </Card>
