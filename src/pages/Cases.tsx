@@ -14,11 +14,12 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Mail, FileText, BarChart2, Clock, Calendar, Search } from 'lucide-react';
+import { Mail, FileText, BarChart2, Clock, Calendar, Search, Filter } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { toast } from "@/hooks/use-toast";
 
 // サンプルデータ（作成日を追加）
 const caseData = [
@@ -349,6 +350,10 @@ export function Cases() {
   const resetDateFilters = () => {
     setEmailDateFrom("");
     setEmailDateTo("");
+    toast({
+      title: "フィルターをリセットしました",
+      description: "日付フィルターがクリアされました",
+    });
   };
 
   return (
@@ -660,6 +665,43 @@ export function Cases() {
                     </div>
                   </div>
                   
+                  <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <div className="relative flex-1">
+                          <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                          <Input
+                            type="date"
+                            placeholder="開始日"
+                            value={emailDateFrom}
+                            onChange={(e) => setEmailDateFrom(e.target.value)}
+                            className="pl-9"
+                          />
+                        </div>
+                        <span className="text-center">〜</span>
+                        <div className="relative flex-1">
+                          <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                          <Input
+                            type="date"
+                            placeholder="終了日"
+                            value={emailDateTo}
+                            onChange={(e) => setEmailDateTo(e.target.value)}
+                            className="pl-9"
+                          />
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={resetDateFilters}
+                          className="japanese-text"
+                        >
+                          <Filter className="h-4 w-4 mr-1" />
+                          リセット
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="rounded-md border">
                     <Table>
                       <TableHeader>
@@ -689,6 +731,13 @@ export function Cases() {
                             </TableRow>
                           );
                         })}
+                        {filteredMailCases.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-4 japanese-text">
+                              該当する案件がありません
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </div>
