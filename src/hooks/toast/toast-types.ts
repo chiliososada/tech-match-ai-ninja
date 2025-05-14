@@ -5,6 +5,7 @@ import { type ToastProps } from "@/components/ui/toast"
 export const TOAST_LIMIT = 5
 export const TOAST_REMOVE_DELAY = 5000
 
+// 导出 ToastActionElement 类型
 export type ToastActionElement = React.ReactElement
 
 export type ToasterToast = ToastProps & {
@@ -14,33 +15,31 @@ export type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
+export type State = {
+  toasts: ToasterToast[]
+}
+
 export const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
   DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST",
+  REMOVE_TOAST: "REMOVE_TOAST"
 } as const
-
-export type ActionType = typeof actionTypes
 
 export type Action =
   | {
-      type: ActionType["ADD_TOAST"]
+      type: typeof actionTypes.ADD_TOAST
       toast: ToasterToast
     }
   | {
-      type: ActionType["UPDATE_TOAST"]
-      toast: Partial<ToasterToast>
+      type: typeof actionTypes.UPDATE_TOAST
+      toast: Partial<ToasterToast> & { id: string }
     }
   | {
-      type: ActionType["DISMISS_TOAST"]
+      type: typeof actionTypes.DISMISS_TOAST
       toastId?: string
     }
   | {
-      type: ActionType["REMOVE_TOAST"]
+      type: typeof actionTypes.REMOVE_TOAST
       toastId?: string
     }
-
-export interface State {
-  toasts: ToasterToast[]
-}

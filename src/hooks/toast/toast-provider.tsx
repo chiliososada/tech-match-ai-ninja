@@ -5,26 +5,35 @@ import {
   Action,
   actionTypes
 } from "./toast-types"
-import { reducer, toastTimeouts, dispatchFunction as globalDispatch, genId } from "./toast-reducer"
 import { ToastContext } from "./toast-context"
+import { reducer } from "./toast-reducer"
 
-export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, innerDispatch] = React.useReducer(reducer, [])
+// 生成唯一ID的辅助函数
+const genId = () => {
+  return Math.random().toString(36).slice(2, 9)
+}
 
+// 创建一个可变的dispatch引用对象
+export const dispatchFunction = {
+  current: (_action: Action) => {},
+}
+
+export function ToastProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [state, dispatch] = React.useReducer(
+    reducer,
+    { toasts: [] }
+  )
+
+  const innerDispatch = React.useCallback((action: Action) => {
+    dispatch(action)
+  }, [dispatch])
+  
   React.useEffect(() => {
-    return () => {
-      toastTimeouts.forEach((timeout) => {
-        clearTimeout(timeout)
-      })
-      toastTimeouts.clear()
-    }
-  }, [])
-
-  // Update the dispatchFunction reference
-  React.useEffect(() => {
-    // Using a mutable object reference pattern to update the module level variable
-    // This avoids the "Cannot assign to 'dispatchFunction' because it is an import" error
-    Object.assign(globalDispatch, { current: innerDispatch });
+    dispatchFunction.current = innerDispatch
   }, [innerDispatch])
 
   const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
@@ -33,9 +42,11 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
     const update = (props: Omit<Partial<ToasterToast>, "id">) => {
       innerDispatch({
         type: actionTypes.UPDATE_TOAST,
-        toast: { ...props, id },
+        toast: {
+          ...props,
+          id,
+        },
       })
-      return id
     }
 
     const dismiss = () => {
@@ -43,7 +54,6 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
         type: actionTypes.DISMISS_TOAST,
         toastId: id,
       })
-      return id
     }
 
     innerDispatch({
@@ -51,9 +61,10 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
       toast: {
         ...props,
         id,
-        open: true,
         onOpenChange: (open) => {
-          if (!open) dismiss()
+          if (!open) {
+            dismiss()
+          }
         },
       },
     })
@@ -63,27 +74,18 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
       dismiss,
       update,
     }
-  }, [])
+  }, [innerDispatch])
 
   return (
     <ToastContext.Provider
       value={{
-        toasts: state,
+        toasts: state.toasts,
         toast,
         dismiss: (toastId?: string) => {
-          if (toastId) {
-            innerDispatch({
-              type: actionTypes.DISMISS_TOAST,
-              toastId,
-            })
-          } else {
-            state.forEach((toast) => {
-              innerDispatch({
-                type: actionTypes.DISMISS_TOAST,
-                toastId: toast.id,
-              })
-            })
-          }
+          innerDispatch({
+            type: actionTypes.DISMISS_TOAST,
+            toastId,
+          })
         },
       }}
     >

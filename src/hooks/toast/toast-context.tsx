@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { State, ToasterToast } from "./toast-types"
+import { ToasterToast } from "./toast-types"
 
 export interface ToastContextType {
   toasts: ToasterToast[]
@@ -12,12 +12,20 @@ export interface ToastContextType {
   dismiss: (toastId?: string) => void
 }
 
-export const ToastContext = React.createContext<ToastContextType | null>(null)
+export const ToastContext = React.createContext<ToastContextType>({
+  toasts: [],
+  toast: () => ({
+    id: "",
+    dismiss: () => {},
+    update: () => {},
+  }),
+  dismiss: () => {},
+})
 
-export function useToast() {
+export const useToast = () => {
   const context = React.useContext(ToastContext)
 
-  if (context === null) {
+  if (!context) {
     throw new Error("useToast must be used within a ToastProvider")
   }
 
