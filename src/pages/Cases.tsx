@@ -114,7 +114,7 @@ const caseData = [
   },
   {
     id: "7",
-    title: "データサイエンティスト",
+    title: "データサイエンスト",
     skills: ["Python", "R", "機械学習"],
     location: "東京",
     budget: "70~90万円",
@@ -237,6 +237,10 @@ export function Cases() {
   const itemsPerPage = 10;
   const [companyFilter, setCompanyFilter] = useState("all");
   
+  // 新しい日付範囲フィルター
+  const [emailDateFrom, setEmailDateFrom] = useState("");
+  const [emailDateTo, setEmailDateTo] = useState("");
+  
   // 会社のリストを取得
   const companyList = Array.from(new Set(caseData.filter(item => item.company).map(item => item.company)));
   
@@ -266,32 +270,64 @@ export function Cases() {
   );
   const totalCasesPages = Math.ceil(filteredCases.length / itemsPerPage);
 
+  // メール案件のフィルタリング（日付フィルターを追加）
+  const filteredMailCases = caseData.filter(item => {
+    if (item.source !== "mail") return false;
+    
+    // 会社フィルター
+    const matchesCompany = companyFilter === "all" || item.company === companyFilter;
+    
+    // 技術キーワードフィルター
+    const matchesTech = techKeyword === "" ||
+      (item.keyTechnologies && item.keyTechnologies.toLowerCase().includes(techKeyword.toLowerCase()));
+    
+    // 日付範囲フィルター
+    let matchesDateRange = true;
+    if (emailDateFrom || emailDateTo) {
+      if (item.receivedDate) {
+        const itemDate = new Date(item.receivedDate).toISOString().split('T')[0];
+        if (emailDateFrom && itemDate < emailDateFrom) {
+          matchesDateRange = false;
+        }
+        if (emailDateTo && itemDate > emailDateTo) {
+          matchesDateRange = false;
+        }
+      } else {
+        // 日付がない項目は日付フィルターを使用時に除外
+        if (emailDateFrom || emailDateTo) {
+          matchesDateRange = false;
+        }
+      }
+    }
+    
+    return matchesCompany && matchesTech && matchesDateRange;
+  });
+  
   // ページネーション用のメール案件取得
-  const mailCases = caseData.filter(item => item.source === "mail");
-  const paginatedMailCases = mailCases.slice(
+  const paginatedMailCases = filteredMailCases.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  const totalPages = Math.ceil(mailCases.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredMailCases.length / itemsPerPage);
   
   // メール案件の統計関数
   const getEmailStats = () => {
     // 会社ごとの案件数
-    const companyCounts = mailCases.reduce((acc, cur) => {
+    const companyCounts = filteredMailCases.reduce((acc, cur) => {
       const company = cur.company || "不明";
       acc[company] = (acc[company] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
     // 送信者ごとの案件数
-    const senderCounts = mailCases.reduce((acc, cur) => {
+    const senderCounts = filteredMailCases.reduce((acc, cur) => {
       const sender = cur.sender || "不明";
       acc[sender] = (acc[sender] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
     // 日付ごとの案件数
-    const dateCounts = mailCases.reduce((acc, cur) => {
+    const dateCounts = filteredMailCases.reduce((acc, cur) => {
       if (cur.receivedDate) {
         const date = new Date(cur.receivedDate).toLocaleDateString();
         acc[date] = (acc[date] || 0) + 1;
@@ -300,7 +336,7 @@ export function Cases() {
     }, {} as Record<string, number>);
     
     return {
-      total: mailCases.length,
+      total: filteredMailCases.length,
       companies: companyCounts,
       senders: senderCounts,
       dates: dateCounts
@@ -308,6 +344,12 @@ export function Cases() {
   };
 
   const emailStats = getEmailStats();
+  
+  // 日付フィルターをリセットする関数
+  const resetDateFilters = () => {
+    setEmailDateFrom("");
+    setEmailDateTo("");
+  };
 
   return (
     <MainLayout>
@@ -632,7 +674,7 @@ export function Cases() {
                       </TableHeader>
                       <TableBody>
                         {paginatedMailCases.map((item) => {
-                          const senderCount = mailCases.filter(c => c.sender === item.sender).length;
+                          const senderCount = filteredMailCases.filter(c => c.sender === item.sender).length;
                           
                           return (
                             <TableRow key={item.id}>
@@ -732,7 +774,7 @@ export function Cases() {
                       className="japanese-text"
                     />
                     <p className="text-xs text-muted-foreground mt-1 japanese-text">
-                      特定の送信者やドメインからのメールを優先的に処理します
+                      特定の送信者や���メインからのメールを優先的に処理します
                     </p>
                   </div>
                   
@@ -743,7 +785,7 @@ export function Cases() {
           </TabsContent>
 
           <TabsContent value="send" className="space-y-6">
-            <EmailSender mailCases={mailCases} />
+            <EmailSender mailCases={filteredMailCases} />
           </TabsContent>
         </Tabs>
       </div>
