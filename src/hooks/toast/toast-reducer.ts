@@ -1,18 +1,25 @@
 
-import { State, Action, actionTypes, TOAST_LIMIT, TOAST_REMOVE_DELAY } from "./toast-types"
+import { ToasterToast, Action, actionTypes } from "./toast-types"
 
-// Track active timeouts
+// A map of toast ids to their timeout ids
 export const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-// Counter for generating unique IDs
-let count = 0
-
-export function genId() {
-  count = (count + 1) % Number.MAX_VALUE
-  return count.toString()
+export function reducer(state: ToasterToast[], action: Action): ToasterToast[] {
+  switch (action.type) {
+    case actionTypes.ADD_TOAST:
+      return [...state, action.toast]
+    case actionTypes.UPDATE_TOAST:
+      return state.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t))
+    case actionTypes.DISMISS_TOAST:
+      return state.map((t) => (t.id === action.toastId ? { ...t, open: false } : t))
+    case actionTypes.REMOVE_TOAST:
+      return state.filter((t) => t.id !== action.toastId)
+    default:
+      return state
+  }
 }
 
-// Mutable dispatch function reference
+// Mutable dispatch function reference using an object with a current property
 export const dispatchFunction: { current?: React.Dispatch<Action> } = {}
 
 export function addToRemoveQueue(toastId: string) {
@@ -28,60 +35,11 @@ export function addToRemoveQueue(toastId: string) {
         toastId: toastId,
       })
     }
-  }, TOAST_REMOVE_DELAY)
+  }, 1000)
 
   toastTimeouts.set(toastId, timeout)
 }
 
-export const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case actionTypes.ADD_TOAST:
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
-      }
-
-    case actionTypes.UPDATE_TOAST:
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
-        ),
-      }
-
-    case actionTypes.DISMISS_TOAST: {
-      const { toastId } = action
-
-      if (toastId) {
-        addToRemoveQueue(toastId)
-      } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id)
-        })
-      }
-
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t
-        ),
-      }
-    }
-    case actionTypes.REMOVE_TOAST:
-      if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        }
-      }
-      return {
-        ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.toastId),
-      }
-  }
+export function genId() {
+  return Math.random().toString(36).substring(2, 9)
 }

@@ -71,7 +71,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "リモートのみ, 50~65万円",
     companyType: "自社",
-    recommendation: "山田さんはPythonとDjangoを中心に3年以上のバック��ンド開発経験があり、日本語は日常会話レベルです。クラウドサービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
+    recommendation: "山田さんはPythonとDjangoを中心に3年以上のバックエンド開発経験があり、日本語は日常会話レベルです。クラウドサービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
     email: "kenji.yamada@example.com",
     phone: "090-3456-7890",
   },
@@ -559,7 +559,7 @@ export function Candidates() {
                           <SelectValue placeholder="全て" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">全て</SelectItem>
+                          <SelectItem value="all">全て</SelectItem>
                           <SelectItem value="自社">自社</SelectItem>
                           <SelectItem value="他社">他社</SelectItem>
                         </SelectContent>
@@ -576,7 +576,7 @@ export function Candidates() {
                           <SelectValue placeholder="全て" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">全て</SelectItem>
+                          <SelectItem value="all">全て</SelectItem>
                           <SelectItem value="不問">不問</SelectItem>
                           <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
                           <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
@@ -595,7 +595,7 @@ export function Candidates() {
                           <SelectValue placeholder="全て" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">全て</SelectItem>
+                          <SelectItem value="all">全て</SelectItem>
                           <SelectItem value="案件探し中">案件探し中</SelectItem>
                           <SelectItem value="提案中">提案中</SelectItem>
                           <SelectItem value="稼働中">稼働中</SelectItem>
