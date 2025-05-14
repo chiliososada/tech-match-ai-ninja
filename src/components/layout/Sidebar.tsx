@@ -7,7 +7,8 @@ import {
   Users, 
   BarChart3,
   Inbox,
-  Settings
+  Settings,
+  ListCheck
 } from 'lucide-react';
 
 type SidebarItem = {
@@ -31,6 +32,11 @@ const sidebarItems: SidebarItem[] = [
     icon: <Users className="h-5 w-5" />,
     label: '人材管理',
     href: '/candidates',
+  },
+  {
+    icon: <ListCheck className="h-5 w-5" />,
+    label: '案件とのマッチング',
+    href: '/matching',
   },
   {
     icon: <Inbox className="h-5 w-5" />,
