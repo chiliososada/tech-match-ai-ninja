@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -29,7 +28,7 @@ import {
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog';
-import { CommandInput } from '@/components/ui/command';
+import { Command, CommandInput } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 // サンプル技術者データ
@@ -72,7 +71,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "リモートのみ, 50~65万円",
     companyType: "自社",
-    recommendation: "山田さんはPythonとDjangoを中心に3年以上のバックエンド開発経験があり、日本語は日常会話レベルです。クラウ��サービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
+    recommendation: "山田さんはPythonとDjangoを中心に3年以上のバックエンド開発経験があり、日本語は日常会話レベルです。クラウドサービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
     email: "kenji.yamada@example.com",
     phone: "090-3456-7890",
   },
@@ -537,12 +536,15 @@ export function Candidates() {
                 <div className="mb-6 space-y-4">
                   {/* 検索フィールド */}
                   <div>
-                    <CommandInput 
-                      placeholder="名前、スキル、経験などで検索..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="japanese-text w-full"
-                    />
+                    <div className="flex items-center border-b px-3 rounded-md border">
+                      <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                      <Input
+                        placeholder="名前、スキル、経験などで検索..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="japanese-text w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      />
+                    </div>
                   </div>
                   
                   {/* 絞り込みオプション */}
