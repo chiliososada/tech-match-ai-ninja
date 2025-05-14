@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -9,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileDown, Edit, Trash2, Wand2, Save, Eye, Filter, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileDown, Edit, Trash2, Wand2, Save, Eye, Search } from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -29,7 +28,8 @@ import {
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { CommandInput } from '@/components/ui/command-input';
+import { cn } from '@/lib/utils';
 
 // サンプル技術者データ
 const engineersData = [
@@ -122,7 +122,7 @@ const engineersData = [
 export function Candidates() {
   const [currentPage, setCurrentPage] = useState(1);
   const [recommendationTemplate, setRecommendationTemplate] = useState(
-    `[名前]��[スキル]を中心に[経験]年の開発経験があり、日本語は[日本語レベル]です。
+    `[名前]は[スキル]を中心に[経験]年の開発経験があり、日本語は[日本語レベル]です。
 [得意分野]に強みがあり、[ツール]などの技術も習得しています。
 チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。
 希望条件は[勤務地]で、単価は[単価]です。`
@@ -149,8 +149,8 @@ export function Candidates() {
   const [selectedEngineer, setSelectedEngineer] = useState<any>(null);
   const [editEngineerData, setEditEngineerData] = useState<any>(null);
   
-  // フィルター関連の状態
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // 検索関連の状態
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     name: '',
     companyType: '',
@@ -173,10 +173,74 @@ export function Candidates() {
     currentPage * itemsPerPage
   );
   
-  // フィルター適用時にページをリセット
+  // 検索時にページをリセット
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredEngineers]);
+  
+  // 検索クエリが変更されたときに検索を実行
+  useEffect(() => {
+    handleSearch();
+  }, [searchQuery, filters.companyType, filters.japaneseLevel, filters.status]);
+  
+  // 検索を実行
+  const handleSearch = () => {
+    const query = searchQuery.toLowerCase();
+    
+    const filtered = engineersData.filter(engineer => {
+      // 検索クエリでフィルター
+      if (query) {
+        const nameMatch = engineer.name.toLowerCase().includes(query);
+        const skillsMatch = engineer.skills.some((skill: string) => 
+          skill.toLowerCase().includes(query)
+        );
+        const experienceMatch = engineer.experience.toLowerCase().includes(query);
+        const conditionsMatch = engineer.desiredConditions.toLowerCase().includes(query);
+        
+        if (!(nameMatch || skillsMatch || experienceMatch || conditionsMatch)) {
+          return false;
+        }
+      }
+      
+      // 区分でフィルター
+      if (filters.companyType && engineer.companyType !== filters.companyType) {
+        return false;
+      }
+      
+      // 日本語レベルでフィルター
+      if (filters.japaneseLevel && engineer.japaneseLevel !== filters.japaneseLevel) {
+        return false;
+      }
+      
+      // ステータスでフィルター
+      if (filters.status && engineer.status !== filters.status) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    setFilteredEngineers(filtered);
+    
+    if (filtered.length === 0 && (query || filters.companyType || filters.japaneseLevel || filters.status)) {
+      toast.info('該当する技術者が見つかりませんでした');
+    }
+  };
+  
+  // フィルター条件をリセット
+  const resetFilters = () => {
+    setSearchQuery('');
+    setFilters({
+      name: '',
+      companyType: '',
+      skills: '',
+      experience: '',
+      japaneseLevel: '',
+      desiredConditions: '',
+      status: ''
+    });
+    setFilteredEngineers(engineersData);
+  };
   
   // AIで推薦文を生成（シミュレーション）
   const generateRecommendation = () => {
@@ -264,74 +328,6 @@ export function Candidates() {
     toast.success('履歴書をダウンロードします');
   };
   
-  // フィルター条件をリセット
-  const resetFilters = () => {
-    setFilters({
-      name: '',
-      companyType: '',
-      skills: '',
-      experience: '',
-      japaneseLevel: '',
-      desiredConditions: '',
-      status: ''
-    });
-    setFilteredEngineers(engineersData);
-  };
-  
-  // フィルターを適用
-  const applyFilters = () => {
-    const filtered = engineersData.filter(engineer => {
-      // 名前でフィルター
-      if (filters.name && !engineer.name.includes(filters.name)) {
-        return false;
-      }
-      
-      // 区分でフィルター
-      if (filters.companyType && engineer.companyType !== filters.companyType) {
-        return false;
-      }
-      
-      // スキルでフィルター
-      if (filters.skills && !engineer.skills.some((skill: string) => 
-        skill.toLowerCase().includes(filters.skills.toLowerCase())
-      )) {
-        return false;
-      }
-      
-      // 経験年数でフィルター
-      if (filters.experience && !engineer.experience.includes(filters.experience)) {
-        return false;
-      }
-      
-      // 日本語レベルでフィルター
-      if (filters.japaneseLevel && engineer.japaneseLevel !== filters.japaneseLevel) {
-        return false;
-      }
-      
-      // 希望条件でフィルター
-      if (filters.desiredConditions && !engineer.desiredConditions.includes(filters.desiredConditions)) {
-        return false;
-      }
-      
-      // ステータスでフィルター
-      if (filters.status && engineer.status !== filters.status) {
-        return false;
-      }
-      
-      return true;
-    });
-    
-    setFilteredEngineers(filtered);
-    
-    if (filtered.length === 0) {
-      toast.info('該当する技術者が見つかりませんでした');
-    } else {
-      toast.success(`${filtered.length}件の技術者が見つかりました`);
-    }
-    
-    setIsFilterOpen(false);
-  };
-
   return (
     <MainLayout>
       <div className="flex-1 space-y-8 p-8 pt-6">
@@ -536,157 +532,86 @@ export function Candidates() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="mb-4">
-                  <Collapsible
-                    open={isFilterOpen}
-                    onOpenChange={setIsFilterOpen}
-                    className="w-full"
-                  >
-                    <div className="flex items-center justify-between">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="outline" className="japanese-text">
-                          <Filter className="mr-2 h-4 w-4" />
-                          フィルター
-                          {isFilterOpen ? (
-                            <ChevronUp className="ml-2 h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                          )}
-                        </Button>
-                      </CollapsibleTrigger>
-                      <div>
-                        {Object.values(filters).some(value => value !== '') && (
-                          <Button 
-                            variant="ghost" 
-                            onClick={resetFilters} 
-                            className="text-xs japanese-text mr-2"
-                          >
-                            フィルターをクリア
-                          </Button>
-                        )}
-                      </div>
+                {/* 検索フィールドと絞り込みオプション */}
+                <div className="mb-6 space-y-4">
+                  {/* 検索フィールド */}
+                  <div>
+                    <CommandInput 
+                      placeholder="名前、スキル、経験などで検索..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="japanese-text w-full"
+                    />
+                  </div>
+                  
+                  {/* 絞り込みオプション */}
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium japanese-text whitespace-nowrap">区分:</Label>
+                      <Select
+                        value={filters.companyType}
+                        onValueChange={(value) => setFilters({...filters, companyType: value})}
+                      >
+                        <SelectTrigger className="h-8 w-[120px] japanese-text">
+                          <SelectValue placeholder="全て" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">全て</SelectItem>
+                          <SelectItem value="自社">自社</SelectItem>
+                          <SelectItem value="他社">他社</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     
-                    <CollapsibleContent className="mt-4 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-name" className="japanese-text">名前</Label>
-                          <Input 
-                            id="filter-name" 
-                            value={filters.name}
-                            onChange={(e) => setFilters({...filters, name: e.target.value})}
-                            placeholder="名前で検索"
-                            className="japanese-text"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-company-type" className="japanese-text">区分</Label>
-                          <Select
-                            value={filters.companyType}
-                            onValueChange={(value) => setFilters({...filters, companyType: value})}
-                          >
-                            <SelectTrigger id="filter-company-type" className="japanese-text">
-                              <SelectValue placeholder="区分を選択" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="">すべて</SelectItem>
-                              <SelectItem value="自社">自社</SelectItem>
-                              <SelectItem value="他社">他社</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-skills" className="japanese-text">スキル</Label>
-                          <Input 
-                            id="filter-skills" 
-                            value={filters.skills}
-                            onChange={(e) => setFilters({...filters, skills: e.target.value})}
-                            placeholder="スキルで検索"
-                            className="japanese-text"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-experience" className="japanese-text">経験年数</Label>
-                          <Input 
-                            id="filter-experience" 
-                            value={filters.experience}
-                            onChange={(e) => setFilters({...filters, experience: e.target.value})}
-                            placeholder="経験年数で検索"
-                            className="japanese-text"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-japanese" className="japanese-text">日本語レベル</Label>
-                          <Select
-                            value={filters.japaneseLevel}
-                            onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
-                          >
-                            <SelectTrigger id="filter-japanese" className="japanese-text">
-                              <SelectValue placeholder="日本語レベルを選択" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="">すべて</SelectItem>
-                              <SelectItem value="不問">不問</SelectItem>
-                              <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                              <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                              <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-status" className="japanese-text">ステータス</Label>
-                          <Select
-                            value={filters.status}
-                            onValueChange={(value) => setFilters({...filters, status: value})}
-                          >
-                            <SelectTrigger id="filter-status" className="japanese-text">
-                              <SelectValue placeholder="ステータスを選択" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="">すべて</SelectItem>
-                              <SelectItem value="案件探し中">案件探し中</SelectItem>
-                              <SelectItem value="提案中">提案中</SelectItem>
-                              <SelectItem value="稼働中">稼働中</SelectItem>
-                              <SelectItem value="非稼働">非稼働</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="filter-conditions" className="japanese-text">希望条件</Label>
-                          <Input 
-                            id="filter-conditions" 
-                            value={filters.desiredConditions}
-                            onChange={(e) => setFilters({...filters, desiredConditions: e.target.value})}
-                            placeholder="希望条件で検索"
-                            className="japanese-text"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          onClick={resetFilters}
-                          className="japanese-text"
-                        >
-                          リセット
-                        </Button>
-                        <Button
-                          onClick={applyFilters}
-                          className="japanese-text"
-                        >
-                          <Search className="mr-2 h-4 w-4" />
-                          検索
-                        </Button>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
+                      <Select
+                        value={filters.japaneseLevel}
+                        onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
+                      >
+                        <SelectTrigger className="h-8 w-[160px] japanese-text">
+                          <SelectValue placeholder="全て" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">全て</SelectItem>
+                          <SelectItem value="不問">不問</SelectItem>
+                          <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                          <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                          <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
+                      <Select
+                        value={filters.status}
+                        onValueChange={(value) => setFilters({...filters, status: value})}
+                      >
+                        <SelectTrigger className="h-8 w-[120px] japanese-text">
+                          <SelectValue placeholder="全て" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">全て</SelectItem>
+                          <SelectItem value="案件探し中">案件探し中</SelectItem>
+                          <SelectItem value="提案中">提案中</SelectItem>
+                          <SelectItem value="稼働中">稼働中</SelectItem>
+                          <SelectItem value="非稼働">非稼働</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {(searchQuery || filters.companyType || filters.japaneseLevel || filters.status) && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={resetFilters} 
+                        className="h-8 px-2 text-xs japanese-text"
+                      >
+                        リセット
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="rounded-md border">
