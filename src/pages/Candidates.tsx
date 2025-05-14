@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -535,7 +536,7 @@ export function Candidates() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4">
                   <Collapsible
                     open={isFilterOpen}
                     onOpenChange={setIsFilterOpen}
@@ -565,6 +566,7 @@ export function Candidates() {
                         )}
                       </div>
                     </div>
+                    
                     <CollapsibleContent className="mt-4 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
@@ -588,9 +590,9 @@ export function Candidates() {
                               <SelectValue placeholder="区分を選択" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="" className="japanese-text">すべて</SelectItem>
-                              <SelectItem value="自社" className="japanese-text">自社</SelectItem>
-                              <SelectItem value="他社" className="japanese-text">他社</SelectItem>
+                              <SelectItem value="">すべて</SelectItem>
+                              <SelectItem value="自社">自社</SelectItem>
+                              <SelectItem value="他社">他社</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -627,11 +629,11 @@ export function Candidates() {
                               <SelectValue placeholder="日本語レベルを選択" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="" className="japanese-text">すべて</SelectItem>
-                              <SelectItem value="不問" className="japanese-text">不問</SelectItem>
-                              <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
-                              <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
-                              <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                              <SelectItem value="">すべて</SelectItem>
+                              <SelectItem value="不問">不問</SelectItem>
+                              <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                              <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                              <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -646,11 +648,11 @@ export function Candidates() {
                               <SelectValue placeholder="ステータスを選択" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="" className="japanese-text">すべて</SelectItem>
-                              <SelectItem value="案件探し中" className="japanese-text">案件探し中</SelectItem>
-                              <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
-                              <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                              <SelectItem value="非稼働" className="japanese-text">非稼働</SelectItem>
+                              <SelectItem value="">すべて</SelectItem>
+                              <SelectItem value="案件探し中">案件探し中</SelectItem>
+                              <SelectItem value="提案中">提案中</SelectItem>
+                              <SelectItem value="稼働中">稼働中</SelectItem>
+                              <SelectItem value="非稼働">非稼働</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
