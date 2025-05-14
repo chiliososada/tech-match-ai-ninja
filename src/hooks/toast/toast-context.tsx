@@ -2,11 +2,12 @@
 import * as React from "react"
 import { State, ToasterToast } from "./toast-types"
 
-export interface ToastContextType extends State {
+export interface ToastContextType {
+  toasts: ToasterToast[]
   toast: (props: Omit<ToasterToast, "id">) => {
     id: string
     dismiss: () => void
-    update: (props: Omit<ToasterToast, "id">) => void
+    update: (props: Omit<Partial<ToasterToast>, "id">) => void
   }
   dismiss: (toastId?: string) => void
 }

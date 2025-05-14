@@ -2,7 +2,6 @@
 import * as React from "react"
 import {
   ToasterToast,
-  ToastActionElement,
   Action,
   actionTypes
 } from "./toast-types"
@@ -29,7 +28,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   }, [innerDispatch])
 
   const toast = React.useCallback((props: Omit<ToasterToast, "id">) => {
-    const id = props.id || genId()
+    const id = genId()
 
     const update = (props: Omit<Partial<ToasterToast>, "id">) => {
       innerDispatch({
@@ -69,7 +68,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ToastContext.Provider
       value={{
-        state,
+        toasts: state,
         toast,
         dismiss: (toastId?: string) => {
           if (toastId) {
