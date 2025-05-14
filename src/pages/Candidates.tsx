@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -28,7 +29,7 @@ import {
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog';
-import { CommandInput } from '@/components/ui/command-input';
+import { CommandInput } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 // サンプル技術者データ
