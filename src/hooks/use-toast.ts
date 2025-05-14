@@ -204,14 +204,14 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
 export { ToastProvider, useToast, type ToastContextType }
 
-// 我们还需要一个导出给应用其他部分使用的简单方法
+// A simple export method for other parts of the application to use
 const toast = (props: Omit<ToasterToast, "id">) => {
-  // 当直接使用 toast() 而不在 provider 内时，对调用进行保护
+  // Protect calls when used directly without being in a provider
   try {
     const { toast } = useToast()
     return toast(props)
   } catch (e) {
-    // 如果不在 provider 内，简单地忽略
+    // Simply ignore if not within provider scope
     console.warn("Toast attempted to use outside of provider scope")
     return {
       id: "0",
