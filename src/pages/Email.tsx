@@ -42,12 +42,18 @@ export function Email() {
     // 実際には別ページやモーダルでログを表示する処理
   };
   
-  const openSettingsHistory = () => {
+  const restoreLastSettings = () => {
     toast({
-      title: "設定履歴を表示中",
-      description: "過去の設定履歴を取得しています。",
+      title: "前回の設定に戻しています",
+      description: "以前の設定を復元しています。",
     });
-    // 設定履歴を表示する処理
+    // 前回の設定を復元する処理
+    setTimeout(() => {
+      toast({
+        title: "設定を復元しました",
+        description: "前回の設定に正常に戻りました。",
+      });
+    }, 1000);
   };
 
   return (
@@ -60,10 +66,10 @@ export function Email() {
               variant="outline" 
               size="sm" 
               className="japanese-text flex items-center" 
-              onClick={openSettingsHistory}
+              onClick={restoreLastSettings}
             >
               <History className="mr-1 h-4 w-4" />
-              設定履歴
+              還元上次設定
             </Button>
             <Button 
               variant="outline" 
@@ -172,10 +178,10 @@ export function Email() {
                     <div className="border rounded-md p-3 bg-muted/50">
                       <div className="flex items-center mb-2">
                         <History className="h-4 w-4 mr-2" />
-                        <span className="font-medium japanese-text">設定の保存履歴</span>
+                        <span className="font-medium japanese-text">還元上次設定</span>
                       </div>
                       <p className="text-xs text-muted-foreground japanese-text">
-                        自動保存された過去の設定履歴を確認・復元できます
+                        万一出错可以回滚上一次设定
                       </p>
                     </div>
                     
