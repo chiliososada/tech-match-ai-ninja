@@ -47,7 +47,7 @@ export function Email() {
               onClick={restoreLastSettings}
             >
               <History className="mr-1 h-4 w-4" />
-              設定
+              設定 前回の設定に戻す
             </Button>
           </div>
         </div>
@@ -128,7 +128,7 @@ export function Email() {
                     <div className="border rounded-md p-3 bg-muted/50">
                       <div className="flex items-center mb-2">
                         <History className="h-4 w-4 mr-2" />
-                        <span className="font-medium japanese-text">設定</span>
+                        <span className="font-medium japanese-text">設定 前回の設定に戻す</span>
                       </div>
                       <p className="text-xs text-muted-foreground japanese-text">
                         設定エラー時に前回の設定に戻すことができます
