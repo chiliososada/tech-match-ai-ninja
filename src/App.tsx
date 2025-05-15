@@ -12,6 +12,7 @@ import Email from "./pages/Email";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import EmailAnalysis from "./pages/EmailAnalysis";
+import BatchMatching from "./pages/BatchMatching";
 import { ToastProvider } from "@/hooks/use-toast";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/cases" element={<Cases />} />
             <Route path="/candidates" element={<Candidates />} />
             <Route path="/matching" element={<Matching />} />
+            <Route path="/batch-matching" element={<BatchMatching />} />
             <Route path="/email" element={<Email />} />
             <Route path="/email-analysis" element={<EmailAnalysis />} />
             <Route path="/settings" element={<Settings />} />

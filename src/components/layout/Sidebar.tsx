@@ -16,6 +16,7 @@ type SidebarItem = {
   icon: React.ReactNode;
   label: string;
   href: string;
+  subItems?: SidebarItem[];
 };
 
 const sidebarItems: SidebarItem[] = [
@@ -38,6 +39,13 @@ const sidebarItems: SidebarItem[] = [
     icon: <ListCheck className="h-5 w-5" />,
     label: '案件とのマッチング',
     href: '/matching',
+    subItems: [
+      {
+        icon: <ListCheck className="h-4 w-4" />,
+        label: '一括マッチング',
+        href: '/batch-matching',
+      }
+    ]
   },
   {
     icon: <Inbox className="h-5 w-5" />,
@@ -64,21 +72,45 @@ export function Sidebar() {
       </div>
       <div className="flex-1 px-4 space-y-2 overflow-y-auto py-2">
         {sidebarItems.map((item, i) => (
-          <NavLink
-            key={i}
-            to={item.href}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
-                isActive
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
-              )
-            }
-          >
-            {item.icon}
-            <span className="japanese-text">{item.label}</span>
-          </NavLink>
+          <React.Fragment key={i}>
+            <NavLink
+              to={item.href}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+                  isActive
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                )
+              }
+            >
+              {item.icon}
+              <span className="japanese-text">{item.label}</span>
+            </NavLink>
+            
+            {/* Sub items */}
+            {item.subItems && item.subItems.length > 0 && (
+              <div className="pl-6 space-y-1 mt-1">
+                {item.subItems.map((subItem, j) => (
+                  <NavLink
+                    key={`${i}-${j}`}
+                    to={subItem.href}
+                    className={({ isActive }) =>
+                      cn(
+                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+                        isActive
+                          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                      )
+                    }
+                  >
+                    {subItem.icon}
+                    <span className="japanese-text">{subItem.label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </React.Fragment>
         ))}
       </div>
       <div className="p-4 border-t border-sidebar-border">
