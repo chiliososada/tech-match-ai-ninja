@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Users, List } from 'lucide-react';
+import { FileText, List } from 'lucide-react';
 import { BatchMatchingTab3 } from '@/components/batch-matching/BatchMatchingTab3';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,14 +19,12 @@ export function BatchMatching() {
   const [filterCaseRegistrationDate, setFilterCaseRegistrationDate] = useState<string>('');
   const [filterCaseAffiliation, setFilterCaseAffiliation] = useState<string>('');
   const [filterCaseStartDate, setFilterCaseStartDate] = useState<string>('');
-  const [filterRequiredSkills, setFilterRequiredSkills] = useState<string>('');
   const [filterCandidateStatus, setFilterCandidateStatus] = useState<string>('');
   const [filterCandidateAffiliation, setFilterCandidateAffiliation] = useState<string>('');
   const [filterCandidateUpdateDate, setFilterCandidateUpdateDate] = useState<string>('');
   
   // Search result states
   const [isSearched, setIsSearched] = useState<boolean>(false);
-  const [searchType, setSearchType] = useState<string>(''); // 'case-to-candidate' or 'candidate-to-case'
   const [showCandidates, setShowCandidates] = useState<boolean>(false);
   const [showCases, setShowCases] = useState<boolean>(false);
 
@@ -103,9 +101,8 @@ export function BatchMatching() {
     }
   ];
 
-  const handleSearch = (type: string) => {
+  const handleSearch = () => {
     setIsSearched(true);
-    setSearchType(type);
   };
 
   return (
@@ -162,14 +159,6 @@ export function BatchMatching() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium japanese-text">必須スキル</label>
-                  <Input 
-                    placeholder="例：Java, AWS, React" 
-                    value={filterRequiredSkills}
-                    onChange={(e) => setFilterRequiredSkills(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text">技術者の状態</label>
                   <Input 
                     placeholder="例：案件探し中" 
@@ -201,96 +190,90 @@ export function BatchMatching() {
 
               <div className="mt-6 flex justify-end space-x-4">
                 <Button 
-                  onClick={() => handleSearch('case-to-candidate')} 
+                  onClick={() => handleSearch()} 
                   className="japanese-text"
                 >
-                  案件に合う技術者を検索
-                </Button>
-                <Button 
-                  onClick={() => handleSearch('candidate-to-case')} 
-                  className="japanese-text"
-                  variant="outline"
-                >
-                  技術者に合う案件を検索
+                  マッチング検索
                 </Button>
               </div>
             </div>
 
-            {/* Results Area - Case to Candidate */}
-            {isSearched && searchType === 'case-to-candidate' && (
-              <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-8">
-                <div className="p-4 border-b">
-                  <h3 className="text-lg font-medium japanese-text">案件に合う技術者検索結果</h3>
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="japanese-text">案件名</TableHead>
-                      <TableHead className="japanese-text">会社名</TableHead>
-                      <TableHead className="japanese-text">技術者数</TableHead>
-                      <TableHead className="japanese-text">候補者（上位3人）</TableHead>
-                      <TableHead className="japanese-text">詳細</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {matchingCaseResults.map((result) => (
-                      <TableRow key={result.id}>
-                        <TableCell className="font-medium">{result.caseName}</TableCell>
-                        <TableCell>{result.companyName}</TableCell>
-                        <TableCell>{result.candidateCount}名</TableCell>
-                        <TableCell>{result.topCandidates.join('、')}</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="japanese-text"
-                            onClick={() => setShowCandidates(true)}
-                          >
-                            候補者一覧を見る
-                          </Button>
-                        </TableCell>
+            {/* Results Area - Both results displayed in vertical layout */}
+            {isSearched && (
+              <div className="space-y-8">
+                {/* Case to Candidate Results */}
+                <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                  <div className="p-4 border-b bg-blue-50">
+                    <h3 className="text-lg font-medium japanese-text">案件に合う技術者検索結果</h3>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="japanese-text">案件名</TableHead>
+                        <TableHead className="japanese-text">会社名</TableHead>
+                        <TableHead className="japanese-text">技術者数</TableHead>
+                        <TableHead className="japanese-text">候補者（上位3人）</TableHead>
+                        <TableHead className="japanese-text">詳細</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                    </TableHeader>
+                    <TableBody>
+                      {matchingCaseResults.map((result) => (
+                        <TableRow key={result.id}>
+                          <TableCell className="font-medium">{result.caseName}</TableCell>
+                          <TableCell>{result.companyName}</TableCell>
+                          <TableCell>{result.candidateCount}名</TableCell>
+                          <TableCell>{result.topCandidates.join('、')}</TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="japanese-text"
+                              onClick={() => setShowCandidates(true)}
+                            >
+                              候補者一覧を見る
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
 
-            {/* Results Area - Candidate to Case */}
-            {isSearched && searchType === 'candidate-to-case' && (
-              <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div className="p-4 border-b">
-                  <h3 className="text-lg font-medium japanese-text">技術者に合う案件検索結果</h3>
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="japanese-text">技術者名</TableHead>
-                      <TableHead className="japanese-text">スキル</TableHead>
-                      <TableHead className="japanese-text">マッチ案件数</TableHead>
-                      <TableHead className="japanese-text">案件一覧</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {matchingCandidateResults.map((tech) => (
-                      <TableRow key={tech.id}>
-                        <TableCell className="font-medium">{tech.name}</TableCell>
-                        <TableCell>{tech.skills}</TableCell>
-                        <TableCell>{tech.matchCount}件</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="japanese-text"
-                            onClick={() => setShowCases(true)}
-                          >
-                            案件を見る
-                          </Button>
-                        </TableCell>
+                {/* Candidate to Case Results */}
+                <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                  <div className="p-4 border-b bg-green-50">
+                    <h3 className="text-lg font-medium japanese-text">技術者に合う案件検索結果</h3>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="japanese-text">技術者名</TableHead>
+                        <TableHead className="japanese-text">スキル</TableHead>
+                        <TableHead className="japanese-text">マッチ案件数</TableHead>
+                        <TableHead className="japanese-text">案件一覧</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {matchingCandidateResults.map((tech) => (
+                        <TableRow key={tech.id}>
+                          <TableCell className="font-medium">{tech.name}</TableCell>
+                          <TableCell>{tech.skills}</TableCell>
+                          <TableCell>{tech.matchCount}件</TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="japanese-text"
+                              onClick={() => setShowCases(true)}
+                            >
+                              案件を見る
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             )}
 
