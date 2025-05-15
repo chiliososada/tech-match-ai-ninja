@@ -22,11 +22,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { toast } from '@/hooks/use-toast';
-import { Mail, Send, Wand2, UserRound, Users } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { Mail, Send, Wand2 } from 'lucide-react';
 
 interface EmailSenderProps {
   mailCases: any[];
@@ -75,132 +72,10 @@ const EMAIL_TEMPLATES = [
 ご不明な点やご質問がございましたら、お気軽にお問い合わせください。`
   },
   {
-    id: "engineer-intro",
-    name: "技術者紹介",
-    subject: "【技術者紹介】案件に最適な人材のご紹介",
-    body: `お世話になっております。株式会社テックリクルーターの山田と申します。
-
-貴社の案件に最適な技術者をご紹介いたします。
-
-【技術者情報】
-・氏名：[技術者名]
-・スキル：[技術者スキル]
-・経験年数：[経験年数]年
-・稼働可能時期：[稼働可能時期]
-・単価：[単価]
-
-詳細な経歴書を添付いたしますので、ご確認いただければ幸いです。
-面談のセッティングなど、お気軽にご相談ください。`
-  },
-  {
     id: "custom",
     name: "カスタム",
     subject: "",
     body: ""
-  }
-];
-
-// サンプル技術者データ
-const ENGINEERS_DATA = [
-  {
-    id: "e1",
-    name: "佐藤 一郎",
-    skills: ["Java", "Spring Boot", "AWS"],
-    experience: "7年",
-    availability: "即日",
-    rate: "80万円",
-    languages: ["日本語（ネイティブ）", "英語（ビジネスレベル）"],
-    status: "稼働中"
-  },
-  {
-    id: "e2",
-    name: "鈴木 二郎",
-    skills: ["React", "TypeScript", "Node.js"],
-    experience: "5年",
-    availability: "１週間後",
-    rate: "75万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "待機中"
-  },
-  {
-    id: "e3",
-    name: "高橋 三郎",
-    skills: ["Python", "Django", "AWS"],
-    experience: "4年",
-    availability: "即日",
-    rate: "70万円",
-    languages: ["日本語（ビジネスレベル）", "英語（日常会話）"],
-    status: "待機中"
-  },
-  {
-    id: "e4",
-    name: "田中 四郎",
-    skills: ["C#", ".NET", "Azure"],
-    experience: "6年",
-    availability: "2週間後",
-    rate: "78万円",
-    languages: ["日本語（ネイティブ）", "中国語（日常会話）"],
-    status: "稼働中"
-  },
-  {
-    id: "e5",
-    name: "渡辺 五郎",
-    skills: ["PHP", "Laravel", "MySQL"],
-    experience: "3年",
-    availability: "即日",
-    rate: "65万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "待機中"
-  },
-  {
-    id: "e6",
-    name: "伊藤 六郎",
-    skills: ["JavaScript", "Vue.js", "Firebase"],
-    experience: "4年",
-    availability: "1ヶ月後",
-    rate: "72万円",
-    languages: ["日本語（ネイティブ）", "英語（ビジネスレベル）"],
-    status: "稼働中"
-  },
-  {
-    id: "e7",
-    name: "山本 七郎",
-    skills: ["Go", "Docker", "Kubernetes"],
-    experience: "5年",
-    availability: "即日",
-    rate: "85万円",
-    languages: ["日本語（ネイティブ）", "英語（ビジネスレベル）"],
-    status: "待機中"
-  },
-  {
-    id: "e8",
-    name: "中村 八郎",
-    skills: ["Ruby", "Rails", "PostgreSQL"],
-    experience: "6年",
-    availability: "2週間後",
-    rate: "78万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "稼働中"
-  },
-  {
-    id: "e9",
-    name: "小林 九郎",
-    skills: ["Angular", "TypeScript", "Firebase"],
-    experience: "3年",
-    availability: "即日",
-    rate: "68万円",
-    languages: ["日本語（ビジネスレベル）", "英語（日常会話）"],
-    status: "待機中"
-  },
-  {
-    id: "e10",
-    name: "加藤 十郎",
-    skills: ["Swift", "iOS", "Firebase"],
-    experience: "4年",
-    availability: "1週間後",
-    rate: "75万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "稼働中"
   }
 ];
 
@@ -215,13 +90,8 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
   const [techFilter, setTechFilter] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("custom");
   const [signature, setSignature] = useState(DEFAULT_SIGNATURE);
-  const [selectedEngineers, setSelectedEngineers] = useState<string[]>([]);
-  const [engineersSelectAll, setEngineersSelectAll] = useState(false);
-  const [engineerCurrentPage, setEngineerCurrentPage] = useState(1);
-  const [engineerFilter, setEngineerFilter] = useState("");
-  const [engineerStatusFilter, setEngineerStatusFilter] = useState("all");
   
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   
   // 会社のリストを取得
   const companyList = Array.from(new Set(mailCases.filter(item => item.company).map(item => item.company)));
@@ -242,29 +112,7 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
   
   const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
 
-  // フィルタリングされた技術者を取得
-  const filteredEngineers = ENGINEERS_DATA.filter(engineer => {
-    // スキルフィルター
-    const matchesSkill = engineerFilter === "" || 
-                         engineer.skills.some(skill => 
-                           skill.toLowerCase().includes(engineerFilter.toLowerCase()));
-    
-    // ステータスフィルター
-    const matchesStatus = engineerStatusFilter === "all" || 
-                          engineer.status === engineerStatusFilter;
-    
-    return matchesSkill && matchesStatus;
-  });
-  
-  // ページネーションで表示する技術者
-  const paginatedEngineers = filteredEngineers.slice(
-    (engineerCurrentPage - 1) * itemsPerPage,
-    engineerCurrentPage * itemsPerPage
-  );
-  
-  const totalEngineerPages = Math.ceil(filteredEngineers.length / itemsPerPage);
-
-  // Handle selectAll checkbox change for cases
+  // Handle selectAll checkbox change
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedCases([]);
@@ -289,32 +137,6 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
       setSelectAll(false);
     }
   };
-  
-  // Handle selectAll checkbox change for engineers
-  const handleEngineerSelectAll = () => {
-    if (engineersSelectAll) {
-      setSelectedEngineers([]);
-    } else {
-      setSelectedEngineers(paginatedEngineers.map(item => item.id));
-    }
-    setEngineersSelectAll(!engineersSelectAll);
-  };
-
-  // Handle individual engineer checkbox change
-  const handleEngineerSelect = (id: string) => {
-    setSelectedEngineers(prev => 
-      prev.includes(id) 
-        ? prev.filter(engId => engId !== id) 
-        : [...prev, id]
-    );
-    
-    // Update selectAll state
-    if (selectedEngineers.length + 1 === paginatedEngineers.length && !selectedEngineers.includes(id)) {
-      setEngineersSelectAll(true);
-    } else {
-      setEngineersSelectAll(false);
-    }
-  };
 
   // Handle template selection
   const handleTemplateChange = (templateId: string) => {
@@ -331,11 +153,7 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
   // Apply AI enhancement to email content
   const handleEnhanceEmail = () => {
     if (!emailBody.trim()) {
-      toast({
-        title: "エラー",
-        description: 'メール本文を入力してください',
-        variant: "destructive"
-      });
+      toast.error('メール本文を入力してください');
       return;
     }
     
@@ -348,77 +166,26 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
 ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討のほど、よろしくお願いいたします。'}`;
       setEmailBody(enhancedBody);
       setSending(false);
-      toast({
-        title: "メール内容が改善されました",
-        variant: "success"
-      });
+      toast.success('メール内容が改善されました');
     }, 1500);
-  };
-
-  // Generate email content with selected engineers
-  const generateEmailContentWithEngineers = () => {
-    // Basic validation
-    if (!emailBody.trim()) {
-      return emailBody;
-    }
-
-    // If no engineers selected, return original content
-    if (selectedEngineers.length === 0) {
-      return emailBody;
-    }
-
-    // Get selected engineers data
-    const engineersData = ENGINEERS_DATA.filter(eng => selectedEngineers.includes(eng.id));
-    
-    let engineerContent = "\n\n【ご紹介する技術者一覧】\n";
-    engineersData.forEach((eng, index) => {
-      engineerContent += `
-■ 技術者${index + 1}
-氏名：${eng.name}
-スキル：${eng.skills.join(', ')}
-経験年数：${eng.experience}
-稼働可能時期：${eng.availability}
-単価：${eng.rate}
-言語：${eng.languages.join(', ')}
-
-`;
-    });
-    
-    // Append engineer content to email body
-    return emailBody + engineerContent;
   };
 
   // Handle send email
   const handleSendEmail = () => {
     if (selectedCases.length === 0) {
-      toast({
-        title: "エラー",
-        description: '送信先を選択してください',
-        variant: "destructive"
-      });
+      toast.error('送信先を選択してください');
       return;
     }
     
     if (!subject.trim()) {
-      toast({
-        title: "エラー",
-        description: '件名を入力してください',
-        variant: "destructive"
-      });
+      toast.error('件名を入力してください');
       return;
     }
     
     if (!emailBody.trim()) {
-      toast({
-        title: "エラー",
-        description: '本文を入力してください',
-        variant: "destructive"
-      });
+      toast.error('本文を入力してください');
       return;
     }
-
-    // Generate email content with engineers if they're selected
-    const finalEmailContent = generateEmailContentWithEngineers();
 
     // Simulate sending email
     setSending(true);
@@ -428,17 +195,13 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
         .filter(item => selectedCases.includes(item.id))
         .map(item => item.sender);
       
-      toast({
-        title: "メールが送信されました",
-        description: `${selectedEmails.length}件のメールが正常に送信されました${selectedEngineers.length > 0 ? `（${selectedEngineers.length}名の技術者情報を含む）` : ''}`,
-        variant: "default"
+      toast.success('メールが送信されました', {
+        description: `${selectedEmails.length}件のメールが正常に送信されました`
       });
       
       setSending(false);
       setSelectedCases([]);
       setSelectAll(false);
-      setSelectedEngineers([]);
-      setEngineersSelectAll(false);
       setSubject('');
       setEmailBody('');
     }, 2000);
@@ -476,280 +239,96 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="cases">
-            <TabsList className="mb-4">
-              <TabsTrigger value="cases" className="japanese-text">
-                <Mail className="mr-2 h-4 w-4" />
-                送信先
-              </TabsTrigger>
-              <TabsTrigger value="engineers" className="japanese-text">
-                <Users className="mr-2 h-4 w-4" />
-                技術者選択
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="cases">
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">
-                        <Checkbox 
-                          checked={selectAll} 
-                          onCheckedChange={handleSelectAll}
-                          aria-label="全選択"
-                        />
-                      </TableHead>
-                      <TableHead className="japanese-text">送信者</TableHead>
-                      <TableHead className="japanese-text">担当者名</TableHead>
-                      <TableHead className="japanese-text">会社</TableHead>
-                      <TableHead className="japanese-text">案件名</TableHead>
-                      <TableHead className="japanese-text">技術キーワード</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedCases.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <Checkbox 
-                            checked={selectedCases.includes(item.id)}
-                            onCheckedChange={() => handleSelectCase(item.id)}
-                            aria-label={`${item.sender}を選択`}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">{item.sender}</TableCell>
-                        <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
-                        <TableCell className="japanese-text">{item.company || "-"}</TableCell>
-                        <TableCell className="japanese-text">{item.title}</TableCell>
-                        <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
-                      </TableRow>
-                    ))}
-                    {paginatedCases.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-4 japanese-text">
-                          フィルター条件に一致するデータが見つかりません
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              
-              {totalPages > 1 && (
-                <div className="mt-4 flex justify-center">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                      
-                      {Array.from({ length: totalPages }).map((_, index) => {
-                        const pageNumber = index + 1;
-                        if (
-                          pageNumber === 1 || 
-                          pageNumber === totalPages || 
-                          (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink 
-                                isActive={currentPage === pageNumber}
-                                onClick={() => setCurrentPage(pageNumber)}
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (
-                          pageNumber === currentPage - 2 || 
-                          pageNumber === currentPage + 2
-                        ) {
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          );
-                        }
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
-              )}
-              
-              <div className="mt-4">
-                <div className="japanese-text flex items-center gap-2">
-                  <span className="text-sm font-medium">選択中: {selectedCases.length}件</span>
-                  {selectedCases.length > 0 && (
-                    <Button variant="outline" size="sm" onClick={() => setSelectedCases([])}>
-                      選択をクリア
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="engineers">
-              <div className="flex flex-col sm:flex-row gap-4 mb-4">
-                <Input 
-                  placeholder="スキルで検索" 
-                  value={engineerFilter}
-                  onChange={(e) => setEngineerFilter(e.target.value)}
-                  className="japanese-text"
-                />
-                
-                <Select value={engineerStatusFilter} onValueChange={setEngineerStatusFilter}>
-                  <SelectTrigger className="japanese-text w-full sm:w-[200px]">
-                    <SelectValue placeholder="ステータスでフィルター" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="japanese-text">すべてのステータス</SelectItem>
-                    <SelectItem value="待機中" className="japanese-text">待機中</SelectItem>
-                    <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">
-                        <Checkbox 
-                          checked={engineersSelectAll} 
-                          onCheckedChange={handleEngineerSelectAll}
-                          aria-label="全選択"
-                        />
-                      </TableHead>
-                      <TableHead className="japanese-text">氏名</TableHead>
-                      <TableHead className="japanese-text">スキル</TableHead>
-                      <TableHead className="japanese-text">経験</TableHead>
-                      <TableHead className="japanese-text">稼働可能時期</TableHead>
-                      <TableHead className="japanese-text">単価</TableHead>
-                      <TableHead className="japanese-text">ステータス</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedEngineers.map((engineer) => (
-                      <TableRow key={engineer.id}>
-                        <TableCell>
-                          <Checkbox 
-                            checked={selectedEngineers.includes(engineer.id)}
-                            onCheckedChange={() => handleEngineerSelect(engineer.id)}
-                            aria-label={`${engineer.name}を選択`}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {engineer.skills.map((skill, i) => (
-                              <Badge key={i} variant="outline" className="japanese-text text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
-                          </div>
-                        </TableCell>
-                        <TableCell className="japanese-text">{engineer.experience}</TableCell>
-                        <TableCell className="japanese-text">{engineer.availability}</TableCell>
-                        <TableCell className="japanese-text">{engineer.rate}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={engineer.status === "待機中" ? "success" : "secondary"}
-                            className="japanese-text"
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">
+                    <Checkbox 
+                      checked={selectAll} 
+                      onCheckedChange={handleSelectAll}
+                      aria-label="全選択"
+                    />
+                  </TableHead>
+                  <TableHead className="japanese-text">送信者</TableHead>
+                  <TableHead className="japanese-text">担当者名</TableHead>
+                  <TableHead className="japanese-text">会社</TableHead>
+                  <TableHead className="japanese-text">案件名</TableHead>
+                  <TableHead className="japanese-text">技術キーワード</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedCases.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedCases.includes(item.id)}
+                        onCheckedChange={() => handleSelectCase(item.id)}
+                        aria-label={`${item.sender}を選択`}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{item.sender}</TableCell>
+                    <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
+                    <TableCell className="japanese-text">{item.company || "-"}</TableCell>
+                    <TableCell className="japanese-text">{item.title}</TableCell>
+                    <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }).map((_, index) => {
+                    const pageNumber = index + 1;
+                    if (
+                      pageNumber === 1 || 
+                      pageNumber === totalPages || 
+                      (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationLink 
+                            isActive={currentPage === pageNumber}
+                            onClick={() => setCurrentPage(pageNumber)}
                           >
-                            {engineer.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {paginatedEngineers.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center py-4 japanese-text">
-                          フィルター条件に一致するデータが見つかりません
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              
-              {totalEngineerPages > 1 && (
-                <div className="mt-4 flex justify-center">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setEngineerCurrentPage(prev => Math.max(prev - 1, 1))}
-                          className={engineerCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                      
-                      {Array.from({ length: totalEngineerPages }).map((_, index) => {
-                        const pageNumber = index + 1;
-                        if (
-                          pageNumber === 1 || 
-                          pageNumber === totalEngineerPages || 
-                          (pageNumber >= engineerCurrentPage - 1 && pageNumber <= engineerCurrentPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink 
-                                isActive={engineerCurrentPage === pageNumber}
-                                onClick={() => setEngineerCurrentPage(pageNumber)}
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (
-                          pageNumber === engineerCurrentPage - 2 || 
-                          pageNumber === engineerCurrentPage + 2
-                        ) {
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          );
-                        }
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setEngineerCurrentPage(prev => Math.min(prev + 1, totalEngineerPages))}
-                          className={engineerCurrentPage === totalEngineerPages ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
-              )}
-              
-              <div className="mt-4">
-                <div className="japanese-text flex items-center gap-2">
-                  <span className="text-sm font-medium">選択中の技術者: {selectedEngineers.length}名</span>
-                  {selectedEngineers.length > 0 && (
-                    <Button variant="outline" size="sm" onClick={() => {
-                      setSelectedEngineers([]);
-                      setEngineersSelectAll(false);
-                    }}>
-                      選択をクリア
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+                            {pageNumber}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    } else if (
+                      pageNumber === currentPage - 2 || 
+                      pageNumber === currentPage + 2
+                    ) {
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
           
           <div className="mt-6 space-y-4">
             <div className="space-y-2">
@@ -792,14 +371,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
             </div>
             
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="signature" className="japanese-text">署名</Label>
-                {selectedEngineers.length > 0 && (
-                  <span className="text-sm text-muted-foreground japanese-text">
-                    {selectedEngineers.length}名の技術者情報が本文に追加されます
-                  </span>
-                )}
-              </div>
+              <Label htmlFor="signature" className="japanese-text">署名</Label>
               <Textarea 
                 id="signature"
                 placeholder="メールの署名"
@@ -833,7 +405,6 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                     <Send className="mr-2 h-4 w-4" />
                     <span className="japanese-text">
                       {selectedCases.length}件のメールを送信
-                      {selectedEngineers.length > 0 && ` (${selectedEngineers.length}名の技術者情報を含む)`}
                     </span>
                   </>
                 )}
