@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Check, Send, ListChecks, Building, FileDown } from 'lucide-react';
+import { Search, Check, Send, ListChecks, Building, FileDown, Wand2 } from 'lucide-react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 
@@ -81,6 +80,62 @@ const casesData = [
   }
 ];
 
+// サンプルテキスト
+const sampleTemplates = [
+  { 
+    id: 'intro',
+    name: '案件紹介',
+    text: `お世話になっております。
+
+新規案件情報のご案内をさせていただきます。
+
+【案件名】大手銀行向け業務システム開発
+【必要スキル】Java、Spring Boot、Oracle
+【勤務地】東京都千代田区
+【単価】70万円〜90万円
+【勤務形態】オンサイト
+【開始時期】即日
+【応募締切】2024-05-31
+
+御社の技術者様で、上記案件にご興味がありそうな方がいらっしゃいましたら、ぜひご連絡ください。
+詳細な条件のすり合わせや面談の調整などさせていただきます。
+
+ご検討のほど、よろしくお願い申し上げます。`
+  },
+  {
+    id: 'follow',
+    name: 'フォローアップ',
+    text: `お世話になっております。
+
+先日ご案内した案件についてフォローアップのご連絡をさせていただきます。
+
+現在、クライアント企業様より早急に人材を確保したいとのご要望をいただいております。
+もしご興味をお持ちいただける技術者様がいらっしゃいましたら、お早めにご連絡いただけますと幸いです。
+
+何かご質問等ございましたら、お気軽にお問い合わせください。
+
+今後ともよろしくお願い申し上げます。`
+  },
+  {
+    id: 'thanks',
+    name: 'お礼',
+    text: `お世話になっております。
+
+この度は技術者様のご紹介をいただき、誠にありがとうございました。
+おかげさまで、クライアント企業様にもご満足いただけるマッチングができました。
+
+今後とも良い関係を続けていけますよう、よろしくお願い申し上げます。`
+  }
+];
+
+// デフォルト署名
+const defaultSignature = `------------------------------
+株式会社テックリクルーター
+採用担当：山田 太郎
+電話番号：03-1234-5678
+メール：contact@techrecruiter.co.jp
+------------------------------`;
+
 export function BulkEmailTab() {
   // 状態管理
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,6 +148,9 @@ export function BulkEmailTab() {
   const [emailSubject, setEmailSubject] = useState('');
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [previewCompany, setPreviewCompany] = useState<any>(null);
+  const [signature, setSignature] = useState(defaultSignature);
+  const [sampleTemplate, setSampleTemplate] = useState("");
+  const [enhancingEmail, setEnhancingEmail] = useState(false);
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
@@ -176,6 +234,38 @@ ${caseData.description}
     setIsSelectCaseOpen(false);
   };
 
+  // サンプルテンプレートの適用
+  const handleApplySample = (templateId: string) => {
+    const template = sampleTemplates.find(t => t.id === templateId);
+    if (template) {
+      setEmailTemplate(template.text);
+      toast.success(`「${template.name}」テンプレートを適用しました`);
+    }
+  };
+
+  // AI による本文の美化
+  const handleEnhanceEmail = () => {
+    if (!emailTemplate.trim()) {
+      toast.error('メール本文を入力してください');
+      return;
+    }
+    
+    setEnhancingEmail(true);
+    
+    // 実際のアプリケーションではAI APIを呼び出す
+    // ここではタイムアウトでシミュレーション
+    setTimeout(() => {
+      const enhancedText = `${emailTemplate.trim()}
+
+${!emailTemplate.includes('よろしくお願い申し上げます') ? 
+  '\n何かご不明な点がございましたら、お気軽にお問い合わせください。\n\nご検討のほど、よろしくお願い申し上げます。' : ''}`;
+      
+      setEmailTemplate(enhancedText);
+      setEnhancingEmail(false);
+      toast.success('AI によるメール本文の改善が完了しました');
+    }, 1500);
+  };
+
   // メール送信プレビュー表示
   const handleShowPreview = (company: any) => {
     setPreviewCompany(company);
@@ -191,6 +281,16 @@ ${caseData.description}
 
     if (selectedCompanies.length === 0) {
       toast.error('送信先企業を選択してください');
+      return;
+    }
+
+    if (!emailTemplate.trim()) {
+      toast.error('メール本文を入力してください');
+      return;
+    }
+
+    if (!signature.trim()) {
+      toast.error('署名を入力してください');
       return;
     }
 
@@ -439,8 +539,48 @@ ${caseData.description}
             />
           </div>
           
+          {/* サンプルテンプレート選択 */}
           <div className="space-y-2">
-            <Label htmlFor="email-template" className="japanese-text">本文</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="sample-template" className="japanese-text">サンプルテンプレート</Label>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleApplySample(sampleTemplate)}
+                disabled={!sampleTemplate}
+                className="japanese-text"
+              >
+                適用
+              </Button>
+            </div>
+            <Select value={sampleTemplate} onValueChange={setSampleTemplate}>
+              <SelectTrigger className="japanese-text">
+                <SelectValue placeholder="テンプレートを選択" />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleTemplates.map((template) => (
+                  <SelectItem key={template.id} value={template.id} className="japanese-text">
+                    {template.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <Label htmlFor="email-template" className="japanese-text">本文</Label>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleEnhanceEmail}
+                disabled={enhancingEmail || !emailTemplate.trim()}
+                className="japanese-text"
+              >
+                <Wand2 className="h-4 w-4 mr-2" />
+                {enhancingEmail ? '処理中...' : 'AIで美化'}
+              </Button>
+            </div>
             <Textarea 
               id="email-template" 
               value={emailTemplate} 
@@ -452,6 +592,18 @@ ${caseData.description}
             {!selectedCase && (
               <p className="text-xs text-muted-foreground japanese-text">※ 案件を選択すると自動的にテンプレートが生成されます</p>
             )}
+          </div>
+
+          {/* 署名 */}
+          <div className="space-y-2">
+            <Label htmlFor="email-signature" className="japanese-text">署名</Label>
+            <Textarea 
+              id="email-signature" 
+              value={signature} 
+              onChange={(e) => setSignature(e.target.value)}
+              placeholder="メールの署名を入力してください"
+              className="min-h-[100px] japanese-text"
+            />
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
