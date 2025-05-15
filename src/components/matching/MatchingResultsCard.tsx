@@ -80,7 +80,7 @@ export function MatchingResultsCard({ results, exportButtonText, actionButtonTex
                       {result.matchingRate}
                     </span>
                   </TableCell>
-                  <TableCell className="japanese-text max-w-[200px] truncate" title={result.matchingReason}>
+                  <TableCell className="japanese-text whitespace-normal">
                     {result.matchingReason}
                   </TableCell>
                   <TableCell>
