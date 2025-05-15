@@ -1,40 +1,18 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileDown, Edit, Trash2, Wand2, Save, Eye, Search } from 'lucide-react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { toast } from 'sonner';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
-import { Command } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { BulkEmailTab } from '@/components/candidates/BulkEmailTab';
+import { CandidateList } from '@/components/candidates/CandidateList';
+import { CandidateForm } from '@/components/candidates/CandidateForm';
+import { CandidateDetails } from '@/components/candidates/CandidateDetails';
+import { CandidateEdit } from '@/components/candidates/CandidateEdit';
+import { Engineer, CategoryType, NewEngineerType } from '@/components/candidates/types';
 
 // サンプル技術者データ
-const engineersData = [
+const engineersData: Engineer[] = [
   {
     id: "1",
     name: "鈴木太郎",
@@ -146,14 +124,14 @@ const engineersData = [
 ];
 
 // カテゴリー定義
-const categories = [
+const categories: CategoryType[] = [
   { id: "all", name: "全て" },
   { id: "self", name: "自社" },
   { id: "other", name: "他社" }
 ];
 
 // 新規エンジニアのサンプルデータに所属会社のフィールドを追加
-const newEngineerInitialState = {
+const newEngineerInitialState: NewEngineerType = {
   name: '',
   skills: '',
   japaneseLevel: 'ビジネスレベル',
@@ -169,7 +147,6 @@ const newEngineerInitialState = {
 };
 
 export function Candidates() {
-  const [currentPage, setCurrentPage] = useState(1);
   const [recommendationTemplate, setRecommendationTemplate] = useState(
     `[名前]は[スキル]を中心に[経験]年の開発経験があり、日本語は[日本語レベル]です。
 [得意分野]に強みがあり、[ツール]などの技術も習得しています。
@@ -181,177 +158,63 @@ export function Candidates() {
   );
   
   // 新規技術者のフォームデータ
-  const [newEngineer, setNewEngineer] = useState(newEngineerInitialState);
+  const [newEngineer, setNewEngineer] = useState<NewEngineerType>(newEngineerInitialState);
   
   // 詳細ダイアログの状態管理
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedEngineer, setSelectedEngineer] = useState<any>(null);
-  const [editEngineerData, setEditEngineerData] = useState<any>(null);
+  const [selectedEngineer, setSelectedEngineer] = useState<Engineer | null>(null);
+  const [editEngineerData, setEditEngineerData] = useState<Engineer | null>(null);
   
-  // 検索関連の状態
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState({
-    name: '',
-    companyType: '',
-    companyName: '',
-    skills: '',
-    experience: '',
-    japaneseLevel: '',
-    desiredConditions: '',
-    status: ''
-  });
+  // 技術者詳細を表示
+  const handleViewDetails = (engineer: Engineer) => {
+    setSelectedEngineer(engineer);
+    setDetailDialogOpen(true);
+  };
   
-  // 選択されたカテゴリー
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  
-  // フィルター適用済みのエンジニアデータ
-  const [filteredEngineers, setFilteredEngineers] = useState(engineersData);
-  
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredEngineers.length / itemsPerPage);
-  
-  // ページネーションで表示する技術者
-  const paginatedEngineers = filteredEngineers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // ヘルパー関数：前のページへ移動
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  // ステータスを更新
+  const handleStatusChange = (value: string) => {
+    if (selectedEngineer) {
+      setSelectedEngineer({...selectedEngineer, status: value});
+      toast.success('ステータスを更新しました');
     }
+  };
+  
+  // 技術者の編集 (詳細画面から)
+  const handleEditClick = () => {
+    setDetailDialogOpen(false);
+    setEditEngineerData({...selectedEngineer!});
+    setEditDialogOpen(true);
+  };
+  
+  // 技術者の編集 (テーブルから直接)
+  const handleDirectEditClick = (engineer: Engineer) => {
+    setSelectedEngineer(engineer);
+    setEditEngineerData({...engineer});
+    setEditDialogOpen(true);
+  };
+  
+  // 編集内容を保存
+  const handleSaveEdit = () => {
+    if (editEngineerData) {
+      // 更新日を現在の日付に設定
+      editEngineerData.updatedAt = new Date().toISOString().split('T')[0];
+    }
+    toast.success('技術者情報を更新しました');
+    setEditDialogOpen(false);
+    // 実際のアプリケーションでは、ここでデータベースの更新を行います
+  };
+  
+  // 技術者の削除（シミュレーション）
+  const handleDeleteEngineer = (id: string) => {
+    toast.success('技術者情報を削除しました');
+  };
+  
+  // 履歴書ダウンロード（シミュレーション）
+  const handleDownloadResume = (id: string) => {
+    toast.success('履歴書をダウンロードします');
   };
 
-  // ヘルパー関数：次のページへ移動
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-  
-  // カテゴリー選択時の処理
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setCurrentPage(1);
-    
-    let filtered = engineersData;
-    
-    // カテゴリーでフィルタリング
-    if (categoryId === 'self') {
-      filtered = filtered.filter(engineer => engineer.companyType === '自社');
-    } else if (categoryId === 'other') {
-      filtered = filtered.filter(engineer => engineer.companyType === '他社');
-    }
-    
-    // 既存の検索クエリや他のフィルターも適用
-    if (searchQuery || filters.companyType || filters.japaneseLevel || filters.status) {
-      filtered = applyFilters(filtered);
-    }
-    
-    setFilteredEngineers(filtered);
-  };
-  
-  // 既存のフィルター適用処理
-  const applyFilters = (engineers: any[]) => {
-    const query = searchQuery.toLowerCase();
-    
-    return engineers.filter(engineer => {
-      // 検索クエリでフィルター
-      if (query) {
-        const nameMatch = engineer.name.toLowerCase().includes(query);
-        const skillsMatch = engineer.skills && engineer.skills.some((skill: string) => 
-          skill.toLowerCase().includes(query)
-        );
-        const experienceMatch = engineer.experience.toLowerCase().includes(query);
-        const conditionsMatch = engineer.desiredConditions.toLowerCase().includes(query);
-        const companyNameMatch = engineer.companyName?.toLowerCase().includes(query);
-        
-        if (!(nameMatch || skillsMatch || experienceMatch || conditionsMatch || companyNameMatch)) {
-          return false;
-        }
-      }
-      
-      // 区分でフィルター
-      if (filters.companyType && engineer.companyType !== filters.companyType) {
-        return false;
-      }
-      
-      // 所属会社でフィルター
-      if (filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
-        return false;
-      }
-      
-      // 日本語レベルでフィルター
-      if (filters.japaneseLevel && engineer.japaneseLevel !== filters.japaneseLevel) {
-        return false;
-      }
-      
-      // ステータスでフィルター
-      if (filters.status && engineer.status !== filters.status) {
-        return false;
-      }
-      
-      return true;
-    });
-  };
-  
-  // 検索時にページをリセット
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filteredEngineers]);
-  
-  // 検索クエリが変更されたときに検索を実行
-  useEffect(() => {
-    handleSearch();
-  }, [searchQuery, filters.companyType, filters.companyName, filters.japaneseLevel, filters.status]);
-  
-  // 検索を実行
-  const handleSearch = () => {
-    let filtered = engineersData;
-    
-    // カテゴリーでフィルタリング
-    if (selectedCategory === 'self') {
-      filtered = filtered.filter(engineer => engineer.companyType === '自社');
-    } else if (selectedCategory === 'other') {
-      filtered = filtered.filter(engineer => engineer.companyType === '他社');
-    }
-    
-    // その他のフィルターを適用
-    filtered = applyFilters(filtered);
-    
-    setFilteredEngineers(filtered);
-    
-    if (filtered.length === 0 && (searchQuery || filters.companyType || filters.companyName || filters.japaneseLevel || filters.status)) {
-      toast.info('該当する技術者が見つかりませんでした');
-    }
-  };
-  
-  // フィルター条件をリセット
-  const resetFilters = () => {
-    setSearchQuery('');
-    setFilters({
-      name: '',
-      companyType: '',
-      companyName: '',
-      skills: '',
-      experience: '',
-      japaneseLevel: '',
-      desiredConditions: '',
-      status: ''
-    });
-    
-    // カテゴリーに基づいてエンジニアをフィルタリング
-    if (selectedCategory === 'all') {
-      setFilteredEngineers(engineersData);
-    } else if (selectedCategory === 'self') {
-      setFilteredEngineers(engineersData.filter(engineer => engineer.companyType === '自社'));
-    } else if (selectedCategory === 'other') {
-      setFilteredEngineers(engineersData.filter(engineer => engineer.companyType === '他社'));
-    }
-  };
-  
   // AIで推薦文を生成（シミュレーション）
   const generateRecommendation = () => {
     toast.success('推薦文を生成中...', { duration: 2000 });
@@ -393,56 +256,7 @@ export function Candidates() {
     setNewEngineer(newEngineerInitialState);
     setRecommendationText("");
   };
-  
-  // 技術者詳細を表示
-  const handleViewDetails = (engineer: any) => {
-    setSelectedEngineer(engineer);
-    setDetailDialogOpen(true);
-  };
-  
-  // ステータスを更新
-  const handleStatusChange = (value: string) => {
-    if (selectedEngineer) {
-      setSelectedEngineer({...selectedEngineer, status: value});
-      toast.success('ステータスを更新しました');
-    }
-  };
-  
-  // 技術者の編集 (詳細画面から)
-  const handleEditClick = () => {
-    setDetailDialogOpen(false);
-    setEditEngineerData({...selectedEngineer});
-    setEditDialogOpen(true);
-  };
-  
-  // 技術者の編集 (テーブルから直接)
-  const handleDirectEditClick = (engineer: any) => {
-    setSelectedEngineer(engineer);
-    setEditEngineerData({...engineer});
-    setEditDialogOpen(true);
-  };
-  
-  // 編集内容を保存
-  const handleSaveEdit = () => {
-    if (editEngineerData) {
-      // 更新日を現在の日付に設定
-      editEngineerData.updatedAt = new Date().toISOString().split('T')[0];
-    }
-    toast.success('技術者情報を更新しました');
-    setEditDialogOpen(false);
-    // 実際のアプリケーションでは、ここでデータベースの更新を行います
-  };
-  
-  // 技術者の削除（シミュレーション）
-  const handleDeleteEngineer = (id: string) => {
-    toast.success('技術者情報を削除しました');
-  };
-  
-  // 履歴書ダウンロード（シミュレーション）
-  const handleDownloadResume = (id: string) => {
-    toast.success('履歴書をダウンロードします');
-  };
-  
+
   return (
     <MainLayout>
       <div className="flex-1 space-y-8 p-8 pt-6">
@@ -459,259 +273,14 @@ export function Candidates() {
           </TabsList>
           
           <TabsContent value="list">
-            <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">技術者一覧</CardTitle>
-                <CardDescription className="japanese-text">
-                  登録済みの技術者一覧と詳細を表示します
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* カテゴリー選択 */}
-                <div className="mb-6">
-                  <div className="flex space-x-2 mb-4">
-                    {categories.map((category) => (
-                      <Button
-                        key={category.id}
-                        onClick={() => handleCategoryChange(category.id)}
-                        variant={selectedCategory === category.id ? "default" : "outline"}
-                        className="japanese-text"
-                      >
-                        {category.name}
-                      </Button>
-                    ))}
-                  </div>
-                
-                  {/* 検索フィールドと絞り込みオプション */}
-                  <div className="space-y-4">
-                    {/* 検索フィールド */}
-                    <div>
-                      <div className="flex items-center border-b px-3 rounded-md border">
-                        <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                        <Input
-                          placeholder="名前、スキル、経験などで検索..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="japanese-text w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                        />
-                      </div>
-                    </div>
-                    
-                    {/* 絞り込みオプション */}
-                    <div className="flex flex-wrap gap-3">
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">区分:</Label>
-                        <Select
-                          value={filters.companyType}
-                          onValueChange={(value) => setFilters({...filters, companyType: value})}
-                        >
-                          <SelectTrigger className="h-8 w-[120px] japanese-text">
-                            <SelectValue placeholder="全て" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">全て</SelectItem>
-                            <SelectItem value="自社">自社</SelectItem>
-                            <SelectItem value="他社">他社</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">所属会社:</Label>
-                        <Select
-                          value={filters.companyName}
-                          onValueChange={(value) => setFilters({...filters, companyName: value})}
-                        >
-                          <SelectTrigger className="h-8 w-[200px] japanese-text">
-                            <SelectValue placeholder="全て" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">全て</SelectItem>
-                            <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
-                            <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
-                            <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
-                            <SelectItem value="ウェブソリューションズ株式会社">ウェブソリューションズ株式会社</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
-                        <Select
-                          value={filters.japaneseLevel}
-                          onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
-                        >
-                          <SelectTrigger className="h-8 w-[160px] japanese-text">
-                            <SelectValue placeholder="全て" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">全て</SelectItem>
-                            <SelectItem value="不問">不問</SelectItem>
-                            <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                            <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                            <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
-                        <Select
-                          value={filters.status}
-                          onValueChange={(value) => setFilters({...filters, status: value})}
-                        >
-                          <SelectTrigger className="h-8 w-[120px] japanese-text">
-                            <SelectValue placeholder="全て" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">全て</SelectItem>
-                            <SelectItem value="案件探し中">案件探し中</SelectItem>
-                            <SelectItem value="提案中">提案中</SelectItem>
-                            <SelectItem value="稼働中">稼働中</SelectItem>
-                            <SelectItem value="非稼働">非稼働</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      {(searchQuery || filters.companyType || filters.companyName || filters.japaneseLevel || filters.status) && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={resetFilters} 
-                          className="h-8 px-2 text-xs japanese-text"
-                        >
-                          リセット
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="japanese-text">名前</TableHead>
-                        <TableHead className="japanese-text">区分</TableHead>
-                        <TableHead className="japanese-text">所属会社</TableHead>
-                        <TableHead className="japanese-text">スキル</TableHead>
-                        <TableHead className="japanese-text">経験年数</TableHead>
-                        <TableHead className="japanese-text">希望条件</TableHead>
-                        <TableHead className="japanese-text">ステータス</TableHead>
-                        <TableHead className="japanese-text">登録日</TableHead>
-                        <TableHead className="japanese-text">更新日</TableHead>
-                        <TableHead className="japanese-text">アクション</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedEngineers.length > 0 ? (
-                        paginatedEngineers.map((engineer) => (
-                          <TableRow key={engineer.id}>
-                            <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
-                            <TableCell>
-                              <Badge 
-                                variant={engineer.companyType === "自社" ? "default" : "secondary"} 
-                                className="japanese-text text-xs"
-                              >
-                                {engineer.companyType}
-                                {engineer.source === "メール" && " (メール)"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.companyName}</TableCell>
-                            <TableCell className="japanese-text text-sm truncate">
-                              {engineer.skills && engineer.skills.join(", ")}
-                            </TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.experience}</TableCell>
-                            <TableCell className="japanese-text text-sm truncate">{engineer.desiredConditions}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.status}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.registeredAt}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.updatedAt}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleViewDetails(engineer)}
-                                  title="詳細を表示"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleDownloadResume(engineer.id)}
-                                  title="履歴書をダウンロード"
-                                >
-                                  <FileDown className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleDirectEditClick(engineer)}
-                                  title="編集"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleDeleteEngineer(engineer.id)}
-                                  title="削除"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={10} className="h-24 text-center">
-                            データが見つかりません
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                {totalPages > 1 && (
-                  <div className="mt-4 flex justify-center">
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={goToPrevPage}
-                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                          />
-                        </PaginationItem>
-                        
-                        {Array.from({ length: totalPages }).map((_, index) => {
-                          const pageNumber = index + 1;
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink 
-                                isActive={currentPage === pageNumber}
-                                onClick={() => setCurrentPage(pageNumber)}
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
-                        
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={goToNextPage}
-                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <CandidateList 
+              engineers={engineersData}
+              categories={categories}
+              onViewDetails={handleViewDetails}
+              onEditEngineer={handleDirectEditClick}
+              onDeleteEngineer={handleDeleteEngineer}
+              onDownloadResume={handleDownloadResume}
+            />
           </TabsContent>
           
           <TabsContent value="upload" className="space-y-6">
@@ -719,192 +288,16 @@ export function Candidates() {
           </TabsContent>
           
           <TabsContent value="add" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">新規技術者登録</CardTitle>
-                <CardDescription className="japanese-text">
-                  自社や協力会社の技術者情報を登録します
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAddEngineer} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="japanese-text">区分</Label>
-                    <RadioGroup 
-                      value={newEngineer.companyType}
-                      onValueChange={(value) => setNewEngineer({...newEngineer, companyType: value})}
-                      className="flex space-x-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="自社" id="own-company" />
-                        <Label htmlFor="own-company" className="japanese-text">自社</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="他社" id="other-company" />
-                        <Label htmlFor="other-company" className="japanese-text">他社</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="japanese-text">氏名 <span className="text-red-500">*</span></Label>
-                      <Input 
-                        id="name" 
-                        value={newEngineer.name}
-                        onChange={(e) => setNewEngineer({...newEngineer, name: e.target.value})}
-                        placeholder="例: 山田太郎"
-                        className="japanese-text"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="companyName" className="japanese-text">所属会社 <span className="text-red-500">*</span></Label>
-                      <Input 
-                        id="companyName" 
-                        value={newEngineer.companyName}
-                        onChange={(e) => setNewEngineer({...newEngineer, companyName: e.target.value})}
-                        placeholder="例: テックイノベーション株式会社"
-                        className="japanese-text"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="skills" className="japanese-text">保有スキル <span className="text-red-500">*</span></Label>
-                      <Input 
-                        id="skills" 
-                        value={newEngineer.skills}
-                        onChange={(e) => setNewEngineer({...newEngineer, skills: e.target.value})}
-                        placeholder="例: Java, Spring Boot, AWS（カンマ区切り）"
-                        className="japanese-text"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="japanese" className="japanese-text">日本語レベル <span className="text-red-500">*</span></Label>
-                      <Select
-                        value={newEngineer.japaneseLevel}
-                        onValueChange={(value) => setNewEngineer({...newEngineer, japaneseLevel: value})}
-                      >
-                        <SelectTrigger className="japanese-text">
-                          <SelectValue placeholder="日本語レベルを選択" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="不問">不問</SelectItem>
-                          <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                          <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                          <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="experience" className="japanese-text">経験年数 <span className="text-red-500">*</span></Label>
-                      <Input 
-                        id="experience" 
-                        value={newEngineer.experience}
-                        onChange={(e) => setNewEngineer({...newEngineer, experience: e.target.value})}
-                        placeholder="例: 5年"
-                        className="japanese-text"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="availability" className="japanese-text">稼働可能時期</Label>
-                      <Input 
-                        id="availability" 
-                        value={newEngineer.availability}
-                        onChange={(e) => setNewEngineer({...newEngineer, availability: e.target.value})}
-                        placeholder="例: 即日、1ヶ月後、応相談"
-                        className="japanese-text"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="status" className="japanese-text">ステータス</Label>
-                      <Select
-                        value={newEngineer.status}
-                        onValueChange={(value) => setNewEngineer({...newEngineer, status: value})}
-                      >
-                        <SelectTrigger className="japanese-text">
-                          <SelectValue placeholder="ステータスを選択" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="案件探し中">案件探し中</SelectItem>
-                          <SelectItem value="提案中">提案中</SelectItem>
-                          <SelectItem value="稼働中">稼働中</SelectItem>
-                          <SelectItem value="非稼働">非稼働</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="desired-conditions" className="japanese-text">希望条件</Label>
-                    <Input 
-                      id="desired-conditions" 
-                      value={newEngineer.desiredConditions}
-                      onChange={(e) => setNewEngineer({...newEngineer, desiredConditions: e.target.value})}
-                      placeholder="例: 東京/リモート, 60~80万円"
-                      className="japanese-text"
-                    />
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">推薦文生成</CardTitle>
-                <CardDescription className="japanese-text">
-                  候補者の自動生成された推薦文
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="recommendation-template" className="japanese-text">テンプレート</Label>
-                  <Textarea 
-                    id="recommendation-template" 
-                    className="min-h-[150px] japanese-text"
-                    value={recommendationTemplate}
-                    onChange={(e) => setRecommendationTemplate(e.target.value)}
-                    placeholder="[名前]、[スキル]、[経験]などのプレースホルダーを使用してください"
-                  />
-                  <p className="text-xs text-muted-foreground japanese-text">
-                    推薦文のテンプレートを編集できます。[名前]、[スキル]、[経験]などのプレースホルダーを使用します。
-                  </p>
-                </div>
-                
-                <Button 
-                  onClick={generateRecommendation} 
-                  variant="outline" 
-                  className="w-full japanese-text"
-                >
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  AIで推薦文を生成
-                </Button>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="generated-recommendation" className="japanese-text">生成された推薦文</Label>
-                  <Textarea 
-                    id="generated-recommendation"
-                    className="min-h-[150px] japanese-text" 
-                    value={recommendationText}
-                    onChange={(e) => setRecommendationText(e.target.value)}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button onClick={handleAddEngineer} type="submit" className="japanese-text">
-                  <Save className="mr-2 h-4 w-4" />
-                  技術者と推薦文を登録
-                </Button>
-              </CardFooter>
-            </Card>
+            <CandidateForm
+              initialData={newEngineer}
+              onSubmit={handleAddEngineer}
+              onDataChange={setNewEngineer}
+              recommendationTemplate={recommendationTemplate}
+              recommendationText={recommendationText}
+              onRecommendationTemplateChange={setRecommendationTemplate}
+              onRecommendationTextChange={setRecommendationText}
+              onGenerateRecommendation={generateRecommendation}
+            />
           </TabsContent>
 
           <TabsContent value="bulk-email" className="space-y-6">
@@ -913,310 +306,22 @@ export function Candidates() {
         </Tabs>
         
         {/* 技術者詳細ダイアログ */}
-        <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle className="japanese-text">技術者詳細</DialogTitle>
-              <DialogDescription className="japanese-text">
-                技術者の詳細情報を表示しています
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedEngineer && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">氏名</h4>
-                    <p className="japanese-text">{selectedEngineer.name}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">区分</h4>
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant={selectedEngineer.companyType === "自社" ? "default" : "secondary"} 
-                        className="japanese-text"
-                      >
-                        {selectedEngineer.companyType}
-                      </Badge>
-                      {selectedEngineer.source === "メール" && (
-                        <Badge variant="outline" className="japanese-text">メール</Badge>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">所属会社</h4>
-                    <p className="japanese-text">{selectedEngineer.companyName || 'N/A'}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">メールアドレス</h4>
-                    <p>{selectedEngineer.email || 'N/A'}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">電話番号</h4>
-                    <p>{selectedEngineer.phone || 'N/A'}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">スキル</h4>
-                    <p className="japanese-text">{selectedEngineer.skills && selectedEngineer.skills.join(', ')}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">経験年数</h4>
-                    <p className="japanese-text">{selectedEngineer.experience}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">日本語レベル</h4>
-                    <p className="japanese-text">{selectedEngineer.japaneseLevel}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">稼働可能時期</h4>
-                    <p className="japanese-text">{selectedEngineer.availability}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">登録日</h4>
-                    <p className="japanese-text">{selectedEngineer.registeredAt}</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium japanese-text">更新日</h4>
-                    <p className="japanese-text">{selectedEngineer.updatedAt}</p>
-                  </div>
-                  
-                  <div className="col-span-2">
-                    <h4 className="text-sm font-medium japanese-text">希望条件</h4>
-                    <p className="japanese-text">{selectedEngineer.desiredConditions}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium mb-2 japanese-text">ステータス</h4>
-                  <Select
-                    value={selectedEngineer.status}
-                    onValueChange={handleStatusChange}
-                  >
-                    <SelectTrigger className="w-full japanese-text">
-                      <SelectValue placeholder="ステータスを選択" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="案件探し中" className="japanese-text">案件探し中</SelectItem>
-                      <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
-                      <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                      <SelectItem value="非稼働" className="japanese-text">非稼働</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium mb-2 japanese-text">推薦文</h4>
-                  <div className="bg-muted p-4 rounded-md">
-                    <p className="text-sm japanese-text whitespace-pre-wrap">{selectedEngineer.recommendation}</p>
-                  </div>
-                </div>
-                
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setDetailDialogOpen(false)} className="japanese-text">
-                    閉じる
-                  </Button>
-                  <Button onClick={handleEditClick} className="japanese-text">
-                    <Edit className="mr-2 h-4 w-4" />
-                    編集
-                  </Button>
-                </DialogFooter>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <CandidateDetails
+          open={detailDialogOpen}
+          onOpenChange={setDetailDialogOpen}
+          engineer={selectedEngineer}
+          onStatusChange={handleStatusChange}
+          onEditClick={handleEditClick}
+        />
         
         {/* 技術者編集ダイアログ */}
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle className="japanese-text">技術者情報編集</DialogTitle>
-              <DialogDescription className="japanese-text">
-                技術者の情報を編集します
-              </DialogDescription>
-            </DialogHeader>
-            
-            {editEngineerData && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="japanese-text">区分</Label>
-                  <RadioGroup 
-                    value={editEngineerData.companyType}
-                    onValueChange={(value) => setEditEngineerData({...editEngineerData, companyType: value})}
-                    className="flex space-x-4"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="自社" id="edit-own-company" />
-                      <Label htmlFor="edit-own-company" className="japanese-text">自社</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="他社" id="edit-other-company" />
-                      <Label htmlFor="edit-other-company" className="japanese-text">他社</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="japanese-text">氏名</Label>
-                    <Input 
-                      value={editEngineerData.name}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, name: e.target.value})}
-                      className="japanese-text"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="japanese-text">所属会社</Label>
-                    <Input 
-                      value={editEngineerData.companyName || ''}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, companyName: e.target.value})}
-                      className="japanese-text"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">メールアドレス</Label>
-                    <Input 
-                      value={editEngineerData.email || ''}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, email: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">電話番号</Label>
-                    <Input 
-                      value={editEngineerData.phone || ''}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, phone: e.target.value})}
-                      className="japanese-text"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">日本語レベル</Label>
-                    <Select
-                      value={editEngineerData.japaneseLevel}
-                      onValueChange={(value) => setEditEngineerData({...editEngineerData, japaneseLevel: value})}
-                    >
-                      <SelectTrigger className="japanese-text">
-                        <SelectValue placeholder="日本語レベルを選択" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="不問" className="japanese-text">不問</SelectItem>
-                        <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
-                        <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
-                        <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">保有スキル</Label>
-                    <Input 
-                      value={editEngineerData.skills && editEngineerData.skills.join(', ')}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, skills: e.target.value.split(', ')})}
-                      className="japanese-text"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">経験年数</Label>
-                    <Input 
-                      value={editEngineerData.experience}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, experience: e.target.value})}
-                      className="japanese-text"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">希望条件</Label>
-                    <Input 
-                      value={editEngineerData.desiredConditions}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, desiredConditions: e.target.value})}
-                      className="japanese-text"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">稼働可能時期</Label>
-                    <Input 
-                      value={editEngineerData.availability}
-                      onChange={(e) => setEditEngineerData({...editEngineerData, availability: e.target.value})}
-                      className="japanese-text"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">登録日</Label>
-                    <Input 
-                      value={editEngineerData.registeredAt}
-                      readOnly
-                      disabled
-                      className="japanese-text bg-muted"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="japanese-text">更新日</Label>
-                    <Input 
-                      value={new Date().toISOString().split('T')[0]} 
-                      readOnly
-                      disabled
-                      className="japanese-text bg-muted"
-                    />
-                    <p className="text-xs text-muted-foreground japanese-text">保存時に自動で更新されます</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="japanese-text">ステータス</Label>
-                  <Select
-                    value={editEngineerData.status}
-                    onValueChange={(value) => setEditEngineerData({...editEngineerData, status: value})}
-                  >
-                    <SelectTrigger className="japanese-text">
-                      <SelectValue placeholder="ステータスを選択" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="案件探し中" className="japanese-text">案件探し中</SelectItem>
-                      <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
-                      <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                      <SelectItem value="非稼働" className="japanese-text">非稼働</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="japanese-text">推薦文</Label>
-                  <Textarea 
-                    value={editEngineerData.recommendation || ''}
-                    onChange={(e) => setEditEngineerData({...editEngineerData, recommendation: e.target.value})}
-                    className="min-h-[150px] japanese-text" 
-                  />
-                </div>
-                
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="japanese-text">
-                    キャンセル
-                  </Button>
-                  <Button onClick={handleSaveEdit} className="japanese-text">
-                    <Save className="mr-2 h-4 w-4" />
-                    保存
-                  </Button>
-                </DialogFooter>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <CandidateEdit
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          engineer={editEngineerData}
+          onEngineerChange={setEditEngineerData}
+          onSave={handleSaveEdit}
+        />
       </div>
     </MainLayout>
   );
