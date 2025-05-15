@@ -47,7 +47,7 @@ export const EngineerSelection: React.FC<EngineerSelectionProps> = ({
                 <div>
                   <p className="text-sm font-medium japanese-text">{engineer.name}</p>
                   <p className="text-xs text-muted-foreground japanese-text">
-                    {engineer.skills.join(", ")} | {engineer.experience}
+                    {engineer.skills && engineer.skills.join(", ")} | {engineer.experience}
                   </p>
                 </div>
               </div>

@@ -93,7 +93,7 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
                     <p className="font-medium japanese-text">{engineer.name}</p>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <span className="japanese-text mr-2">スキル:</span>
-                      <span className="japanese-text">{engineer.skills.join(", ")}</span>
+                      <span className="japanese-text">{engineer.skills && engineer.skills.join(", ")}</span>
                     </div>
                     <div className="flex items-center text-xs">
                       <span className="japanese-text mr-2">経験:</span>
