@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -181,7 +180,7 @@ export function Email() {
                         <span className="font-medium japanese-text">還元上次設定</span>
                       </div>
                       <p className="text-xs text-muted-foreground japanese-text">
-                        万一出错可以回滚上一次设定
+                        設定エラー時に前回の設定に戻すことができます
                       </p>
                     </div>
                     
