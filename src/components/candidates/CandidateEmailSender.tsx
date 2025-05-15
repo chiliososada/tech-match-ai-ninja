@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -374,7 +373,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
       setSending(false);
       toast({
         title: "メール内容が改善されました",
-        variant: "success"
+        variant: "default"
       });
     }, 1500);
   };
