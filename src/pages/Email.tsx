@@ -6,10 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Clock, Shield, Mail } from 'lucide-react';
+import { Clock, Shield, Mail, Play, History, Link } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 
 export function Email() {
   const { toast } = useToast();
@@ -20,12 +19,71 @@ export function Email() {
       description: "メール連携の設定が正常に保存されました。",
     });
   };
+  
+  const handleTestRun = () => {
+    toast({
+      title: "テスト実行中",
+      description: "メール連携のテスト実行を開始しました。",
+    });
+    // テスト実行のロジックを実装
+    setTimeout(() => {
+      toast({
+        title: "テスト実行完了",
+        description: "メール連携のテスト実行が成功しました。5件のメールを処理しました。",
+      });
+    }, 2000);
+  };
+  
+  const openLogHistory = () => {
+    toast({
+      title: "実行ログを表示中",
+      description: "直近の実行ログを取得しています。",
+    });
+    // 実際には別ページやモーダルでログを表示する処理
+  };
+  
+  const openSettingsHistory = () => {
+    toast({
+      title: "設定履歴を表示中",
+      description: "過去の設定履歴を取得しています。",
+    });
+    // 設定履歴を表示する処理
+  };
 
   return (
     <MainLayout>
       <div className="flex-1 space-y-8 p-8 pt-6">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight japanese-text">メール連携</h2>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="japanese-text flex items-center" 
+              onClick={openSettingsHistory}
+            >
+              <History className="mr-1 h-4 w-4" />
+              設定履歴
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="japanese-text flex items-center" 
+              onClick={openLogHistory}
+            >
+              <Link className="mr-1 h-4 w-4" />
+              実行ログ
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="japanese-text flex items-center" 
+              onClick={handleTestRun}
+            >
+              <Play className="mr-1 h-4 w-4" />
+              テスト実行
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="execution" className="space-y-6">
@@ -96,6 +154,41 @@ export function Email() {
                   <p className="text-xs text-muted-foreground japanese-text">
                     1回の実行で処理する最大メール数
                   </p>
+                </div>
+                
+                <div className="space-y-2 pt-4 border-t">
+                  <Label className="japanese-text font-medium">機能名称と用途</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                    <div className="border rounded-md p-3 bg-muted/50">
+                      <div className="flex items-center mb-2">
+                        <Play className="h-4 w-4 mr-2" />
+                        <span className="font-medium japanese-text">手動実行ボタン</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground japanese-text">
+                        テスト実行用 - 現在の設定でメール連携処理を手動で実行します
+                      </p>
+                    </div>
+                    
+                    <div className="border rounded-md p-3 bg-muted/50">
+                      <div className="flex items-center mb-2">
+                        <History className="h-4 w-4 mr-2" />
+                        <span className="font-medium japanese-text">設定の保存履歴</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground japanese-text">
+                        自動保存された過去の設定履歴を確認・復元できます
+                      </p>
+                    </div>
+                    
+                    <div className="border rounded-md p-3 bg-muted/50">
+                      <div className="flex items-center mb-2">
+                        <Link className="h-4 w-4 mr-2" />
+                        <span className="font-medium japanese-text">最終実行ログ確認</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground japanese-text">
+                        直近の実行結果や処理状況を確認できます
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
