@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileDown, Edit, Trash2, Wand2, Save, Eye, Search } from 'lucide-react';
+import { FileDown, Edit, Trash2, Wand2, Save, Eye, Search, Send } from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -31,6 +32,7 @@ import {
 import { Command } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { BulkEmailTab } from '@/components/candidates/BulkEmailTab';
 
 // サンプル技術者データ
 const engineersData = [
@@ -44,6 +46,7 @@ const engineersData = [
     status: "稼働中",
     desiredConditions: "東京/リモート, 60~80万円",
     companyType: "自社",
+    companyName: "テックイノベーション株式会社",
     source: "手動入力",
     recommendation: "鈴木さんはJavaとSpring Bootを中心に7年以上の開発経験があり、日本語はビジネスレベルです。金融系のプロジェクトに強みがあり、AWSやDockerなどのクラウド技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。直近では大手金融機関のオンラインバンキングシステム開発に5年間携わっており、セキュリティに関する知識も豊富です。希望条件は東京またはリモートワークで、単価は60万円〜80万円です。",
     email: "taro.suzuki@example.com",
@@ -61,6 +64,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "大阪/リモート, 55~70万円",
     companyType: "他社",
+    companyName: "フロントエンドパートナーズ株式会社",
     source: "メール",
     recommendation: "田中さんはReactとTypeScriptを中心に5年以上のフロントエンド開発経験があり、日本語はネイティブレベルです。Webアプリケーション開発に強みがあり、Node.jsやExpressなどのバックエンド技術も習得しています。直近では大手ECサイトのフロントエンド開発に3年間携わっており、パフォーマンス最適化とユーザー体験の向上に貢献しました。希望条件は大阪またはリモートワークで、単価は55万円〜70万円です。",
     email: "hanako.tanaka@example.com",
@@ -78,6 +82,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "リモートのみ, 50~65万円",
     companyType: "自社",
+    companyName: "テックイノベーション株式会社",
     source: "手動入力",
     recommendation: "山田さんはPythonとDjangoを中心に3年以上のバックエンド開発経験があり、日本語は日常会話レベルです。クラウドサービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
     email: "kenji.yamada@example.com",
@@ -95,6 +100,7 @@ const engineersData = [
     status: "稼働中",
     desiredConditions: "東京, 70~90万円",
     companyType: "他社",
+    companyName: "クラウドシステムズ株式会社",
     source: "メール",
     recommendation: "佐藤さんはAWSとDockerを中心に8年以上のクラウド開発経験があり、日本語はビジネスレベルです。AIやIoTなどの技術に強みがあり、KubernetesやEKSなどのクラウドサービスを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は東京で、単価は70万円〜90万円です。",
     email: "yoshihiro.sato@example.com",
@@ -112,6 +118,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "東京/リモート, 55~75万円",
     companyType: "自社",
+    companyName: "テックイノベーション株式会社",
     source: "手動入力",
     recommendation: "高橋さんはJavaScriptとVue.jsを中心に4年以上のフロントエンド開発経験があり、日本語はビジネスレベルです。クラウドサービスの開発に強みがあり、FirebaseやAWSなどのサービスを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は東京またはリモートワークで、単価は55万円〜75万円です。",
     email: "shohei.kawasaki@example.com",
@@ -129,6 +136,7 @@ const engineersData = [
     status: "稼働中",
     desiredConditions: "大阪, 50~70万円",
     companyType: "他社",
+    companyName: "ウェブソリューションズ株式会社",
     source: "メール",
     recommendation: "伊藤さんはPHPとLaravelを中心に6年以上のバックエンド開発経験があり、日本語はネイティブレベルです。データベースの設計と管理に強みがあり、MySQLやPostgreSQLなどのデータベースを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は大阪で、単価は50万円〜70万円です。",
     email: "yukiko.itoh@example.com",
@@ -145,6 +153,22 @@ const categories = [
   { id: "other", name: "他社" }
 ];
 
+// 新規エンジニアのサンプルデータに所属会社のフィールドを追加
+const newEngineerInitialState = {
+  name: '',
+  skills: '',
+  japaneseLevel: 'ビジネスレベル',
+  experience: '',
+  availability: '',
+  status: '案件探し中',
+  desiredConditions: '',
+  companyType: '自社',
+  companyName: '',
+  source: '手動入力',
+  registeredAt: new Date().toISOString().split('T')[0],
+  updatedAt: new Date().toISOString().split('T')[0]
+};
+
 export function Candidates() {
   const [currentPage, setCurrentPage] = useState(1);
   const [recommendationTemplate, setRecommendationTemplate] = useState(
@@ -158,19 +182,7 @@ export function Candidates() {
   );
   
   // 新規技術者のフォームデータ
-  const [newEngineer, setNewEngineer] = useState({
-    name: '',
-    skills: '',
-    japaneseLevel: 'ビジネスレベル',
-    experience: '',
-    availability: '',
-    status: '案件探し中',
-    desiredConditions: '',
-    companyType: '自社',
-    source: '手動入力',
-    registeredAt: new Date().toISOString().split('T')[0],
-    updatedAt: new Date().toISOString().split('T')[0]
-  });
+  const [newEngineer, setNewEngineer] = useState(newEngineerInitialState);
   
   // 詳細ダイアログの状態管理
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -183,6 +195,7 @@ export function Candidates() {
   const [filters, setFilters] = useState({
     name: '',
     companyType: '',
+    companyName: '',
     skills: '',
     experience: '',
     japaneseLevel: '',
@@ -204,6 +217,20 @@ export function Candidates() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // ヘルパー関数：前のページへ移動
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // ヘルパー関数：次のページへ移動
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
   
   // カテゴリー選択時の処理
   const handleCategoryChange = (categoryId: string) => {
@@ -240,14 +267,20 @@ export function Candidates() {
         );
         const experienceMatch = engineer.experience.toLowerCase().includes(query);
         const conditionsMatch = engineer.desiredConditions.toLowerCase().includes(query);
+        const companyNameMatch = engineer.companyName?.toLowerCase().includes(query);
         
-        if (!(nameMatch || skillsMatch || experienceMatch || conditionsMatch)) {
+        if (!(nameMatch || skillsMatch || experienceMatch || conditionsMatch || companyNameMatch)) {
           return false;
         }
       }
       
       // 区分でフィルター
       if (filters.companyType && engineer.companyType !== filters.companyType) {
+        return false;
+      }
+      
+      // 所属会社でフィルター
+      if (filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
         return false;
       }
       
@@ -273,7 +306,7 @@ export function Candidates() {
   // 検索クエリが変更されたときに検索を実行
   useEffect(() => {
     handleSearch();
-  }, [searchQuery, filters.companyType, filters.japaneseLevel, filters.status]);
+  }, [searchQuery, filters.companyType, filters.companyName, filters.japaneseLevel, filters.status]);
   
   // 検索を実行
   const handleSearch = () => {
@@ -302,6 +335,7 @@ export function Candidates() {
     setFilters({
       name: '',
       companyType: '',
+      companyName: '',
       skills: '',
       experience: '',
       japaneseLevel: '',
@@ -357,19 +391,7 @@ export function Candidates() {
     });
     
     // フォームをリセット
-    setNewEngineer({
-      name: '',
-      skills: '',
-      japaneseLevel: 'ビジネスレベル',
-      experience: '',
-      availability: '',
-      status: '案件探し中',
-      desiredConditions: '',
-      companyType: '自社',
-      source: '手動入力',
-      registeredAt: today,
-      updatedAt: today
-    });
+    setNewEngineer(newEngineerInitialState);
     setRecommendationText("");
   };
   
@@ -427,6 +449,7 @@ export function Candidates() {
             <TabsTrigger value="list" className="japanese-text">技術者一覧</TabsTrigger>
             <TabsTrigger value="upload" className="japanese-text">履歴書アップロード</TabsTrigger>
             <TabsTrigger value="add" className="japanese-text">技術者追加</TabsTrigger>
+            <TabsTrigger value="bulk-email" className="japanese-text">一括送信</TabsTrigger>
           </TabsList>
           
           <TabsContent value="list">
@@ -486,6 +509,25 @@ export function Candidates() {
                           </SelectContent>
                         </Select>
                       </div>
+
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">所属会社:</Label>
+                        <Select
+                          value={filters.companyName}
+                          onValueChange={(value) => setFilters({...filters, companyName: value})}
+                        >
+                          <SelectTrigger className="h-8 w-[200px] japanese-text">
+                            <SelectValue placeholder="全て" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">全て</SelectItem>
+                            <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
+                            <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
+                            <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
+                            <SelectItem value="ウェブソリューションズ株式会社">ウェブソリューションズ株式会社</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                       
                       <div className="flex items-center gap-2">
                         <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
@@ -525,7 +567,7 @@ export function Candidates() {
                         </Select>
                       </div>
                       
-                      {(searchQuery || filters.companyType || filters.japaneseLevel || filters.status) && (
+                      {(searchQuery || filters.companyType || filters.companyName || filters.japaneseLevel || filters.status) && (
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -545,6 +587,7 @@ export function Candidates() {
                       <TableRow>
                         <TableHead className="japanese-text">名前</TableHead>
                         <TableHead className="japanese-text">区分</TableHead>
+                        <TableHead className="japanese-text">所属会社</TableHead>
                         <TableHead className="japanese-text">スキル</TableHead>
                         <TableHead className="japanese-text">経験年数</TableHead>
                         <TableHead className="japanese-text">希望条件</TableHead>
@@ -568,6 +611,7 @@ export function Candidates() {
                                 {engineer.source === "メール" && " (メール)"}
                               </Badge>
                             </TableCell>
+                            <TableCell className="japanese-text text-sm">{engineer.companyName}</TableCell>
                             <TableCell className="japanese-text text-sm truncate">
                               {engineer.skills.join(", ")}
                             </TableCell>
@@ -616,7 +660,7 @@ export function Candidates() {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={9} className="h-24 text-center">
+                          <TableCell colSpan={10} className="h-24 text-center">
                             データが見つかりません
                           </TableCell>
                         </TableRow>
@@ -631,7 +675,7 @@ export function Candidates() {
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious 
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            onClick={goToPrevPage}
                             className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                           />
                         </PaginationItem>
@@ -652,7 +696,7 @@ export function Candidates() {
                         
                         <PaginationItem>
                           <PaginationNext 
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            onClick={goToNextPage}
                             className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                           />
                         </PaginationItem>
@@ -704,6 +748,18 @@ export function Candidates() {
                         value={newEngineer.name}
                         onChange={(e) => setNewEngineer({...newEngineer, name: e.target.value})}
                         placeholder="例: 山田太郎"
+                        className="japanese-text"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="companyName" className="japanese-text">所属会社 <span className="text-red-500">*</span></Label>
+                      <Input 
+                        id="companyName" 
+                        value={newEngineer.companyName}
+                        onChange={(e) => setNewEngineer({...newEngineer, companyName: e.target.value})}
+                        placeholder="例: テックイノベーション株式会社"
                         className="japanese-text"
                         required
                       />
@@ -844,6 +900,10 @@ export function Candidates() {
               </CardFooter>
             </Card>
           </TabsContent>
+
+          <TabsContent value="bulk-email" className="space-y-6">
+            <BulkEmailTab />
+          </TabsContent>
         </Tabs>
         
         {/* 技術者詳細ダイアログ */}
@@ -877,6 +937,11 @@ export function Candidates() {
                         <Badge variant="outline" className="japanese-text">メール</Badge>
                       )}
                     </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium japanese-text">所属会社</h4>
+                    <p className="japanese-text">{selectedEngineer.companyName || 'N/A'}</p>
                   </div>
                   
                   <div>
@@ -1000,6 +1065,15 @@ export function Candidates() {
                     <Input 
                       value={editEngineerData.name}
                       onChange={(e) => setEditEngineerData({...editEngineerData, name: e.target.value})}
+                      className="japanese-text"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="japanese-text">所属会社</Label>
+                    <Input 
+                      value={editEngineerData.companyName || ''}
+                      onChange={(e) => setEditEngineerData({...editEngineerData, companyName: e.target.value})}
                       className="japanese-text"
                     />
                   </div>
