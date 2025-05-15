@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -6,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { toast } from '@/components/ui/use-toast';
-import { FileText, Loader, Search, Textarea } from 'lucide-react';
+import { FileText, Loader, Search } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { CaseSelectionDialog } from './CaseSelectionDialog';
 import { MatchingProgressCard } from './MatchingProgressCard';
 import { MatchingResultsCard } from './MatchingResultsCard';
