@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -16,7 +17,15 @@ import { CaseTextInput } from './CaseTextInput';
 export interface CaseMatchingResult {
   id: number;
   candidate: string;
+  candidateCompany?: string;
+  candidateManager?: string;
+  candidateEmail?: string;
+  candidatePhone?: string;
   case: string;
+  caseCompany?: string;
+  caseManager?: string;
+  caseEmail?: string;
+  casePhone?: string;
   matchingRate: string;
   matchingReason: string;
   status: string;
@@ -31,7 +40,15 @@ export function CaseToCandidate() {
     {
       id: 1,
       candidate: '鈴木太郎',
+      candidateCompany: 'テック株式会社',
+      candidateManager: '佐藤部長',
+      candidateEmail: 'sato@tech.co.jp',
+      candidatePhone: '03-1234-5678',
       case: 'Java開発エンジニア',
+      caseCompany: 'システム開発株式会社',
+      caseManager: '田中課長',
+      caseEmail: 'tanaka@system.co.jp',
+      casePhone: '03-8765-4321',
       matchingRate: '92%',
       matchingReason: 'スキル・経験年数・単価が一致',
       status: '提案済み',
@@ -40,7 +57,15 @@ export function CaseToCandidate() {
     {
       id: 2,
       candidate: '田中花子',
+      candidateCompany: 'エンジニア株式会社',
+      candidateManager: '高橋部長',
+      candidateEmail: 'takahashi@engineer.co.jp',
+      candidatePhone: '03-2345-6789',
       case: 'フロントエンドエンジニア',
+      caseCompany: 'ウェブ開発株式会社',
+      caseManager: '伊藤課長',
+      caseEmail: 'ito@web.co.jp',
+      casePhone: '03-9876-5432',
       matchingRate: '89%',
       matchingReason: 'React経験が案件要件に一致',
       status: '未提案',
@@ -49,7 +74,15 @@ export function CaseToCandidate() {
     {
       id: 3,
       candidate: '佐藤一郎',
+      candidateCompany: 'ITソリューション株式会社',
+      candidateManager: '木村課長',
+      candidateEmail: 'kimura@itsolution.co.jp',
+      candidatePhone: '03-3456-7890',
       case: 'インフラエンジニア',
+      caseCompany: 'クラウドサービス株式会社',
+      caseManager: '小林部長',
+      caseEmail: 'kobayashi@cloud.co.jp',
+      casePhone: '03-0987-6543',
       matchingRate: '94%',
       matchingReason: 'AWS/Dockerの経験が豊富',
       status: '選考中',
@@ -58,7 +91,15 @@ export function CaseToCandidate() {
     {
       id: 4,
       candidate: '山田健太',
+      candidateCompany: 'デベロップ株式会社',
+      candidateManager: '山本課長',
+      candidateEmail: 'yamamoto@develop.co.jp',
+      candidatePhone: '03-4567-8901',
       case: 'バックエンドエンジニア',
+      caseCompany: 'サーバー株式会社',
+      caseManager: '加藤部長',
+      caseEmail: 'kato@server.co.jp',
+      casePhone: '03-2109-8765',
       matchingRate: '75%',
       matchingReason: 'Python経験あるが、年数不足',
       status: '未提案',

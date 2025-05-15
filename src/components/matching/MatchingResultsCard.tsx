@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CaseMatchingResult } from './CaseToCandidate';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 
 interface MatchingResultsCardProps {
   results: CaseMatchingResult[];
@@ -20,33 +21,53 @@ export function MatchingResultsCard({ results, exportButtonText, actionButtonTex
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <div className="grid grid-cols-5 gap-4 p-4 font-medium border-b">
-            <div className="japanese-text">候補者</div>
-            <div className="japanese-text">案件</div>
-            <div className="japanese-text">マッチング度</div>
-            <div className="japanese-text">マッチング理由</div>
-            <div className="japanese-text">ステータス</div>
-          </div>
-          <div className="divide-y">
-            {results.map(result => (
-              <div key={result.id} className="grid grid-cols-5 gap-4 p-4 items-center">
-                <div className="font-medium japanese-text">{result.candidate}</div>
-                <div className="japanese-text text-sm">{result.case}</div>
-                <div>
-                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 japanese-text">
-                    {result.matchingRate}
-                  </span>
-                </div>
-                <div className="japanese-text text-sm">{result.matchingReason}</div>
-                <div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${result.statusClass} japanese-text`}>
-                    {result.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="japanese-text">候補者</TableHead>
+                <TableHead className="japanese-text">候補者会社</TableHead>
+                <TableHead className="japanese-text">候補者担当者</TableHead>
+                <TableHead className="japanese-text">担当者メール</TableHead>
+                <TableHead className="japanese-text">担当者電話</TableHead>
+                <TableHead className="japanese-text">案件</TableHead>
+                <TableHead className="japanese-text">案件会社</TableHead>
+                <TableHead className="japanese-text">案件担当者</TableHead>
+                <TableHead className="japanese-text">担当者メール</TableHead>
+                <TableHead className="japanese-text">担当者電話</TableHead>
+                <TableHead className="japanese-text">マッチング度</TableHead>
+                <TableHead className="japanese-text">マッチング理由</TableHead>
+                <TableHead className="japanese-text">ステータス</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {results.map(result => (
+                <TableRow key={result.id}>
+                  <TableCell className="font-medium japanese-text">{result.candidate}</TableCell>
+                  <TableCell className="japanese-text">{result.candidateCompany || "会社情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.candidateManager || "担当者情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.candidateEmail || "メール情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.candidatePhone || "電話情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.case}</TableCell>
+                  <TableCell className="japanese-text">{result.caseCompany || "会社情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.caseManager || "担当者情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.caseEmail || "メール情報なし"}</TableCell>
+                  <TableCell className="japanese-text">{result.casePhone || "電話情報なし"}</TableCell>
+                  <TableCell>
+                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 japanese-text">
+                      {result.matchingRate}
+                    </span>
+                  </TableCell>
+                  <TableCell className="japanese-text">{result.matchingReason}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 text-xs rounded-full ${result.statusClass} japanese-text`}>
+                      {result.status}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">

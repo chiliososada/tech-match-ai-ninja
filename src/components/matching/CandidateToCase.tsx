@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { Loader } from 'lucide-react';
 import { CandidateSelectionDialog } from './CandidateSelectionDialog';
 import { MatchingProgressCard } from './MatchingProgressCard';
@@ -20,7 +21,15 @@ export function CandidateToCase() {
     {
       id: 1,
       candidate: '鈴木太郎',
+      candidateCompany: 'テック株式会社',
+      candidateManager: '佐藤部長',
+      candidateEmail: 'sato@tech.co.jp',
+      candidatePhone: '03-1234-5678',
       case: 'Java開発エンジニア',
+      caseCompany: 'システム開発株式会社',
+      caseManager: '田中課長',
+      caseEmail: 'tanaka@system.co.jp',
+      casePhone: '03-8765-4321',
       matchingRate: '92%',
       matchingReason: 'スキル・経験年数・単価が一致',
       status: '提案可能',
@@ -29,7 +38,15 @@ export function CandidateToCase() {
     {
       id: 2,
       candidate: '鈴木太郎',
+      candidateCompany: 'テック株式会社',
+      candidateManager: '佐藤部長',
+      candidateEmail: 'sato@tech.co.jp',
+      candidatePhone: '03-1234-5678',
       case: 'フロントエンドエンジニア',
+      caseCompany: 'ウェブ開発株式会社',
+      caseManager: '伊藤課長',
+      caseEmail: 'ito@web.co.jp',
+      casePhone: '03-9876-5432',
       matchingRate: '85%',
       matchingReason: 'React経験が案件要件に一致',
       status: '提案可能',
@@ -38,7 +55,15 @@ export function CandidateToCase() {
     {
       id: 3,
       candidate: '鈴木太郎',
+      candidateCompany: 'テック株式会社',
+      candidateManager: '佐藤部長',
+      candidateEmail: 'sato@tech.co.jp',
+      candidatePhone: '03-1234-5678',
       case: 'バックエンドエンジニア',
+      caseCompany: 'サーバー株式会社',
+      caseManager: '加藤部長',
+      caseEmail: 'kato@server.co.jp',
+      casePhone: '03-2109-8765',
       matchingRate: '78%',
       matchingReason: 'Java経験あり、フレームワーク経験なし',
       status: '要検討',
