@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -30,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { Command } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 // サンプル技術者データ
 const engineersData = [
@@ -43,6 +45,7 @@ const engineersData = [
     status: "稼働中",
     desiredConditions: "東京/リモート, 60~80万円",
     companyType: "自社",
+    source: "手動入力",
     recommendation: "鈴木さんはJavaとSpring Bootを中心に7年以上の開発経験があり、日本語はビジネスレベルです。金融系のプロジェクトに強みがあり、AWSやDockerなどのクラウド技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。直近では大手金融機関のオンラインバンキングシステム開発に5年間携わっており、セキュリティに関する知識も豊富です。希望条件は東京またはリモートワークで、単価は60万円〜80万円です。",
     email: "taro.suzuki@example.com",
     phone: "090-1234-5678",
@@ -57,6 +60,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "大阪/リモート, 55~70万円",
     companyType: "他社",
+    source: "メール",
     recommendation: "田中さんはReactとTypeScriptを中心に5年以上のフロントエンド開発経験があり、日本語はネイティブレベルです。Webアプリケーション開発に強みがあり、Node.jsやExpressなどのバックエンド技術も習得しています。直近では大手ECサイトのフロントエンド開発に3年間携わっており、パフォーマンス最適化とユーザー体験の向上に貢献しました。希望条件は大阪またはリモートワークで、単価は55万円〜70万円です。",
     email: "hanako.tanaka@example.com",
     phone: "090-2345-6789",
@@ -71,6 +75,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "リモートのみ, 50~65万円",
     companyType: "自社",
+    source: "手動入力",
     recommendation: "山田さんはPythonとDjangoを中心に3年以上のバックエンド開発経験があり、日本語は日常会話レベルです。クラウドサービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
     email: "kenji.yamada@example.com",
     phone: "090-3456-7890",
@@ -85,6 +90,7 @@ const engineersData = [
     status: "稼働中",
     desiredConditions: "東京, 70~90万円",
     companyType: "他社",
+    source: "メール",
     recommendation: "佐藤さんはAWSとDockerを中心に8年以上のクラウド開発経験があり、日本語はビジネスレベルです。AIやIoTなどの技術に強みがあり、KubernetesやEKSなどのクラウドサービスを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は東京で、単価は70万円〜90万円です。",
     email: "yoshihiro.sato@example.com",
     phone: "090-4567-8901",
@@ -99,6 +105,7 @@ const engineersData = [
     status: "案件探し中",
     desiredConditions: "東京/リモート, 55~75万円",
     companyType: "自社",
+    source: "手動入力",
     recommendation: "高橋さんはJavaScriptとVue.jsを中心に4年以上のフロントエンド開発経験があり、日本語はビジネスレベルです。クラウドサービスの開発に強みがあり、FirebaseやAWSなどのサービスを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は東京またはリモートワークで、単価は55万円〜75万円です。",
     email: "shohei.kawasaki@example.com",
     phone: "090-5678-9012",
@@ -113,10 +120,18 @@ const engineersData = [
     status: "稼働中",
     desiredConditions: "大阪, 50~70万円",
     companyType: "他社",
+    source: "メール",
     recommendation: "伊藤さんはPHPとLaravelを中心に6年以上のバックエンド開発経験があり、日本語はネイティブレベルです。データベースの設計と管理に強みがあり、MySQLやPostgreSQLなどのデータベースを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は大阪で、単価は50万円〜70万円です。",
     email: "yukiko.itoh@example.com",
     phone: "090-6789-0123",
   }
+];
+
+// カテゴリー定義
+const categories = [
+  { id: "all", name: "全て" },
+  { id: "self", name: "自社" },
+  { id: "other", name: "他社" }
 ];
 
 export function Candidates() {
@@ -140,7 +155,8 @@ export function Candidates() {
     availability: '',
     status: '案件探し中',
     desiredConditions: '',
-    companyType: '自社'
+    companyType: '自社',
+    source: '手動入力'
   });
   
   // 詳細ダイアログの状態管理
@@ -161,6 +177,9 @@ export function Candidates() {
     status: ''
   });
   
+  // 選択されたカテゴリー
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  
   // フィルター適用済みのエンジニアデータ
   const [filteredEngineers, setFilteredEngineers] = useState(engineersData);
   
@@ -173,21 +192,33 @@ export function Candidates() {
     currentPage * itemsPerPage
   );
   
-  // 検索時にページをリセット
-  useEffect(() => {
+  // カテゴリー選択時の処理
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
     setCurrentPage(1);
-  }, [filteredEngineers]);
+    
+    let filtered = engineersData;
+    
+    // カテゴリーでフィルタリング
+    if (categoryId === 'self') {
+      filtered = filtered.filter(engineer => engineer.companyType === '自社');
+    } else if (categoryId === 'other') {
+      filtered = filtered.filter(engineer => engineer.companyType === '他社');
+    }
+    
+    // 既存の検索クエリや他のフィルターも適用
+    if (searchQuery || filters.companyType || filters.japaneseLevel || filters.status) {
+      filtered = applyFilters(filtered);
+    }
+    
+    setFilteredEngineers(filtered);
+  };
   
-  // 検索クエリが変更されたときに検索を実行
-  useEffect(() => {
-    handleSearch();
-  }, [searchQuery, filters.companyType, filters.japaneseLevel, filters.status]);
-  
-  // 検索を実行
-  const handleSearch = () => {
+  // 既存のフィルター適用処理
+  const applyFilters = (engineers: any[]) => {
     const query = searchQuery.toLowerCase();
     
-    const filtered = engineersData.filter(engineer => {
+    return engineers.filter(engineer => {
       // 検索クエリでフィルター
       if (query) {
         const nameMatch = engineer.name.toLowerCase().includes(query);
@@ -219,10 +250,35 @@ export function Candidates() {
       
       return true;
     });
+  };
+  
+  // 検索時にページをリセット
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredEngineers]);
+  
+  // 検索クエリが変更されたときに検索を実行
+  useEffect(() => {
+    handleSearch();
+  }, [searchQuery, filters.companyType, filters.japaneseLevel, filters.status]);
+  
+  // 検索を実行
+  const handleSearch = () => {
+    let filtered = engineersData;
+    
+    // カテゴリーでフィルタリング
+    if (selectedCategory === 'self') {
+      filtered = filtered.filter(engineer => engineer.companyType === '自社');
+    } else if (selectedCategory === 'other') {
+      filtered = filtered.filter(engineer => engineer.companyType === '他社');
+    }
+    
+    // その他のフィルターを適用
+    filtered = applyFilters(filtered);
     
     setFilteredEngineers(filtered);
     
-    if (filtered.length === 0 && (query || filters.companyType || filters.japaneseLevel || filters.status)) {
+    if (filtered.length === 0 && (searchQuery || filters.companyType || filters.japaneseLevel || filters.status)) {
       toast.info('該当する技術者が見つかりませんでした');
     }
   };
@@ -239,7 +295,15 @@ export function Candidates() {
       desiredConditions: '',
       status: ''
     });
-    setFilteredEngineers(engineersData);
+    
+    // カテゴリーに基づいてエンジニアをフィルタリング
+    if (selectedCategory === 'all') {
+      setFilteredEngineers(engineersData);
+    } else if (selectedCategory === 'self') {
+      setFilteredEngineers(engineersData.filter(engineer => engineer.companyType === '自社'));
+    } else if (selectedCategory === 'other') {
+      setFilteredEngineers(engineersData.filter(engineer => engineer.companyType === '他社'));
+    }
   };
   
   // AIで推薦文を生成（シミュレーション）
@@ -285,7 +349,8 @@ export function Candidates() {
       availability: '',
       status: '案件探し中',
       desiredConditions: '',
-      companyType: '自社'
+      companyType: '自社',
+      source: '手動入力'
     });
     setRecommendationText("");
   };
@@ -335,12 +400,245 @@ export function Candidates() {
           <h2 className="text-3xl font-bold tracking-tight japanese-text">人材管理</h2>
         </div>
 
-        <Tabs defaultValue="upload" className="space-y-6">
+        <Tabs defaultValue="list" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="list" className="japanese-text">技術者一覧</TabsTrigger>
             <TabsTrigger value="upload" className="japanese-text">履歴書アップロード</TabsTrigger>
             <TabsTrigger value="add" className="japanese-text">技術者追加</TabsTrigger>
-            <TabsTrigger value="list" className="japanese-text">技術者一覧</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="list">
+            <Card>
+              <CardHeader>
+                <CardTitle className="japanese-text">技術者一覧</CardTitle>
+                <CardDescription className="japanese-text">
+                  登録済みの技術者一覧と詳細を表示します
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* カテゴリー選択 */}
+                <div className="mb-6">
+                  <div className="flex space-x-2 mb-4">
+                    {categories.map((category) => (
+                      <Button
+                        key={category.id}
+                        onClick={() => handleCategoryChange(category.id)}
+                        variant={selectedCategory === category.id ? "default" : "outline"}
+                        className="japanese-text"
+                      >
+                        {category.name}
+                      </Button>
+                    ))}
+                  </div>
+                
+                  {/* 検索フィールドと絞り込みオプション */}
+                  <div className="space-y-4">
+                    {/* 検索フィールド */}
+                    <div>
+                      <div className="flex items-center border-b px-3 rounded-md border">
+                        <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                        <Input
+                          placeholder="名前、スキル、経験などで検索..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="japanese-text w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* 絞り込みオプション */}
+                    <div className="flex flex-wrap gap-3">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">区分:</Label>
+                        <Select
+                          value={filters.companyType}
+                          onValueChange={(value) => setFilters({...filters, companyType: value})}
+                        >
+                          <SelectTrigger className="h-8 w-[120px] japanese-text">
+                            <SelectValue placeholder="全て" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">全て</SelectItem>
+                            <SelectItem value="自社">自社</SelectItem>
+                            <SelectItem value="他社">他社</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
+                        <Select
+                          value={filters.japaneseLevel}
+                          onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
+                        >
+                          <SelectTrigger className="h-8 w-[160px] japanese-text">
+                            <SelectValue placeholder="全て" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">全て</SelectItem>
+                            <SelectItem value="不問">不問</SelectItem>
+                            <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                            <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                            <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
+                        <Select
+                          value={filters.status}
+                          onValueChange={(value) => setFilters({...filters, status: value})}
+                        >
+                          <SelectTrigger className="h-8 w-[120px] japanese-text">
+                            <SelectValue placeholder="全て" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">全て</SelectItem>
+                            <SelectItem value="案件探し中">案件探し中</SelectItem>
+                            <SelectItem value="提案中">提案中</SelectItem>
+                            <SelectItem value="稼働中">稼働中</SelectItem>
+                            <SelectItem value="非稼働">非稼働</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {(searchQuery || filters.companyType || filters.japaneseLevel || filters.status) && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={resetFilters} 
+                          className="h-8 px-2 text-xs japanese-text"
+                        >
+                          リセット
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="japanese-text">名前</TableHead>
+                        <TableHead className="japanese-text">区分</TableHead>
+                        <TableHead className="japanese-text">スキル</TableHead>
+                        <TableHead className="japanese-text">経験年数</TableHead>
+                        <TableHead className="japanese-text">日本語レベル</TableHead>
+                        <TableHead className="japanese-text">希望条件</TableHead>
+                        <TableHead className="japanese-text">ステータス</TableHead>
+                        <TableHead className="japanese-text">アクション</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedEngineers.length > 0 ? (
+                        paginatedEngineers.map((engineer) => (
+                          <TableRow key={engineer.id}>
+                            <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={engineer.companyType === "自社" ? "default" : "secondary"} 
+                                className="japanese-text text-xs"
+                              >
+                                {engineer.companyType}
+                                {engineer.source === "メール" && " (メール)"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="japanese-text text-sm truncate">
+                              {engineer.skills.join(", ")}
+                            </TableCell>
+                            <TableCell className="japanese-text text-sm">{engineer.experience}</TableCell>
+                            <TableCell className="japanese-text text-sm">{engineer.japaneseLevel}</TableCell>
+                            <TableCell className="japanese-text text-sm truncate">{engineer.desiredConditions}</TableCell>
+                            <TableCell className="japanese-text text-sm">{engineer.status}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleViewDetails(engineer)}
+                                  title="詳細を表示"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleDownloadResume(engineer.id)}
+                                  title="履歴書をダウンロード"
+                                >
+                                  <FileDown className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleEditClick()}
+                                  title="編集"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleDeleteEngineer(engineer.id)}
+                                  title="削除"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={8} className="h-24 text-center">
+                            データが見つかりません
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {totalPages > 1 && (
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }).map((_, index) => {
+                          const pageNumber = index + 1;
+                          return (
+                            <PaginationItem key={pageNumber}>
+                              <PaginationLink 
+                                isActive={currentPage === pageNumber}
+                                onClick={() => setCurrentPage(pageNumber)}
+                              >
+                                {pageNumber}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
           
           <TabsContent value="upload" className="space-y-6">
             <ResumeUpload />
@@ -522,215 +820,6 @@ export function Candidates() {
               </CardFooter>
             </Card>
           </TabsContent>
-          
-          <TabsContent value="list">
-            <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">技術者一覧</CardTitle>
-                <CardDescription className="japanese-text">
-                  登録済みの技術者一覧と詳細を表示します
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* 検索フィールドと絞り込みオプション */}
-                <div className="mb-6 space-y-4">
-                  {/* 検索フィールド */}
-                  <div>
-                    <div className="flex items-center border-b px-3 rounded-md border">
-                      <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                      <Input
-                        placeholder="名前、スキル、経験などで検索..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="japanese-text w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* 絞り込みオプション */}
-                  <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center gap-2">
-                      <Label className="text-sm font-medium japanese-text whitespace-nowrap">区分:</Label>
-                      <Select
-                        value={filters.companyType}
-                        onValueChange={(value) => setFilters({...filters, companyType: value})}
-                      >
-                        <SelectTrigger className="h-8 w-[120px] japanese-text">
-                          <SelectValue placeholder="全て" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">全て</SelectItem>
-                          <SelectItem value="自社">自社</SelectItem>
-                          <SelectItem value="他社">他社</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
-                      <Select
-                        value={filters.japaneseLevel}
-                        onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
-                      >
-                        <SelectTrigger className="h-8 w-[160px] japanese-text">
-                          <SelectValue placeholder="全て" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">全て</SelectItem>
-                          <SelectItem value="不問">不問</SelectItem>
-                          <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                          <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                          <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
-                      <Select
-                        value={filters.status}
-                        onValueChange={(value) => setFilters({...filters, status: value})}
-                      >
-                        <SelectTrigger className="h-8 w-[120px] japanese-text">
-                          <SelectValue placeholder="全て" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">全て</SelectItem>
-                          <SelectItem value="案件探し中">案件探し中</SelectItem>
-                          <SelectItem value="提案中">提案中</SelectItem>
-                          <SelectItem value="稼働中">稼働中</SelectItem>
-                          <SelectItem value="非稼働">非稼働</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {(searchQuery || filters.companyType || filters.japaneseLevel || filters.status) && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={resetFilters} 
-                        className="h-8 px-2 text-xs japanese-text"
-                      >
-                        リセット
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="japanese-text">名前</TableHead>
-                        <TableHead className="japanese-text">区分</TableHead>
-                        <TableHead className="japanese-text">スキル</TableHead>
-                        <TableHead className="japanese-text">経験年数</TableHead>
-                        <TableHead className="japanese-text">日本語レベル</TableHead>
-                        <TableHead className="japanese-text">希望条件</TableHead>
-                        <TableHead className="japanese-text">ステータス</TableHead>
-                        <TableHead className="japanese-text">アクション</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedEngineers.length > 0 ? (
-                        paginatedEngineers.map((engineer) => (
-                          <TableRow key={engineer.id}>
-                            <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.companyType}</TableCell>
-                            <TableCell className="japanese-text text-sm truncate">
-                              {engineer.skills.join(", ")}
-                            </TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.experience}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.japaneseLevel}</TableCell>
-                            <TableCell className="japanese-text text-sm truncate">{engineer.desiredConditions}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.status}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleViewDetails(engineer)}
-                                  title="詳細を表示"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleDownloadResume(engineer.id)}
-                                  title="履歴書をダウンロード"
-                                >
-                                  <FileDown className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleEditClick()}
-                                  title="編集"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleDeleteEngineer(engineer.id)}
-                                  title="削除"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={8} className="h-24 text-center">
-                            データが見つかりません
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                {totalPages > 1 && (
-                  <div className="mt-4 flex justify-center">
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                          />
-                        </PaginationItem>
-                        
-                        {Array.from({ length: totalPages }).map((_, index) => {
-                          const pageNumber = index + 1;
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink 
-                                isActive={currentPage === pageNumber}
-                                onClick={() => setCurrentPage(pageNumber)}
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
-                        
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
         
         {/* 技術者詳細ダイアログ */}
@@ -753,7 +842,17 @@ export function Candidates() {
                   
                   <div>
                     <h4 className="text-sm font-medium japanese-text">区分</h4>
-                    <p className="japanese-text">{selectedEngineer.companyType}</p>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={selectedEngineer.companyType === "自社" ? "default" : "secondary"} 
+                        className="japanese-text"
+                      >
+                        {selectedEngineer.companyType}
+                      </Badge>
+                      {selectedEngineer.source === "メール" && (
+                        <Badge variant="outline" className="japanese-text">メール</Badge>
+                      )}
+                    </div>
                   </div>
                   
                   <div>
