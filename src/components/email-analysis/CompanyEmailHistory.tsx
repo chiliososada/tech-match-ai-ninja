@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Building, ArrowDown, ArrowUp, Mail, Calendar, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { toast } from '@/hooks/use-toast';
 
 // 会社データ
 const companies = [
@@ -91,7 +92,14 @@ Java開発エンジニアを募集しております。
 単価：60~80万円
 場所：東京（リモート可）
 開始：即日
-ご興味ある方はお返事ください。`
+ご興味ある方はお返事ください。`,
+      extractionResults: {
+        position: 'Java開発エンジニア',
+        skills: ['Java', 'Spring Boot', 'SQL'],
+        budget: '60~80万円',
+        location: '東京（リモート可）',
+        startDate: '即日'
+      }
     },
     {
       id: 2,
@@ -107,7 +115,14 @@ Python開発案件の案内です。
 単価：65~75万円
 場所：リモート可
 開始：6月から
-ご検討よろしくお願いします。`
+ご検討よろしくお願いします。`,
+      extractionResults: {
+        position: 'Python開発エンジニア',
+        skills: ['Python', 'Django', 'PostgreSQL'],
+        budget: '65~75万円',
+        location: 'リモート可',
+        startDate: '6月から'
+      }
     },
     {
       id: 3,
@@ -123,7 +138,14 @@ Python開発案件の案内です。
 単価：70~90万円
 場所：東京
 開始：5月中旬
-長期案件となります。`
+長期案件となります。`,
+      extractionResults: {
+        position: 'インフラエンジニア',
+        skills: ['AWS', 'Docker', 'Kubernetes'],
+        budget: '70~90万円',
+        location: '東京',
+        startDate: '5月中旬'
+      }
     },
     {
       id: 4,
@@ -139,7 +161,14 @@ Python開発案件の案内です。
 単価：65~80万円
 場所：東京（リモート可）
 開始：5月初旬
-よろしくお願いします。`
+よろしくお願いします。`,
+      extractionResults: {
+        position: 'フロントエンドエンジニア',
+        skills: ['React', 'TypeScript', 'Next.js'],
+        budget: '65~80万円',
+        location: '東京（リモート可）',
+        startDate: '5月初旬'
+      }
     },
     {
       id: 5,
@@ -154,7 +183,13 @@ Python開発案件の案内です。
 スキル：Java, Spring Boot, Vue.js
 経験：7年
 希望：リモート可、60万円以上
-ご検討よろしくお願いします。`
+ご検討よろしくお願いします。`,
+      extractionResults: {
+        engineerName: '佐々木',
+        skills: ['Java', 'Spring Boot', 'Vue.js'],
+        experience: '7年',
+        preferredConditions: 'リモート可、60万円以上'
+      }
     }
   ];
   
@@ -498,6 +533,74 @@ export function CompanyEmailHistory() {
                 </div>
               </div>
             </div>
+
+            {/* AI抽出結果セクション追加 */}
+            {selectedEmail && selectedEmail.extractionResults && (
+              <div className="rounded-md border p-4">
+                <h5 className="text-sm font-medium mb-3 japanese-text">
+                  <FileText className="h-4 w-4 inline mr-1" />
+                  AI抽出結果
+                </h5>
+                
+                {selectedEmail.emailType === 'case' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">ポジション</p>
+                      <p className="text-sm japanese-text">{selectedEmail.extractionResults.position}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">予算</p>
+                      <p className="text-sm">{selectedEmail.extractionResults.budget}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">スキル</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {selectedEmail.extractionResults.skills.map((skill, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">勤務地</p>
+                      <p className="text-sm japanese-text">{selectedEmail.extractionResults.location}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">開始時期</p>
+                      <p className="text-sm japanese-text">{selectedEmail.extractionResults.startDate}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {selectedEmail.emailType === 'engineer' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">エンジニア名</p>
+                      <p className="text-sm japanese-text">{selectedEmail.extractionResults.engineerName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">経験年数</p>
+                      <p className="text-sm">{selectedEmail.extractionResults.experience}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">スキル</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {selectedEmail.extractionResults.skills.map((skill, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground japanese-text">希望条件</p>
+                      <p className="text-sm japanese-text">{selectedEmail.extractionResults.preferredConditions}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end">
