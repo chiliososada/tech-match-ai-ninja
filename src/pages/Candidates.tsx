@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -49,6 +48,8 @@ const engineersData = [
     recommendation: "鈴木さんはJavaとSpring Bootを中心に7年以上の開発経験があり、日本語はビジネスレベルです。金融系のプロジェクトに強みがあり、AWSやDockerなどのクラウド技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。直近では大手金融機関のオンラインバンキングシステム開発に5年間携わっており、セキュリティに関する知識も豊富です。希望条件は東京またはリモートワークで、単価は60万円〜80万円です。",
     email: "taro.suzuki@example.com",
     phone: "090-1234-5678",
+    registeredAt: "2024-01-15",
+    updatedAt: "2024-05-01"
   },
   {
     id: "2",
@@ -64,6 +65,8 @@ const engineersData = [
     recommendation: "田中さんはReactとTypeScriptを中心に5年以上のフロントエンド開発経験があり、日本語はネイティブレベルです。Webアプリケーション開発に強みがあり、Node.jsやExpressなどのバックエンド技術も習得しています。直近では大手ECサイトのフロントエンド開発に3年間携わっており、パフォーマンス最適化とユーザー体験の向上に貢献しました。希望条件は大阪またはリモートワークで、単価は55万円〜70万円です。",
     email: "hanako.tanaka@example.com",
     phone: "090-2345-6789",
+    registeredAt: "2024-02-10",
+    updatedAt: "2024-04-15"
   },
   {
     id: "3",
@@ -79,6 +82,8 @@ const engineersData = [
     recommendation: "山田さんはPythonとDjangoを中心に3年以上のバックエンド開発経験があり、日本語は日常会話レベルです。クラウドサービスの開発に強みがあり、DockerやKubernetesなどのコンテナ技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件はリモートのみで、単価は50万円〜65万円です。",
     email: "kenji.yamada@example.com",
     phone: "090-3456-7890",
+    registeredAt: "2024-03-05",
+    updatedAt: "2024-03-05"
   },
   {
     id: "4",
@@ -94,6 +99,8 @@ const engineersData = [
     recommendation: "佐藤さんはAWSとDockerを中心に8年以上のクラウド開発経験があり、日本語はビジネスレベルです。AIやIoTなどの技術に強みがあり、KubernetesやEKSなどのクラウドサービスを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は東京で、単価は70万円〜90万円です。",
     email: "yoshihiro.sato@example.com",
     phone: "090-4567-8901",
+    registeredAt: "2024-01-20",
+    updatedAt: "2024-05-10"
   },
   {
     id: "5",
@@ -109,6 +116,8 @@ const engineersData = [
     recommendation: "高橋さんはJavaScriptとVue.jsを中心に4年以上のフロントエンド開発経験があり、日本語はビジネスレベルです。クラウドサービスの開発に強みがあり、FirebaseやAWSなどのサービスを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は東京またはリモートワークで、単価は55万円〜75万円です。",
     email: "shohei.kawasaki@example.com",
     phone: "090-5678-9012",
+    registeredAt: "2024-02-28",
+    updatedAt: "2024-04-30"
   },
   {
     id: "6",
@@ -124,6 +133,8 @@ const engineersData = [
     recommendation: "伊藤さんはPHPとLaravelを中心に6年以上のバックエンド開発経験があり、日本語はネイティブレベルです。データベースの設計と管理に強みがあり、MySQLやPostgreSQLなどのデータベースを活用しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。希望条件は大阪で、単価は50万円〜70万円です。",
     email: "yukiko.itoh@example.com",
     phone: "090-6789-0123",
+    registeredAt: "2024-03-15",
+    updatedAt: "2024-05-05"
   }
 ];
 
@@ -156,7 +167,9 @@ export function Candidates() {
     status: '案件探し中',
     desiredConditions: '',
     companyType: '自社',
-    source: '手動入力'
+    source: '手動入力',
+    registeredAt: new Date().toISOString().split('T')[0],
+    updatedAt: new Date().toISOString().split('T')[0]
   });
   
   // 詳細ダイアログの状態管理
@@ -336,6 +349,9 @@ export function Candidates() {
       return;
     }
     
+    // 現在の日付を設定
+    const today = new Date().toISOString().split('T')[0];
+    
     toast.success('技術者と推薦文が登録されました', {
       description: `${newEngineer.name}さんのプロフィールが登録されました`
     });
@@ -350,7 +366,9 @@ export function Candidates() {
       status: '案件探し中',
       desiredConditions: '',
       companyType: '自社',
-      source: '手動入力'
+      source: '手動入力',
+      registeredAt: today,
+      updatedAt: today
     });
     setRecommendationText("");
   };
@@ -378,6 +396,10 @@ export function Candidates() {
   
   // 編集内容を保存
   const handleSaveEdit = () => {
+    if (editEngineerData) {
+      // 更新日を現在の日付に設定
+      editEngineerData.updatedAt = new Date().toISOString().split('T')[0];
+    }
     toast.success('技術者情報を更新しました');
     setEditDialogOpen(false);
     // 実際のアプリケーションでは、ここでデータベースの更新を行います
@@ -525,9 +547,10 @@ export function Candidates() {
                         <TableHead className="japanese-text">区分</TableHead>
                         <TableHead className="japanese-text">スキル</TableHead>
                         <TableHead className="japanese-text">経験年数</TableHead>
-                        <TableHead className="japanese-text">日本語レベル</TableHead>
                         <TableHead className="japanese-text">希望条件</TableHead>
                         <TableHead className="japanese-text">ステータス</TableHead>
+                        <TableHead className="japanese-text">登録日</TableHead>
+                        <TableHead className="japanese-text">更新日</TableHead>
                         <TableHead className="japanese-text">アクション</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -549,9 +572,10 @@ export function Candidates() {
                               {engineer.skills.join(", ")}
                             </TableCell>
                             <TableCell className="japanese-text text-sm">{engineer.experience}</TableCell>
-                            <TableCell className="japanese-text text-sm">{engineer.japaneseLevel}</TableCell>
                             <TableCell className="japanese-text text-sm truncate">{engineer.desiredConditions}</TableCell>
                             <TableCell className="japanese-text text-sm">{engineer.status}</TableCell>
+                            <TableCell className="japanese-text text-sm">{engineer.registeredAt}</TableCell>
+                            <TableCell className="japanese-text text-sm">{engineer.updatedAt}</TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-2">
                                 <Button 
@@ -592,7 +616,7 @@ export function Candidates() {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={8} className="h-24 text-center">
+                          <TableCell colSpan={9} className="h-24 text-center">
                             データが見つかりません
                           </TableCell>
                         </TableRow>
@@ -885,6 +909,16 @@ export function Candidates() {
                     <p className="japanese-text">{selectedEngineer.availability}</p>
                   </div>
                   
+                  <div>
+                    <h4 className="text-sm font-medium japanese-text">登録日</h4>
+                    <p className="japanese-text">{selectedEngineer.registeredAt}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium japanese-text">更新日</h4>
+                    <p className="japanese-text">{selectedEngineer.updatedAt}</p>
+                  </div>
+                  
                   <div className="col-span-2">
                     <h4 className="text-sm font-medium japanese-text">希望条件</h4>
                     <p className="japanese-text">{selectedEngineer.desiredConditions}</p>
@@ -1039,6 +1073,27 @@ export function Candidates() {
                       onChange={(e) => setEditEngineerData({...editEngineerData, availability: e.target.value})}
                       className="japanese-text"
                     />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="japanese-text">登録日</Label>
+                    <Input 
+                      value={editEngineerData.registeredAt}
+                      readOnly
+                      disabled
+                      className="japanese-text bg-muted"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="japanese-text">更新日</Label>
+                    <Input 
+                      value={new Date().toISOString().split('T')[0]} 
+                      readOnly
+                      disabled
+                      className="japanese-text bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground japanese-text">保存時に自動で更新されます</p>
                   </div>
                 </div>
                 
