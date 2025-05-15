@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { Check } from "lucide-react"
+import { Check, Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -16,28 +16,12 @@ const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   CheckboxProps
 >(({ className, indeterminate, ...props }, ref) => {
-  // Create a reference to manage the indeterminate state on DOM element
-  const innerRef = React.useRef<HTMLButtonElement>(null)
+  // We'll use state to determine what icon to show
+  const isIndeterminate = !!indeterminate
   
-  // Merge refs
-  React.useEffect(() => {
-    const element = innerRef.current
-    if (element) {
-      element.indeterminate = !!indeterminate
-    }
-  }, [indeterminate])
-
   return (
     <CheckboxPrimitive.Root
-      ref={(node) => {
-        // Update both refs
-        if (typeof ref === 'function') {
-          ref(node)
-        } else if (ref) {
-          ref.current = node
-        }
-        innerRef.current = node
-      }}
+      ref={ref}
       className={cn(
         "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
         className
@@ -47,7 +31,11 @@ const Checkbox = React.forwardRef<
       <CheckboxPrimitive.Indicator
         className={cn("flex items-center justify-center text-current")}
       >
-        <Check className="h-4 w-4" />
+        {isIndeterminate ? (
+          <Minus className="h-4 w-4" />
+        ) : (
+          <Check className="h-4 w-4" />
+        )}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )
