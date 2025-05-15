@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -519,8 +518,8 @@ export function Cases() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col lg:flex-row gap-6">
-                  {/* 案件一覧テーブル（左側） - 会社と作成日列を削除 */}
-                  <div className="lg:w-3/4">
+                  {/* 案件一覧テーブル（左側 - 2/3幅） - 会社と作成日列を削除 */}
+                  <div className="lg:w-2/3">
                     <div className="rounded-md border">
                       <Table>
                         <TableHeader>
@@ -583,6 +582,7 @@ export function Cases() {
                           
                           {Array.from({ length: totalCasesPages }).map((_, index) => {
                             const pageNumber = index + 1;
+                            // Show first page, current page, and last page, with ellipsis in between
                             if (
                               pageNumber === 1 || 
                               pageNumber === totalCasesPages || 
@@ -622,8 +622,8 @@ export function Cases() {
                     </div>
                   </div>
                   
-                  {/* 案件詳細表示部分（右側） */}
-                  <div className="lg:w-1/4">
+                  {/* 案件詳細表示部分（右側 - 1/3幅） */}
+                  <div className="lg:w-1/3">
                     {selectedCase ? (
                       <Card>
                         <CardHeader className="pb-2">
