@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Mail, History } from 'lucide-react';
+import { Shield, Mail, History, Wifi } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -32,6 +32,21 @@ export function Email() {
         description: "前回の設定に正常に戻りました。",
       });
     }, 1000);
+  };
+
+  const testConnection = () => {
+    toast({
+      title: "接続テスト中...",
+      description: "メールサーバーへの接続をテストしています。",
+    });
+    
+    // 接続テスト処理をシミュレート
+    setTimeout(() => {
+      toast({
+        title: "接続テスト成功",
+        description: "メールサーバーに正常に接続できました。",
+      });
+    }, 2000);
   };
 
   return (
@@ -243,6 +258,16 @@ export function Email() {
                   <p className="text-xs text-muted-foreground japanese-text">
                     メールプロバイダーで生成したアプリパスワードを入力してください。
                   </p>
+                </div>
+                <div className="pt-4">
+                  <Button 
+                    variant="outline"
+                    className="japanese-text flex items-center"
+                    onClick={testConnection}
+                  >
+                    <Wifi className="mr-2 h-4 w-4" />
+                    接続テスト
+                  </Button>
                 </div>
               </CardContent>
             </Card>
