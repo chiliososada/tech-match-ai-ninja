@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -7,10 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { toast } from '@/components/ui/use-toast';
-import { FileText, Loader, Search } from 'lucide-react';
+import { FileText, Loader, Search, Textarea } from 'lucide-react';
 import { CaseSelectionDialog } from './CaseSelectionDialog';
 import { MatchingProgressCard } from './MatchingProgressCard';
 import { MatchingResultsCard } from './MatchingResultsCard';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CaseTextInput } from './CaseTextInput';
 
 export interface CaseMatchingResult {
   id: number;
@@ -122,6 +123,21 @@ export function CaseToCandidate() {
     // Here you would update the form with the selected case data
   };
 
+  // Handle structured data from text input
+  const handleStructuredData = (data: any) => {
+    // Update form with extracted data
+    caseForm.setValue('skills', data.skills);
+    caseForm.setValue('experience', data.experience);
+    caseForm.setValue('budget', data.budget);
+    caseForm.setValue('location', data.location);
+    caseForm.setValue('workType', data.workType);
+    
+    toast({
+      title: "データを抽出しました",
+      description: "案件テキストからデータを抽出してフォームに適用しました",
+    });
+  };
+
   return (
     <div className="space-y-8">
       <div className="grid gap-8 md:grid-cols-2">
@@ -134,12 +150,25 @@ export function CaseToCandidate() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex space-x-2 mb-6">
+            <div className="flex flex-col sm:flex-row gap-2 mb-6">
               <CaseSelectionDialog onSelect={handleCaseSelect} />
-              <Button variant="outline" className="w-full japanese-text">
-                <Search className="mr-2 h-4 w-4" />
-                案件テキスト検索
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full japanese-text">
+                    <Textarea className="mr-2 h-4 w-4" />
+                    案件テキスト検索
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle className="japanese-text">案件テキスト検索</DialogTitle>
+                    <DialogDescription className="japanese-text">
+                      案件のテキスト情報を入力して構造化データに変換します。
+                    </DialogDescription>
+                  </DialogHeader>
+                  <CaseTextInput onStructuredData={handleStructuredData} />
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Form {...caseForm}>
