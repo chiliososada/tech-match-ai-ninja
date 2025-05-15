@@ -1,6 +1,7 @@
 
-import { useToast } from "./toast/toast-context";
-import { ToastProvider } from "./toast/toast-provider";
-import { toast } from "./toast/toast-function";
+import { toast } from "@/hooks/toast";
 
-export { ToastProvider, useToast, toast };
+export { toast };
+export { useToast } from "./toast";
+export { ToastProvider } from "./toast";
+export type { ToastContextType } from "./toast";

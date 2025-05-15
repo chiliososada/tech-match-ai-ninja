@@ -1,5 +1,5 @@
 
-import { ToastProvider, ToastContextType, useToast } from "./toast"
-import { toast } from "./toast/toast-function"
+import { ToastProvider, ToastContextType, useToast } from "./toast";
+import { toast } from "./toast/toast-function";
 
-export { ToastProvider, useToast, toast, type ToastContextType }
+export { ToastProvider, useToast, toast, type ToastContextType };
