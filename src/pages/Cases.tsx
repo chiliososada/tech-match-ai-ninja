@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -519,7 +520,7 @@ export function Cases() {
               <CardContent>
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* 案件一覧テーブル（左側） - 会社と作成日列を削除 */}
-                  <div className="lg:w-1/2">
+                  <div className="lg:w-3/4">
                     <div className="rounded-md border">
                       <Table>
                         <TableHeader>
@@ -622,7 +623,7 @@ export function Cases() {
                   </div>
                   
                   {/* 案件詳細表示部分（右側） */}
-                  <div className="lg:w-1/2">
+                  <div className="lg:w-1/4">
                     {selectedCase ? (
                       <Card>
                         <CardHeader className="pb-2">
@@ -635,7 +636,7 @@ export function Cases() {
                           </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4">
                             <div>
                               <h4 className="text-sm font-medium mb-1 japanese-text">会社名</h4>
                               <p className="text-sm japanese-text">{selectedCase.company || "未設定"}</p>
@@ -676,7 +677,7 @@ export function Cases() {
                               <h4 className="text-sm font-medium mb-1 japanese-text">単価</h4>
                               <p className="text-sm japanese-text">{selectedCase.budget}</p>
                             </div>
-                            <div className="col-span-2">
+                            <div>
                               <h4 className="text-sm font-medium mb-1 japanese-text">スキル</h4>
                               <div className="flex flex-wrap gap-1">
                                 {selectedCase.skills.map((skill, index) => (
@@ -690,14 +691,14 @@ export function Cases() {
                           
                           <div className="mt-4">
                             <h4 className="text-sm font-medium mb-2 japanese-text">案件詳細</h4>
-                            <div className="bg-muted/50 rounded-md p-3 text-sm whitespace-pre-wrap japanese-text max-h-[400px] overflow-y-auto">
+                            <div className="bg-muted/50 rounded-md p-3 text-sm whitespace-pre-wrap japanese-text max-h-[300px] overflow-y-auto">
                               {selectedCase.detailDescription || "詳細情報はありません"}
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     ) : (
-                      <Card className="flex items-center justify-center h-[400px] text-center">
+                      <Card className="flex items-center justify-center h-[300px] text-center">
                         <CardContent>
                           <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-2" />
                           <p className="text-muted-foreground japanese-text">案件を選択して詳細を表示</p>
