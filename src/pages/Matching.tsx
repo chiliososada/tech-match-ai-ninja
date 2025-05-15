@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Users } from 'lucide-react';
 import { CaseToCandidate } from '@/components/matching/CaseToCandidate';
 import { CandidateToCase } from '@/components/matching/CandidateToCase';
+import { toast } from '@/components/ui/use-toast';
 
 export function Matching() {
   // Common state

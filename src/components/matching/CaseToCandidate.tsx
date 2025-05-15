@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 import { FileText, Loader, Search } from 'lucide-react';
 import { CaseSelectionDialog } from './CaseSelectionDialog';
 import { MatchingProgressCard } from './MatchingProgressCard';
