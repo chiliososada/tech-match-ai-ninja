@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -262,7 +261,7 @@ export function Candidates() {
       // 検索クエリでフィルター
       if (query) {
         const nameMatch = engineer.name.toLowerCase().includes(query);
-        const skillsMatch = engineer.skills.some((skill: string) => 
+        const skillsMatch = engineer.skills && engineer.skills.some((skill: string) => 
           skill.toLowerCase().includes(query)
         );
         const experienceMatch = engineer.experience.toLowerCase().includes(query);
@@ -613,7 +612,7 @@ export function Candidates() {
                             </TableCell>
                             <TableCell className="japanese-text text-sm">{engineer.companyName}</TableCell>
                             <TableCell className="japanese-text text-sm truncate">
-                              {engineer.skills.join(", ")}
+                              {engineer.skills && engineer.skills.join(", ")}
                             </TableCell>
                             <TableCell className="japanese-text text-sm">{engineer.experience}</TableCell>
                             <TableCell className="japanese-text text-sm truncate">{engineer.desiredConditions}</TableCell>
@@ -956,7 +955,7 @@ export function Candidates() {
                   
                   <div>
                     <h4 className="text-sm font-medium japanese-text">スキル</h4>
-                    <p className="japanese-text">{selectedEngineer.skills.join(', ')}</p>
+                    <p className="japanese-text">{selectedEngineer.skills && selectedEngineer.skills.join(', ')}</p>
                   </div>
                   
                   <div>
@@ -1116,7 +1115,7 @@ export function Candidates() {
                   <div className="space-y-2">
                     <Label className="japanese-text">保有スキル</Label>
                     <Input 
-                      value={editEngineerData.skills.join(', ')}
+                      value={editEngineerData.skills && editEngineerData.skills.join(', ')}
                       onChange={(e) => setEditEngineerData({...editEngineerData, skills: e.target.value.split(', ')})}
                       className="japanese-text"
                     />
