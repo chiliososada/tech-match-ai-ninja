@@ -19,9 +19,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast";
 
-// サンプルデータ（作成日を追加）
+// 案件のサンプルデータ（案件詳細を追加）
 const caseData = [
   {
     id: "1",
@@ -36,7 +36,49 @@ const caseData = [
     sender: "tanaka@technosolution.co.jp",
     senderName: "田中 一郎",
     createdAt: "2025-05-10",
-    keyTechnologies: "Java, SpringBoot, AWS"
+    keyTechnologies: "Java, SpringBoot, AWS",
+    // 案件詳細情報を追加
+    detailDescription: `
+金融系システムの新規開発プロジェクトにおけるJavaエンジニアの募集案件です。
+
+【業務内容】
+- 既存金融システムのリプレイスプロジェクト
+- 要件定義からテストまでの一連の開発作業
+- チームでの協業によるアジャイル開発
+
+【必要スキル・経験】
+- Java開発の経験3年以上
+- Spring Bootを用いた開発経験
+- データベース（Oracle、PostgreSQL等）の設計・実装経験
+- Git等のバージョン管理システムの使用経験
+
+【歓迎スキル】
+- クラウド環境（特にAWS）での開発経験
+- マイクロサービスアーキテクチャの経験
+- CI/CDパイプラインの構築・運用経験
+
+【プロジェクト概要】
+- プロジェクト期間：2025年7月〜2026年3月（予定）
+- 開発環境：Java 17, Spring Boot 3.x, PostgreSQL, AWS
+- チーム構成：PM 1名、PL 1名、エンジニア 5名
+
+【その他条件】
+- 週3回のオンサイト勤務（場所：東京都千代田区）
+- リモートワーク併用可能
+- 稼働時間：140〜180時間/月
+- 単価：スキル・経験に応じて60〜80万円
+- 面談：2回（オンライン可）
+
+【案件の魅力】
+最新の技術スタックを使った大規模リプレイスプロジェクトで、��術的な成長が見込めます。また、アジャイル開発を取り入れており、短いサイクルでの成果を実感できる環境です。チームメンバーも経験豊富なエンジニアが多く、知識の共有が活発に行われています。
+    `,
+    experience: "3年以上",
+    workType: "週3回オンサイト/リモート併用可",
+    duration: "2025年7月〜2026年3月（予定）",
+    japanese: "ビジネスレベル",
+    priority: "高",
+    manager: "佐藤 太郎",
+    managerEmail: "sato@technosolution.co.jp",
   },
   {
     id: "2",
@@ -51,7 +93,48 @@ const caseData = [
     sender: null,
     senderName: null,
     createdAt: "2025-05-10",
-    keyTechnologies: "React, TypeScript, Next.js"
+    keyTechnologies: "React, TypeScript, Next.js",
+    // 案件詳細情報を追加
+    detailDescription: `
+ECサイトのフロントエンド開発を担当するエンジニアを募集しています。
+
+【業務内容】
+- ECサイトのフロントエンド開発
+- 既存機能の改善・新機能の追加
+- パフォーマンスチューニング
+- コードレビュー
+
+【必要スキル・経験】
+- React、TypeScriptでの開発経験2年以上
+- GitHubを用いたバージョン管理の経験
+- レスポンシブデザインの実装経験
+
+【歓迎スキル】
+- Next.jsでの開発経験
+- GraphQLの使用経験
+- CIツールの使用経験
+- パフォーマンス最適化の経験
+
+【開発環境】
+- 言語：TypeScript
+- フレームワーク：React、Next.js
+- 状態管理：Redux Toolkit
+- スタイリング：Tailwind CSS
+- その他：Storybook、Jest
+
+【その他条件】
+- 稼働時間：160〜180時間/月
+- 単価：55〜70万円（スキル見合い）
+- 勤務地：大阪市内（リモート勤務は要相談）
+- 面談回数：1〜2回
+`,
+    experience: "2年以上",
+    workType: "オンサイト（リモート勤務は要相談）",
+    duration: "3ヶ月〜（延長の可能性あり）",
+    japanese: "不問",
+    priority: "中",
+    manager: null,
+    managerEmail: null,
   },
   {
     id: "3",
@@ -109,7 +192,7 @@ const caseData = [
     company: "モバイルソリューション株式会社",
     receivedDate: "2025-05-11T10:15:00",
     sender: "watanabe@mobile-solution.jp",
-    senderName: "渡辺 四郎",
+    senderName: "渡辺 ���郎",
     createdAt: "2025-05-11",
     keyTechnologies: "Kotlin, Android, Firebase"
   },
@@ -242,10 +325,13 @@ export function Cases() {
   const [emailDateFrom, setEmailDateFrom] = useState("");
   const [emailDateTo, setEmailDateTo] = useState("");
   
+  // 選択された案件のステート
+  const [selectedCase, setSelectedCase] = useState<(typeof caseData)[0] | null>(null);
+  
   // 会社のリストを取得
   const companyList = Array.from(new Set(caseData.filter(item => item.company).map(item => item.company)));
   
-  // フィルタリングされた案件を取得
+  // フィルタリングさ��た案件を取得
   const filteredCases = caseData.filter(item => {
     const matchesSource = filter === "all" || item.source === filter;
     
@@ -270,6 +356,11 @@ export function Cases() {
     casesCurrentPage * itemsPerPage
   );
   const totalCasesPages = Math.ceil(filteredCases.length / itemsPerPage);
+
+  // ケース選択ハンドラー
+  const handleCaseSelect = (caseItem: (typeof caseData)[0]) => {
+    setSelectedCase(caseItem);
+  };
 
   // メール案件のフィルタリング（日付フィルターを追加）
   const filteredMailCases = caseData.filter(item => {
@@ -426,101 +517,196 @@ export function Cases() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="japanese-text">ソース</TableHead>
-                        <TableHead className="japanese-text">案件名</TableHead>
-                        <TableHead className="japanese-text">スキル</TableHead>
-                        <TableHead className="japanese-text">勤務地</TableHead>
-                        <TableHead className="japanese-text">単価</TableHead>
-                        <TableHead className="japanese-text">会社</TableHead>
-                        <TableHead className="japanese-text">作成日</TableHead>
-                        <TableHead className="japanese-text">ステータス</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedCases.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            <div className="flex items-center">
-                              {getSourceIcon(item.source)}
-                              <span className="text-xs japanese-text">
-                                {item.source === "mail" ? "メール" : "手動"}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-medium japanese-text">{item.title}</TableCell>
-                          <TableCell className="japanese-text text-sm">
-                            {item.skills.join(", ")}
-                          </TableCell>
-                          <TableCell className="japanese-text text-sm">{item.location}</TableCell>
-                          <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
-                          <TableCell className="japanese-text text-sm">
-                            {item.company || "-"}
-                          </TableCell>
-                          <TableCell className="japanese-text text-sm">{item.createdAt}</TableCell>
-                          <TableCell>
-                            <Badge className={getStatusBadgeColor(item.status)}>
-                              <span className="japanese-text">{item.status}</span>
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* 案件一覧テーブル（左側） */}
+                  <div className="lg:w-1/2">
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="japanese-text">ソース</TableHead>
+                            <TableHead className="japanese-text">案件名</TableHead>
+                            <TableHead className="japanese-text">スキル</TableHead>
+                            <TableHead className="japanese-text">勤務地</TableHead>
+                            <TableHead className="japanese-text">単価</TableHead>
+                            <TableHead className="japanese-text">会社</TableHead>
+                            <TableHead className="japanese-text">作成日</TableHead>
+                            <TableHead className="japanese-text">ステータス</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {paginatedCases.map((item) => (
+                            <TableRow 
+                              key={item.id} 
+                              className={selectedCase?.id === item.id ? "bg-muted" : ""}
+                              onClick={() => handleCaseSelect(item)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              <TableCell>
+                                <div className="flex items-center">
+                                  {getSourceIcon(item.source)}
+                                  <span className="text-xs japanese-text">
+                                    {item.source === "mail" ? "メール" : "手動"}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="font-medium japanese-text">{item.title}</TableCell>
+                              <TableCell className="japanese-text text-sm">
+                                {item.skills.join(", ")}
+                              </TableCell>
+                              <TableCell className="japanese-text text-sm">{item.location}</TableCell>
+                              <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
+                              <TableCell className="japanese-text text-sm">
+                                {item.company || "-"}
+                              </TableCell>
+                              <TableCell className="japanese-text text-sm">{item.createdAt}</TableCell>
+                              <TableCell>
+                                <Badge className={getStatusBadgeColor(item.status)}>
+                                  <span className="japanese-text">{item.status}</span>
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  
+                    {/* 案件一覧のページネーション */}
+                    <div className="mt-4 flex justify-center">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious 
+                              onClick={() => setCasesCurrentPage(prev => Math.max(prev - 1, 1))}
+                              className={casesCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                            />
+                          </PaginationItem>
+                          
+                          {Array.from({ length: totalCasesPages }).map((_, index) => {
+                            const pageNumber = index + 1;
+                            if (
+                              pageNumber === 1 || 
+                              pageNumber === totalCasesPages || 
+                              (pageNumber >= casesCurrentPage - 1 && pageNumber <= casesCurrentPage + 1)
+                            ) {
+                              return (
+                                <PaginationItem key={pageNumber}>
+                                  <PaginationLink 
+                                    isActive={casesCurrentPage === pageNumber}
+                                    onClick={() => setCasesCurrentPage(pageNumber)}
+                                  >
+                                    {pageNumber}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              );
+                            } else if (
+                              pageNumber === casesCurrentPage - 2 || 
+                              pageNumber === casesCurrentPage + 2
+                            ) {
+                              return (
+                                <PaginationItem key={pageNumber}>
+                                  <PaginationEllipsis />
+                                </PaginationItem>
+                              );
+                            }
+                            return null;
+                          })}
+                          
+                          <PaginationItem>
+                            <PaginationNext 
+                              onClick={() => setCasesCurrentPage(prev => Math.min(prev + 1, totalCasesPages))}
+                              className={casesCurrentPage === totalCasesPages ? "pointer-events-none opacity-50" : ""}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  </div>
+                  
+                  {/* 案件詳細表示部分（右側） */}
+                  <div className="lg:w-1/2">
+                    {selectedCase ? (
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-xl japanese-text">{selectedCase.title}</CardTitle>
+                          <div className="flex items-center justify-between">
+                            <Badge className={getStatusBadgeColor(selectedCase.status)}>
+                              <span className="japanese-text">{selectedCase.status}</span>
                             </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              
-                {/* Add pagination for cases list */}
-                <div className="mt-4 flex justify-center">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setCasesCurrentPage(prev => Math.max(prev - 1, 1))}
-                          className={casesCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                      
-                      {Array.from({ length: totalCasesPages }).map((_, index) => {
-                        const pageNumber = index + 1;
-                        if (
-                          pageNumber === 1 || 
-                          pageNumber === totalCasesPages || 
-                          (pageNumber >= casesCurrentPage - 1 && pageNumber <= casesCurrentPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink 
-                                isActive={casesCurrentPage === pageNumber}
-                                onClick={() => setCasesCurrentPage(pageNumber)}
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (
-                          pageNumber === casesCurrentPage - 2 || 
-                          pageNumber === casesCurrentPage + 2
-                        ) {
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          );
-                        }
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setCasesCurrentPage(prev => Math.min(prev + 1, totalCasesPages))}
-                          className={casesCurrentPage === totalCasesPages ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                            <span className="text-sm text-muted-foreground japanese-text">作成日: {selectedCase.createdAt}</span>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">会社名</h4>
+                              <p className="text-sm japanese-text">{selectedCase.company || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">担当者</h4>
+                              <p className="text-sm japanese-text">{selectedCase.manager || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">連絡先</h4>
+                              <p className="text-sm japanese-text">{selectedCase.managerEmail || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">必要経験</h4>
+                              <p className="text-sm japanese-text">{selectedCase.experience || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">勤務形態</h4>
+                              <p className="text-sm japanese-text">{selectedCase.workType || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">期間</h4>
+                              <p className="text-sm japanese-text">{selectedCase.duration || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">日本語レベル</h4>
+                              <p className="text-sm japanese-text">{selectedCase.japanese || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">優先度</h4>
+                              <p className="text-sm japanese-text">{selectedCase.priority || "未設定"}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">勤務地</h4>
+                              <p className="text-sm japanese-text">{selectedCase.location}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 japanese-text">単価</h4>
+                              <p className="text-sm japanese-text">{selectedCase.budget}</p>
+                            </div>
+                            <div className="col-span-2">
+                              <h4 className="text-sm font-medium mb-1 japanese-text">スキル</h4>
+                              <div className="flex flex-wrap gap-1">
+                                {selectedCase.skills.map((skill, index) => (
+                                  <Badge key={index} variant="outline" className="japanese-text">
+                                    {skill}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4">
+                            <h4 className="text-sm font-medium mb-2 japanese-text">案件詳細</h4>
+                            <div className="bg-muted/50 rounded-md p-3 text-sm whitespace-pre-wrap japanese-text max-h-[400px] overflow-y-auto">
+                              {selectedCase.detailDescription || "詳細情報はありません"}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Card className="flex items-center justify-center h-[400px] text-center">
+                        <CardContent>
+                          <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-2" />
+                          <p className="text-muted-foreground japanese-text">案件を選択して詳細を表示</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
