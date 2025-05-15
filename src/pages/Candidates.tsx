@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileDown, Edit, Trash2, Wand2, Save, Eye, Search, Send } from 'lucide-react';
+import { FileDown, Edit, Trash2, Wand2, Save, Eye, Search } from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -323,7 +323,7 @@ export function Candidates() {
     
     setFilteredEngineers(filtered);
     
-    if (filtered.length === 0 && (searchQuery || filters.companyType || filters.japaneseLevel || filters.status)) {
+    if (filtered.length === 0 && (searchQuery || filters.companyType || filters.companyName || filters.japaneseLevel || filters.status)) {
       toast.info('該当する技術者が見つかりませんでした');
     }
   };
@@ -408,10 +408,17 @@ export function Candidates() {
     }
   };
   
-  // 技術者の編集
+  // 技術者の編集 (詳細画面から)
   const handleEditClick = () => {
     setDetailDialogOpen(false);
     setEditEngineerData({...selectedEngineer});
+    setEditDialogOpen(true);
+  };
+  
+  // 技術者の編集 (テーブルから直接)
+  const handleDirectEditClick = (engineer: any) => {
+    setSelectedEngineer(engineer);
+    setEditEngineerData({...engineer});
     setEditDialogOpen(true);
   };
   
@@ -640,7 +647,7 @@ export function Candidates() {
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  onClick={() => handleEditClick()}
+                                  onClick={() => handleDirectEditClick(engineer)}
                                   title="編集"
                                 >
                                   <Edit className="h-4 w-4" />
