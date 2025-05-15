@@ -23,13 +23,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Send, Wand2, UserRound, Users } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Mail, Send, Wand2, FileText, Users } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 
-interface EmailSenderProps {
-  mailCases: any[];
+interface CandidateEmailSenderProps {
+  candidateCompanies: any[];
 }
 
 const DEFAULT_SIGNATURE = `
@@ -44,53 +43,54 @@ const EMAIL_TEMPLATES = [
   {
     id: "greeting",
     name: "初回挨拶",
-    subject: "【ご挨拶】技術者派遣のご案内",
+    subject: "【ご挨拶】案件のご案内",
     body: `お世話になっております。株式会社テックリクルーターの山田と申します。
 
-貴社のプロジェクトに最適な技術者をご紹介できればと思い、ご連絡いたしました。
-弊社では、[技術領域]に精通したエンジニアを多数抱えており、短期・中期・長期のプロジェクトに対応可能です。
+貴社の技術者の方々に最適な案件をご紹介できればと思い、ご連絡いたしました。
+弊社では、多数の企業様から[技術領域]に関する案件を頂いており、短期・中期・長期のプロジェクトをご用意しております。
 
-現在、特に以下のスキルを持つエンジニアが稼働可能となっております：
-- Java, Spring Boot（経験5年以上）
-- React, TypeScript（経験3年以上）
-- AWS, Docker, Kubernetes（経験4年以上）
+現在、特に以下のスキルに関する案件の依頼が多くなっております：
+- Java, Spring Boot
+- React, TypeScript
+- AWS, Docker, Kubernetes
 
 ご興味がございましたら、ぜひ一度お話させていただければ幸いです。
 お忙しいところ恐縮ですが、ご検討のほど、よろしくお願い申し上げます。`
   },
   {
-    id: "follow-up",
-    name: "案件フォローアップ",
-    subject: "【フォローアップ】先日ご連絡した件について",
+    id: "case-intro",
+    name: "案件紹介",
+    subject: "【案件紹介】新規案件のご案内",
     body: `お世話になっております。株式会社テックリクルーターの山田と申します。
 
-先日は貴社の案件情報をご共有いただき、誠にありがとうございました。
-頂いた案件情報に基づき、条件に合致する技術者を選定いたしましたので、ご報告させていただきます。
+貴社の技術者様に最適と思われる案件が入りましたので、ご連絡いたしました。
 
-・[案件名]案件について
+【案件概要】
+・案件名：[案件名]
 ・スキル要件：[スキル]
-・稼働可能時期：即日〜
+・場所：[場所]
+・単価：[単価]
+・開始時期：[開始時期]
+・期間：[期間]
 
-技術者のプロフィールを添付いたしますので、ご確認いただければ幸いです。
-ご不明な点やご質問がございましたら、お気軽にお問い合わせください。`
+詳細な案件情報を添付いたしますので、ご確認いただければ幸いです。
+技術者様のご意向をお伺いできましたら幸いです。`
   },
   {
-    id: "engineer-intro",
-    name: "技術者紹介",
-    subject: "【技術者紹介】案件に最適な人材のご紹介",
+    id: "follow-up",
+    name: "フォローアップ",
+    subject: "【フォローアップ】先日ご紹介した案件について",
     body: `お世話になっております。株式会社テックリクルーターの山田と申します。
 
-貴社の案件に最適な技術者をご紹介いたします。
+先日ご紹介した案件についてお返事頂けますと幸いです。
+もし追加の情報が必要でしたら、お気軽にお申し付けください。
 
-【技術者情報】
-・氏名：[技術者名]
-・スキル：[技術者スキル]
-・経験年数：[経験年数]年
-・稼働可能時期：[稼働可能時期]
-・単価：[単価]
+【前回ご紹介した案件】
+・案件名：[案件名]
+・スキル要件：[スキル]
+・場所：[場所]
 
-詳細な経歴書を添付いたしますので、ご確認いただければ幸いです。
-面談のセッティングなど、お気軽にご相談ください。`
+ご検討よろしくお願い申し上げます。`
   },
   {
     id: "custom",
@@ -100,182 +100,232 @@ const EMAIL_TEMPLATES = [
   }
 ];
 
-// サンプル技術者データ
-const ENGINEERS_DATA = [
+// サンプル案件データ
+const CASES_DATA = [
   {
-    id: "e1",
-    name: "佐藤 一郎",
-    skills: ["Java", "Spring Boot", "AWS"],
-    experience: "7年",
-    availability: "即日",
-    rate: "80万円",
-    languages: ["日本語（ネイティブ）", "英語（ビジネスレベル）"],
-    status: "稼働中"
+    id: "c1",
+    title: "Java開発エンジニア",
+    skills: ["Java", "Spring Boot", "SQL"],
+    location: "東京（リモート可）",
+    budget: "60~80万円",
+    duration: "6ヶ月～",
+    startDate: "即日",
+    status: "募集中"
   },
   {
-    id: "e2",
-    name: "鈴木 二郎",
-    skills: ["React", "TypeScript", "Node.js"],
-    experience: "5年",
-    availability: "１週間後",
-    rate: "75万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "待機中"
+    id: "c2",
+    title: "フロントエンドエンジニア",
+    skills: ["React", "TypeScript", "Next.js"],
+    location: "大阪",
+    budget: "55~70万円",
+    duration: "3ヶ月～",
+    startDate: "1週間後～",
+    status: "募集中"
   },
   {
-    id: "e3",
-    name: "高橋 三郎",
-    skills: ["Python", "Django", "AWS"],
-    experience: "4年",
-    availability: "即日",
-    rate: "70万円",
-    languages: ["日本語（ビジネスレベル）", "英語（日常会話）"],
-    status: "待機中"
+    id: "c3",
+    title: "インフラエンジニア",
+    skills: ["AWS", "Docker", "Kubernetes"],
+    location: "名古屋",
+    budget: "65~90万円",
+    duration: "12ヶ月～",
+    startDate: "即日",
+    status: "募集中"
   },
   {
-    id: "e4",
-    name: "田中 四郎",
-    skills: ["C#", ".NET", "Azure"],
-    experience: "6年",
-    availability: "2週間後",
-    rate: "78万円",
-    languages: ["日本語（ネイティブ）", "中国語（日常会話）"],
-    status: "稼働中"
+    id: "c4",
+    title: "QAエンジニア",
+    skills: ["テスト自動化", "Selenium"],
+    location: "リモート",
+    budget: "50~65万円",
+    duration: "3ヶ月～",
+    startDate: "2週間後～",
+    status: "募集中"
   },
   {
-    id: "e5",
-    name: "渡辺 五郎",
+    id: "c5",
+    title: "PHP開発エンジニア",
     skills: ["PHP", "Laravel", "MySQL"],
-    experience: "3年",
-    availability: "即日",
-    rate: "65万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "待機中"
+    location: "東京",
+    budget: "55~75万円",
+    duration: "6ヶ月～",
+    startDate: "即日",
+    status: "募集中"
   },
   {
-    id: "e6",
-    name: "伊藤 六郎",
-    skills: ["JavaScript", "Vue.js", "Firebase"],
-    experience: "4年",
-    availability: "1ヶ月後",
-    rate: "72万円",
-    languages: ["日本語（ネイティブ）", "英語（ビジネスレベル）"],
-    status: "稼働中"
+    id: "c6",
+    title: "Android開発エンジニア",
+    skills: ["Kotlin", "Java", "Android SDK"],
+    location: "福岡",
+    budget: "60~75万円",
+    duration: "3ヶ月～",
+    startDate: "1週間後～",
+    status: "募集中"
   },
   {
-    id: "e7",
-    name: "山本 七郎",
-    skills: ["Go", "Docker", "Kubernetes"],
-    experience: "5年",
-    availability: "即日",
-    rate: "85万円",
-    languages: ["日本語（ネイティブ）", "英語（ビジネスレベル）"],
-    status: "待機中"
+    id: "c7",
+    title: "データサイエンティスト",
+    skills: ["Python", "R", "機械学習"],
+    location: "東京",
+    budget: "70~90万円",
+    duration: "6ヶ月～",
+    startDate: "即日",
+    status: "募集中"
   },
   {
-    id: "e8",
-    name: "中村 八郎",
-    skills: ["Ruby", "Rails", "PostgreSQL"],
-    experience: "6年",
-    availability: "2週間後",
-    rate: "78万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "稼働中"
-  },
-  {
-    id: "e9",
-    name: "小林 九郎",
-    skills: ["Angular", "TypeScript", "Firebase"],
-    experience: "3年",
-    availability: "即日",
-    rate: "68万円",
-    languages: ["日本語（ビジネスレベル）", "英語（日常会話）"],
-    status: "待機中"
-  },
-  {
-    id: "e10",
-    name: "加藤 十郎",
-    skills: ["Swift", "iOS", "Firebase"],
-    experience: "4年",
-    availability: "1週間後",
-    rate: "75万円",
-    languages: ["日本語（ネイティブ）"],
-    status: "稼働中"
+    id: "c8",
+    title: "セキュリティエンジニア",
+    skills: ["ネットワークセキュリティ", "CISSP"],
+    location: "大阪",
+    budget: "65~85万円",
+    duration: "12ヶ月～",
+    startDate: "2週間後～",
+    status: "募集中"
   }
 ];
 
-export function EmailSender({ mailCases }: EmailSenderProps) {
-  const [selectedCases, setSelectedCases] = useState<string[]>([]);
+// サンプル企業データ (実際にはpropsから渡される)
+const SAMPLE_COMPANIES = [
+  {
+    id: "comp1",
+    name: "テクノソリューション株式会社",
+    contactName: "田中 一郎",
+    email: "tanaka@technosolution.co.jp",
+    engineerCount: 12,
+    lastContact: "2025-05-10",
+    specialties: ["Java", "AWS", "React"]
+  },
+  {
+    id: "comp2",
+    name: "デジタルクリエイト株式会社",
+    contactName: "佐藤 二郎",
+    email: "sato@digitalcreate.co.jp",
+    engineerCount: 8,
+    lastContact: "2025-05-08",
+    specialties: ["PHP", "Laravel", "Vue.js"]
+  },
+  {
+    id: "comp3",
+    name: "アイシステム株式会社",
+    contactName: "鈴木 三郎",
+    email: "suzuki@isystems.jp",
+    engineerCount: 15,
+    lastContact: "2025-05-12",
+    specialties: ["C#", ".NET", "Angular"]
+  },
+  {
+    id: "comp4",
+    name: "フューチャーテック株式会社",
+    contactName: "高橋 四郎",
+    email: "takahashi@futuretech.co.jp",
+    engineerCount: 6,
+    lastContact: "2025-05-05",
+    specialties: ["Python", "Django", "React"]
+  },
+  {
+    id: "comp5",
+    name: "ウェブソリューション株式会社",
+    contactName: "伊藤 五郎",
+    email: "ito@websolution.jp",
+    engineerCount: 10,
+    lastContact: "2025-05-09",
+    specialties: ["JavaScript", "Node.js", "React"]
+  }
+];
+
+export function CandidateEmailSender({ candidateCompanies = SAMPLE_COMPANIES }: CandidateEmailSenderProps) {
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [subject, setSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [sending, setSending] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [companyFilter, setCompanyFilter] = useState("all");
+  const [companyFilter, setCompanyFilter] = useState("");
   const [techFilter, setTechFilter] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("custom");
   const [signature, setSignature] = useState(DEFAULT_SIGNATURE);
-  const [selectedEngineers, setSelectedEngineers] = useState<string[]>([]);
-  const [engineersSelectAll, setEngineersSelectAll] = useState(false);
-  const [engineerCurrentPage, setEngineerCurrentPage] = useState(1);
-  const [engineerFilter, setEngineerFilter] = useState("");
-  const [engineerStatusFilter, setEngineerStatusFilter] = useState("all");
+  const [selectedCases, setSelectedCases] = useState<string[]>([]);
+  const [casesSelectAll, setCasesSelectAll] = useState(false);
+  const [caseCurrentPage, setCaseCurrentPage] = useState(1);
+  const [caseFilter, setCaseFilter] = useState("");
   
   const itemsPerPage = 5;
   
-  // 会社のリストを取得
-  const companyList = Array.from(new Set(mailCases.filter(item => item.company).map(item => item.company)));
-  
-  // フィルタリングされた案件を取得
-  const filteredCases = mailCases.filter(item => {
-    const matchesCompany = companyFilter === "all" || item.company === companyFilter;
+  // フィルタリングされた企業を取得
+  const filteredCompanies = candidateCompanies.filter(company => {
+    const matchesName = companyFilter === "" || 
+                       company.name.toLowerCase().includes(companyFilter.toLowerCase());
     const matchesTech = techFilter === "" || 
-                       (item.keyTechnologies && item.keyTechnologies.toLowerCase().includes(techFilter.toLowerCase()));
-    return matchesCompany && matchesTech;
+                       (company.specialties && company.specialties.some(tech => 
+                         tech.toLowerCase().includes(techFilter.toLowerCase())));
+    return matchesName && matchesTech;
   });
   
-  // ページネーションで表示するケース
-  const paginatedCases = filteredCases.slice(
+  // ページネーションで表示する企業
+  const paginatedCompanies = filteredCompanies.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
   
-  const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
 
-  // フィルタリングされた技術者を取得
-  const filteredEngineers = ENGINEERS_DATA.filter(engineer => {
+  // フィルタリングされた案件を取得
+  const filteredCases = CASES_DATA.filter(caseItem => {
     // スキルフィルター
-    const matchesSkill = engineerFilter === "" || 
-                         engineer.skills.some(skill => 
-                           skill.toLowerCase().includes(engineerFilter.toLowerCase()));
+    const matchesSkill = caseFilter === "" || 
+                         caseItem.skills.some(skill => 
+                           skill.toLowerCase().includes(caseFilter.toLowerCase())) ||
+                         caseItem.title.toLowerCase().includes(caseFilter.toLowerCase());
     
-    // ステータスフィルター
-    const matchesStatus = engineerStatusFilter === "all" || 
-                          engineer.status === engineerStatusFilter;
-    
-    return matchesSkill && matchesStatus;
+    return matchesSkill;
   });
   
-  // ページネーションで表示する技術者
-  const paginatedEngineers = filteredEngineers.slice(
-    (engineerCurrentPage - 1) * itemsPerPage,
-    engineerCurrentPage * itemsPerPage
+  // ページネーションで表示する案件
+  const paginatedCases = filteredCases.slice(
+    (caseCurrentPage - 1) * itemsPerPage,
+    caseCurrentPage * itemsPerPage
   );
   
-  const totalEngineerPages = Math.ceil(filteredEngineers.length / itemsPerPage);
+  const totalCasePages = Math.ceil(filteredCases.length / itemsPerPage);
 
-  // Handle selectAll checkbox change for cases
+  // Handle selectAll checkbox change for companies
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedCases([]);
+      setSelectedCompanies([]);
     } else {
-      setSelectedCases(paginatedCases.map(item => item.id));
+      setSelectedCompanies(paginatedCompanies.map(item => item.id));
     }
     setSelectAll(!selectAll);
   };
 
+  // Handle individual company checkbox change
+  const handleSelectCompany = (id: string) => {
+    setSelectedCompanies(prev => 
+      prev.includes(id) 
+        ? prev.filter(compId => compId !== id) 
+        : [...prev, id]
+    );
+    
+    // Update selectAll state
+    if (selectedCompanies.length + 1 === paginatedCompanies.length && !selectedCompanies.includes(id)) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  };
+  
+  // Handle selectAll checkbox change for cases
+  const handleCaseSelectAll = () => {
+    if (casesSelectAll) {
+      setSelectedCases([]);
+    } else {
+      setSelectedCases(paginatedCases.map(item => item.id));
+    }
+    setCasesSelectAll(!casesSelectAll);
+  };
+
   // Handle individual case checkbox change
-  const handleSelectCase = (id: string) => {
+  const handleCaseSelect = (id: string) => {
     setSelectedCases(prev => 
       prev.includes(id) 
         ? prev.filter(caseId => caseId !== id) 
@@ -284,35 +334,9 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
     
     // Update selectAll state
     if (selectedCases.length + 1 === paginatedCases.length && !selectedCases.includes(id)) {
-      setSelectAll(true);
+      setCasesSelectAll(true);
     } else {
-      setSelectAll(false);
-    }
-  };
-  
-  // Handle selectAll checkbox change for engineers
-  const handleEngineerSelectAll = () => {
-    if (engineersSelectAll) {
-      setSelectedEngineers([]);
-    } else {
-      setSelectedEngineers(paginatedEngineers.map(item => item.id));
-    }
-    setEngineersSelectAll(!engineersSelectAll);
-  };
-
-  // Handle individual engineer checkbox change
-  const handleEngineerSelect = (id: string) => {
-    setSelectedEngineers(prev => 
-      prev.includes(id) 
-        ? prev.filter(engId => engId !== id) 
-        : [...prev, id]
-    );
-    
-    // Update selectAll state
-    if (selectedEngineers.length + 1 === paginatedEngineers.length && !selectedEngineers.includes(id)) {
-      setEngineersSelectAll(true);
-    } else {
-      setEngineersSelectAll(false);
+      setCasesSelectAll(false);
     }
   };
 
@@ -355,42 +379,42 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
     }, 1500);
   };
 
-  // Generate email content with selected engineers
-  const generateEmailContentWithEngineers = () => {
+  // Generate email content with selected cases
+  const generateEmailContentWithCases = () => {
     // Basic validation
     if (!emailBody.trim()) {
       return emailBody;
     }
 
-    // If no engineers selected, return original content
-    if (selectedEngineers.length === 0) {
+    // If no cases selected, return original content
+    if (selectedCases.length === 0) {
       return emailBody;
     }
 
-    // Get selected engineers data
-    const engineersData = ENGINEERS_DATA.filter(eng => selectedEngineers.includes(eng.id));
+    // Get selected cases data
+    const casesData = CASES_DATA.filter(c => selectedCases.includes(c.id));
     
-    let engineerContent = "\n\n【ご紹介する技術者一覧】\n";
-    engineersData.forEach((eng, index) => {
-      engineerContent += `
-■ 技術者${index + 1}
-氏名：${eng.name}
-スキル：${eng.skills.join(', ')}
-経験年数：${eng.experience}
-稼働可能時期：${eng.availability}
-単価：${eng.rate}
-言語：${eng.languages.join(', ')}
+    let caseContent = "\n\n【ご紹介する案件一覧】\n";
+    casesData.forEach((caseItem, index) => {
+      caseContent += `
+■ 案件${index + 1}
+案件名：${caseItem.title}
+必要スキル：${caseItem.skills.join(', ')}
+勤務地：${caseItem.location}
+単価：${caseItem.budget}
+期間：${caseItem.duration}
+開始時期：${caseItem.startDate}
 
 `;
     });
     
-    // Append engineer content to email body
-    return emailBody + engineerContent;
+    // Append case content to email body
+    return emailBody + caseContent;
   };
 
   // Handle send email
   const handleSendEmail = () => {
-    if (selectedCases.length === 0) {
+    if (selectedCompanies.length === 0) {
       toast({
         title: "エラー",
         description: '送信先を選択してください',
@@ -417,28 +441,28 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
       return;
     }
 
-    // Generate email content with engineers if they're selected
-    const finalEmailContent = generateEmailContentWithEngineers();
+    // Generate email content with cases if they're selected
+    const finalEmailContent = generateEmailContentWithCases();
 
     // Simulate sending email
     setSending(true);
     
     setTimeout(() => {
-      const selectedEmails = mailCases
-        .filter(item => selectedCases.includes(item.id))
-        .map(item => item.sender);
+      const selectedEmails = candidateCompanies
+        .filter(company => selectedCompanies.includes(company.id))
+        .map(company => company.email);
       
       toast({
         title: "メールが送信されました",
-        description: `${selectedEmails.length}件のメールが正常に送信されました${selectedEngineers.length > 0 ? `（${selectedEngineers.length}名の技術者情報を含む）` : ''}`,
+        description: `${selectedEmails.length}件のメールが正常に送信されました${selectedCases.length > 0 ? `（${selectedCases.length}件の案件情報を含む）` : ''}`,
         variant: "default"
       });
       
       setSending(false);
-      setSelectedCases([]);
+      setSelectedCompanies([]);
       setSelectAll(false);
-      setSelectedEngineers([]);
-      setEngineersSelectAll(false);
+      setSelectedCases([]);
+      setCasesSelectAll(false);
       setSubject('');
       setEmailBody('');
     }, 2000);
@@ -450,25 +474,18 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
         <CardHeader>
           <CardTitle className="japanese-text">一括メール送信</CardTitle>
           <CardDescription className="japanese-text">
-            メール案件の送信者に一括でメールを送信します
+            人材を保有する企業に対して案件を紹介するメールを一括で送信します
           </CardDescription>
           <div className="mt-4 flex flex-col sm:flex-row gap-4">
-            <Select value={companyFilter} onValueChange={setCompanyFilter}>
-              <SelectTrigger className="japanese-text w-full sm:w-[200px]">
-                <SelectValue placeholder="会社でフィルター" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-                {companyList.map((company) => (
-                  <SelectItem key={company as string} value={company as string} className="japanese-text">
-                    {company as string}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input 
+              placeholder="会社名でフィルター" 
+              value={companyFilter}
+              onChange={(e) => setCompanyFilter(e.target.value)}
+              className="japanese-text"
+            />
             
             <Input 
-              placeholder="技術キーワードでフィルター" 
+              placeholder="技術スキルでフィルター" 
               value={techFilter}
               onChange={(e) => setTechFilter(e.target.value)}
               className="japanese-text"
@@ -476,19 +493,19 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="cases">
+          <Tabs defaultValue="companies">
             <TabsList className="mb-4">
-              <TabsTrigger value="cases" className="japanese-text">
+              <TabsTrigger value="companies" className="japanese-text">
                 <Mail className="mr-2 h-4 w-4" />
-                送信先
+                送信先企業
               </TabsTrigger>
-              <TabsTrigger value="engineers" className="japanese-text">
-                <Users className="mr-2 h-4 w-4" />
-                技術者選択
+              <TabsTrigger value="cases" className="japanese-text">
+                <FileText className="mr-2 h-4 w-4" />
+                案件選択
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="cases">
+            <TabsContent value="companies">
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
@@ -500,31 +517,39 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                           aria-label="全選択"
                         />
                       </TableHead>
-                      <TableHead className="japanese-text">送信者</TableHead>
+                      <TableHead className="japanese-text">会社名</TableHead>
                       <TableHead className="japanese-text">担当者名</TableHead>
-                      <TableHead className="japanese-text">会社</TableHead>
-                      <TableHead className="japanese-text">案件名</TableHead>
-                      <TableHead className="japanese-text">技術キーワード</TableHead>
+                      <TableHead className="japanese-text">メールアドレス</TableHead>
+                      <TableHead className="japanese-text">技術者数</TableHead>
+                      <TableHead className="japanese-text">得意分野</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedCases.map((item) => (
-                      <TableRow key={item.id}>
+                    {paginatedCompanies.map((company) => (
+                      <TableRow key={company.id}>
                         <TableCell>
                           <Checkbox 
-                            checked={selectedCases.includes(item.id)}
-                            onCheckedChange={() => handleSelectCase(item.id)}
-                            aria-label={`${item.sender}を選択`}
+                            checked={selectedCompanies.includes(company.id)}
+                            onCheckedChange={() => handleSelectCompany(company.id)}
+                            aria-label={`${company.name}を選択`}
                           />
                         </TableCell>
-                        <TableCell className="font-medium">{item.sender}</TableCell>
-                        <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
-                        <TableCell className="japanese-text">{item.company || "-"}</TableCell>
-                        <TableCell className="japanese-text">{item.title}</TableCell>
-                        <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
+                        <TableCell className="font-medium japanese-text">{company.name}</TableCell>
+                        <TableCell className="japanese-text">{company.contactName || "-"}</TableCell>
+                        <TableCell>{company.email}</TableCell>
+                        <TableCell className="text-center">{company.engineerCount}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {company.specialties.map((skill, i) => (
+                              <Badge key={i} variant="outline" className="japanese-text text-xs">
+                                {skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
-                    {paginatedCases.length === 0 && (
+                    {paginatedCompanies.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-4 japanese-text">
                           フィルター条件に一致するデータが見つかりません
@@ -589,9 +614,9 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
               
               <div className="mt-4">
                 <div className="japanese-text flex items-center gap-2">
-                  <span className="text-sm font-medium">選択中: {selectedCases.length}件</span>
-                  {selectedCases.length > 0 && (
-                    <Button variant="outline" size="sm" onClick={() => setSelectedCases([])}>
+                  <span className="text-sm font-medium">選択中: {selectedCompanies.length}社</span>
+                  {selectedCompanies.length > 0 && (
+                    <Button variant="outline" size="sm" onClick={() => setSelectedCompanies([])}>
                       選択をクリア
                     </Button>
                   )}
@@ -599,25 +624,14 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
               </div>
             </TabsContent>
 
-            <TabsContent value="engineers">
-              <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <TabsContent value="cases">
+              <div className="mb-4">
                 <Input 
-                  placeholder="スキルで検索" 
-                  value={engineerFilter}
-                  onChange={(e) => setEngineerFilter(e.target.value)}
+                  placeholder="案件名やスキルで検索" 
+                  value={caseFilter}
+                  onChange={(e) => setCaseFilter(e.target.value)}
                   className="japanese-text"
                 />
-                
-                <Select value={engineerStatusFilter} onValueChange={setEngineerStatusFilter}>
-                  <SelectTrigger className="japanese-text w-full sm:w-[200px]">
-                    <SelectValue placeholder="ステータスでフィルター" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="japanese-text">すべてのステータス</SelectItem>
-                    <SelectItem value="待機中" className="japanese-text">待機中</SelectItem>
-                    <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="rounded-md border">
@@ -626,55 +640,46 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                     <TableRow>
                       <TableHead className="w-[50px]">
                         <Checkbox 
-                          checked={engineersSelectAll} 
-                          onCheckedChange={handleEngineerSelectAll}
+                          checked={casesSelectAll} 
+                          onCheckedChange={handleCaseSelectAll}
                           aria-label="全選択"
                         />
                       </TableHead>
-                      <TableHead className="japanese-text">氏名</TableHead>
+                      <TableHead className="japanese-text">案件名</TableHead>
                       <TableHead className="japanese-text">スキル</TableHead>
-                      <TableHead className="japanese-text">経験</TableHead>
-                      <TableHead className="japanese-text">稼働可能時期</TableHead>
+                      <TableHead className="japanese-text">勤務地</TableHead>
                       <TableHead className="japanese-text">単価</TableHead>
-                      <TableHead className="japanese-text">ステータス</TableHead>
+                      <TableHead className="japanese-text">開始時期</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedEngineers.map((engineer) => (
-                      <TableRow key={engineer.id}>
+                    {paginatedCases.map((caseItem) => (
+                      <TableRow key={caseItem.id}>
                         <TableCell>
                           <Checkbox 
-                            checked={selectedEngineers.includes(engineer.id)}
-                            onCheckedChange={() => handleEngineerSelect(engineer.id)}
-                            aria-label={`${engineer.name}を選択`}
+                            checked={selectedCases.includes(caseItem.id)}
+                            onCheckedChange={() => handleCaseSelect(caseItem.id)}
+                            aria-label={`${caseItem.title}を選択`}
                           />
                         </TableCell>
-                        <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
+                        <TableCell className="font-medium japanese-text">{caseItem.title}</TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {engineer.skills.map((skill, i) => (
+                            {caseItem.skills.map((skill, i) => (
                               <Badge key={i} variant="outline" className="japanese-text text-xs">
                                 {skill}
                               </Badge>
                             ))}
                           </div>
                         </TableCell>
-                        <TableCell className="japanese-text">{engineer.experience}</TableCell>
-                        <TableCell className="japanese-text">{engineer.availability}</TableCell>
-                        <TableCell className="japanese-text">{engineer.rate}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={engineer.status === "待機中" ? "success" : "secondary"}
-                            className="japanese-text"
-                          >
-                            {engineer.status}
-                          </Badge>
-                        </TableCell>
+                        <TableCell className="japanese-text">{caseItem.location}</TableCell>
+                        <TableCell className="japanese-text">{caseItem.budget}</TableCell>
+                        <TableCell className="japanese-text">{caseItem.startDate}</TableCell>
                       </TableRow>
                     ))}
-                    {paginatedEngineers.length === 0 && (
+                    {paginatedCases.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-4 japanese-text">
+                        <TableCell colSpan={6} className="text-center py-4 japanese-text">
                           フィルター条件に一致するデータが見つかりません
                         </TableCell>
                       </TableRow>
@@ -683,37 +688,37 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                 </Table>
               </div>
               
-              {totalEngineerPages > 1 && (
+              {totalCasePages > 1 && (
                 <div className="mt-4 flex justify-center">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
                         <PaginationPrevious 
-                          onClick={() => setEngineerCurrentPage(prev => Math.max(prev - 1, 1))}
-                          className={engineerCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          onClick={() => setCaseCurrentPage(prev => Math.max(prev - 1, 1))}
+                          className={caseCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
                         />
                       </PaginationItem>
                       
-                      {Array.from({ length: totalEngineerPages }).map((_, index) => {
+                      {Array.from({ length: totalCasePages }).map((_, index) => {
                         const pageNumber = index + 1;
                         if (
                           pageNumber === 1 || 
-                          pageNumber === totalEngineerPages || 
-                          (pageNumber >= engineerCurrentPage - 1 && pageNumber <= engineerCurrentPage + 1)
+                          pageNumber === totalCasePages || 
+                          (pageNumber >= caseCurrentPage - 1 && pageNumber <= caseCurrentPage + 1)
                         ) {
                           return (
                             <PaginationItem key={pageNumber}>
                               <PaginationLink 
-                                isActive={engineerCurrentPage === pageNumber}
-                                onClick={() => setEngineerCurrentPage(pageNumber)}
+                                isActive={caseCurrentPage === pageNumber}
+                                onClick={() => setCaseCurrentPage(pageNumber)}
                               >
                                 {pageNumber}
                               </PaginationLink>
                             </PaginationItem>
                           );
                         } else if (
-                          pageNumber === engineerCurrentPage - 2 || 
-                          pageNumber === engineerCurrentPage + 2
+                          pageNumber === caseCurrentPage - 2 || 
+                          pageNumber === caseCurrentPage + 2
                         ) {
                           return (
                             <PaginationItem key={pageNumber}>
@@ -726,8 +731,8 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                       
                       <PaginationItem>
                         <PaginationNext 
-                          onClick={() => setEngineerCurrentPage(prev => Math.min(prev + 1, totalEngineerPages))}
-                          className={engineerCurrentPage === totalEngineerPages ? "pointer-events-none opacity-50" : ""}
+                          onClick={() => setCaseCurrentPage(prev => Math.min(prev + 1, totalCasePages))}
+                          className={caseCurrentPage === totalCasePages ? "pointer-events-none opacity-50" : ""}
                         />
                       </PaginationItem>
                     </PaginationContent>
@@ -737,11 +742,11 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
               
               <div className="mt-4">
                 <div className="japanese-text flex items-center gap-2">
-                  <span className="text-sm font-medium">選択中の技術者: {selectedEngineers.length}名</span>
-                  {selectedEngineers.length > 0 && (
+                  <span className="text-sm font-medium">選択中の案件: {selectedCases.length}件</span>
+                  {selectedCases.length > 0 && (
                     <Button variant="outline" size="sm" onClick={() => {
-                      setSelectedEngineers([]);
-                      setEngineersSelectAll(false);
+                      setSelectedCases([]);
+                      setCasesSelectAll(false);
                     }}>
                       選択をクリア
                     </Button>
@@ -794,9 +799,9 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label htmlFor="signature" className="japanese-text">署名</Label>
-                {selectedEngineers.length > 0 && (
+                {selectedCases.length > 0 && (
                   <span className="text-sm text-muted-foreground japanese-text">
-                    {selectedEngineers.length}名の技術者情報が本文に追加されます
+                    {selectedCases.length}件の案件情報が本文に追加されます
                   </span>
                 )}
               </div>
@@ -822,7 +827,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
               </Button>
               
               <Button 
-                disabled={sending || selectedCases.length === 0} 
+                disabled={sending || selectedCompanies.length === 0} 
                 onClick={handleSendEmail}
                 className="japanese-text"
               >
@@ -832,8 +837,8 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                   <>
                     <Send className="mr-2 h-4 w-4" />
                     <span className="japanese-text">
-                      {selectedCases.length}件のメールを送信
-                      {selectedEngineers.length > 0 && ` (${selectedEngineers.length}名の技術者情報を含む)`}
+                      {selectedCompanies.length}社にメールを送信
+                      {selectedCases.length > 0 && ` (${selectedCases.length}件の案件情報を含む)`}
                     </span>
                   </>
                 )}
@@ -846,4 +851,4 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
   );
 }
 
-export default EmailSender;
+export default CandidateEmailSender;
