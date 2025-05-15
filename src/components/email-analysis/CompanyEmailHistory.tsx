@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, Building, ArrowDown, ArrowUp, Mail, Calendar, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, generatePaginationRange } from '@/components/ui/pagination';
 import { toast } from '@/hooks/use-toast';
 
 // 会社データ
@@ -110,7 +109,7 @@ Java開発エンジニアを募集しております。
       receivedDate: '2025-05-05T13:45:00',
       emailType: 'case',
       content: `
-Python開発案件の案内です。
+Python開発案件の��内です。
 スキル：Python, Django, PostgreSQL
 単価：65~75万円
 場所：リモート可
@@ -212,6 +211,7 @@ export function CompanyEmailHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<typeof companies[0] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [companyListPage, setCompanyListPage] = useState(1);
   const [companyEmails, setCompanyEmails] = useState<ReturnType<typeof getCompanyEmails>>([]);
   const [selectedEmail, setSelectedEmail] = useState<(typeof companyEmails)[0] | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -224,6 +224,14 @@ export function CompanyEmailHistory() {
     company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     company.emailDomain.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // ページネーション用の会社リスト
+  const paginatedCompanies = filteredCompanies.slice(
+    (companyListPage - 1) * itemsPerPage,
+    companyListPage * itemsPerPage
+  );
+
+  const totalCompanyPages = Math.ceil(filteredCompanies.length / itemsPerPage);
 
   // 会社選択
   const selectCompany = (company: typeof companies[0]) => {
@@ -273,49 +281,94 @@ export function CompanyEmailHistory() {
         <CardContent>
           {!selectedCompany ? (
             // 会社一覧
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="japanese-text">会社名</TableHead>
-                    <TableHead className="japanese-text">ドメイン</TableHead>
-                    <TableHead className="japanese-text text-center">総メール数</TableHead>
-                    <TableHead className="japanese-text text-center">案件数</TableHead>
-                    <TableHead className="japanese-text text-center">技術者数</TableHead>
-                    <TableHead className="japanese-text">担当者</TableHead>
-                    <TableHead className="japanese-text">最新メール日</TableHead>
-                    <TableHead className="japanese-text text-right">詳細</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCompanies.map((company) => (
-                    <TableRow key={company.id} className="cursor-pointer" onClick={() => selectCompany(company)}>
-                      <TableCell className="font-medium japanese-text">{company.name}</TableCell>
-                      <TableCell>{company.emailDomain}</TableCell>
-                      <TableCell className="text-center">{company.totalEmails}</TableCell>
-                      <TableCell className="text-center">{company.caseEmails}</TableCell>
-                      <TableCell className="text-center">{company.engineerEmails}</TableCell>
-                      <TableCell className="japanese-text">{company.contactPerson}</TableCell>
-                      <TableCell className="text-sm">
-                        {new Date(company.lastEmailDate).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" className="japanese-text">
-                          履歴を見る
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {filteredCompanies.length === 0 && (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-4 japanese-text">
-                        該当する会社がありません
-                      </TableCell>
+                      <TableHead className="japanese-text">会社名</TableHead>
+                      <TableHead className="japanese-text">ドメイン</TableHead>
+                      <TableHead className="japanese-text text-center">総メール数</TableHead>
+                      <TableHead className="japanese-text text-center">案件数</TableHead>
+                      <TableHead className="japanese-text text-center">技術者数</TableHead>
+                      <TableHead className="japanese-text">担当者</TableHead>
+                      <TableHead className="japanese-text">最新メール日</TableHead>
+                      <TableHead className="japanese-text text-right">詳細</TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedCompanies.map((company) => (
+                      <TableRow key={company.id} className="cursor-pointer" onClick={() => selectCompany(company)}>
+                        <TableCell className="font-medium japanese-text">{company.name}</TableCell>
+                        <TableCell>{company.emailDomain}</TableCell>
+                        <TableCell className="text-center">{company.totalEmails}</TableCell>
+                        <TableCell className="text-center">{company.caseEmails}</TableCell>
+                        <TableCell className="text-center">{company.engineerEmails}</TableCell>
+                        <TableCell className="japanese-text">{company.contactPerson}</TableCell>
+                        <TableCell className="text-sm">
+                          {new Date(company.lastEmailDate).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" className="japanese-text">
+                            履歴を見る
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {filteredCompanies.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-4 japanese-text">
+                          該当する会社がありません
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {/* 会社リストのページネーション */}
+              {totalCompanyPages > 1 && (
+                <div className="mt-4 flex justify-center">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setCompanyListPage(prev => Math.max(prev - 1, 1))}
+                          className={companyListPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                      
+                      {generatePaginationRange(companyListPage, totalCompanyPages).map((item, index) => {
+                        if (item === 'ellipsis') {
+                          return (
+                            <PaginationItem key={`ellipsis-${index}`}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          );
+                        }
+                        return (
+                          <PaginationItem key={item}>
+                            <PaginationLink 
+                              isActive={companyListPage === item}
+                              onClick={() => setCompanyListPage(item as number)}
+                            >
+                              {item}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setCompanyListPage(prev => Math.min(prev + 1, totalCompanyPages))}
+                          className={companyListPage === totalCompanyPages ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           ) : (
             // 選択された会社のメール履歴
             <>
@@ -429,34 +482,24 @@ export function CompanyEmailHistory() {
                           />
                         </PaginationItem>
                         
-                        {Array.from({ length: totalPages }).map((_, index) => {
-                          const pageNumber = index + 1;
-                          if (
-                            pageNumber === 1 || 
-                            pageNumber === totalPages || 
-                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
-                          ) {
+                        {generatePaginationRange(currentPage, totalPages).map((item, index) => {
+                          if (item === 'ellipsis') {
                             return (
-                              <PaginationItem key={pageNumber}>
-                                <PaginationLink 
-                                  isActive={currentPage === pageNumber}
-                                  onClick={() => setCurrentPage(pageNumber)}
-                                >
-                                  {pageNumber}
-                                </PaginationLink>
-                              </PaginationItem>
-                            );
-                          } else if (
-                            pageNumber === currentPage - 2 || 
-                            pageNumber === currentPage + 2
-                          ) {
-                            return (
-                              <PaginationItem key={pageNumber}>
+                              <PaginationItem key={`ellipsis-${index}`}>
                                 <PaginationEllipsis />
                               </PaginationItem>
                             );
                           }
-                          return null;
+                          return (
+                            <PaginationItem key={item}>
+                              <PaginationLink 
+                                isActive={currentPage === item}
+                                onClick={() => setCurrentPage(item as number)}
+                              >
+                                {item}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
                         })}
                         
                         <PaginationItem>

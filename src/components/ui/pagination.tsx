@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 
@@ -106,6 +107,55 @@ const PaginationEllipsis = ({
 )
 PaginationEllipsis.displayName = "PaginationEllipsis"
 
+// Helper function to generate pagination range with ellipsis
+const generatePaginationRange = (
+  currentPage: number,
+  totalPages: number,
+): (number | 'ellipsis')[] => {
+  // Always show first page, last page, current page, and one page before and after current
+  const range: (number | 'ellipsis')[] = [];
+  
+  if (totalPages <= 7) {
+    // If we have 7 or fewer pages, show all pages
+    for (let i = 1; i <= totalPages; i++) {
+      range.push(i);
+    }
+  } else {
+    // Always add first page
+    range.push(1);
+    
+    // Add ellipsis if needed between first page and currentPage - 1
+    if (currentPage > 3) {
+      range.push('ellipsis');
+    }
+    
+    // Add one page before current if not first or second page
+    if (currentPage > 2) {
+      range.push(currentPage - 1);
+    }
+    
+    // Add current page if not first or last
+    if (currentPage !== 1 && currentPage !== totalPages) {
+      range.push(currentPage);
+    }
+    
+    // Add one page after current if not second-to-last or last page
+    if (currentPage < totalPages - 1) {
+      range.push(currentPage + 1);
+    }
+    
+    // Add ellipsis if needed between currentPage + 1 and last page
+    if (currentPage < totalPages - 2) {
+      range.push('ellipsis');
+    }
+    
+    // Always add last page
+    range.push(totalPages);
+  }
+  
+  return range;
+}
+
 export {
   Pagination,
   PaginationContent,
@@ -114,4 +164,5 @@ export {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  generatePaginationRange,
 }

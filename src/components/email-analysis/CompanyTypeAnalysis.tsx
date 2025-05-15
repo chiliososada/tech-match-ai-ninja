@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Search, Filter, BarChart2, PieChart } from 'lucide-react';
 import { ChartContainer } from '@/components/ui/chart';
 import { PieChart as RechartsChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, generatePaginationRange } from '@/components/ui/pagination';
 
 // 示例数据
 const companyData = [
@@ -100,6 +100,8 @@ export function CompanyTypeAnalysis() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // フィルター処理
   const filteredData = companyData.filter(company => {
@@ -110,12 +112,20 @@ export function CompanyTypeAnalysis() {
     return matchesSearch && matchesType && matchesDateRange;
   });
 
+  // ページネーションのデータを計算
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   // フィルターのリセット
   const resetFilters = () => {
     setSearchTerm('');
     setTypeFilter('all');
     setStartDate('');
     setEndDate('');
+    setCurrentPage(1);
   };
 
   return (
@@ -124,7 +134,7 @@ export function CompanyTypeAnalysis() {
         <CardHeader>
           <CardTitle className="japanese-text">企業タイプ分析</CardTitle>
           <CardDescription className="japanese-text">
-            AIによって分類された企業のタイプ分析（案件系/技術者系/混合型）
+            AIによって��類された企業のタイプ分析（案件系/技術者系/混合型）
           </CardDescription>
 
           {/* フィルターセクション */}
@@ -271,7 +281,7 @@ export function CompanyTypeAnalysis() {
                 <CardTitle className="text-sm font-medium japanese-text">
                   <div className="flex items-center">
                     <BarChart2 className="h-4 w-4 mr-2 text-purple-600" />
-                    統計サマリー
+                    統計サマリ���
                   </div>
                 </CardTitle>
               </CardHeader>
@@ -320,7 +330,7 @@ export function CompanyTypeAnalysis() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredData.map((company) => (
+                {paginatedData.map((company) => (
                   <TableRow key={company.id}>
                     <TableCell className="font-medium japanese-text">{company.name}</TableCell>
                     <TableCell>
@@ -360,9 +370,51 @@ export function CompanyTypeAnalysis() {
               </TableBody>
             </Table>
           </div>
+
+          {/* ページネーション */}
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  {generatePaginationRange(currentPage, totalPages).map((item, index) => {
+                    if (item === 'ellipsis') {
+                      return (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return (
+                      <PaginationItem key={item}>
+                        <PaginationLink 
+                          isActive={currentPage === item}
+                          onClick={() => setCurrentPage(item as number)}
+                        >
+                          {item}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </>
   );
 }
-

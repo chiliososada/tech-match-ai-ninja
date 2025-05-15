@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Search, Filter, ArrowDown, ArrowUp, Mail, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, generatePaginationRange } from '@/components/ui/pagination';
 
 // 示例数据
 const emailData = [
@@ -354,34 +353,24 @@ export function EmailListWithExtraction() {
                     />
                   </PaginationItem>
                   
-                  {Array.from({ length: totalPages }).map((_, index) => {
-                    const pageNumber = index + 1;
-                    if (
-                      pageNumber === 1 || 
-                      pageNumber === totalPages || 
-                      (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
-                    ) {
+                  {generatePaginationRange(currentPage, totalPages).map((item, index) => {
+                    if (item === 'ellipsis') {
                       return (
-                        <PaginationItem key={pageNumber}>
-                          <PaginationLink 
-                            isActive={currentPage === pageNumber}
-                            onClick={() => setCurrentPage(pageNumber)}
-                          >
-                            {pageNumber}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    } else if (
-                      pageNumber === currentPage - 2 || 
-                      pageNumber === currentPage + 2
-                    ) {
-                      return (
-                        <PaginationItem key={pageNumber}>
+                        <PaginationItem key={`ellipsis-${index}`}>
                           <PaginationEllipsis />
                         </PaginationItem>
                       );
                     }
-                    return null;
+                    return (
+                      <PaginationItem key={item}>
+                        <PaginationLink 
+                          isActive={currentPage === item}
+                          onClick={() => setCurrentPage(item as number)}
+                        >
+                          {item}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
                   })}
                   
                   <PaginationItem>
