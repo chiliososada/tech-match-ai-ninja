@@ -9,7 +9,8 @@ import {
   Inbox,
   Settings,
   ListCheck,
-  BarChart2
+  BarChart2,
+  ServerCog
 } from 'lucide-react';
 
 type SidebarItem = {
@@ -41,7 +42,7 @@ const sidebarItems: SidebarItem[] = [
     href: '/matching',
   },
   {
-    icon: <ListCheck className="h-5 w-5" />,
+    icon: <ServerCog className="h-5 w-5" />,
     label: '一括マッチング',
     href: '/batch-matching',
   },
