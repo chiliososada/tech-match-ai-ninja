@@ -636,7 +636,7 @@ export function Cases() {
                           </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                          <div className="grid grid-cols-1 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <h4 className="text-sm font-medium mb-1 japanese-text">会社名</h4>
                               <p className="text-sm japanese-text">{selectedCase.company || "未設定"}</p>
@@ -677,7 +677,7 @@ export function Cases() {
                               <h4 className="text-sm font-medium mb-1 japanese-text">単価</h4>
                               <p className="text-sm japanese-text">{selectedCase.budget}</p>
                             </div>
-                            <div>
+                            <div className="col-span-2">
                               <h4 className="text-sm font-medium mb-1 japanese-text">スキル</h4>
                               <div className="flex flex-wrap gap-1">
                                 {selectedCase.skills.map((skill, index) => (
