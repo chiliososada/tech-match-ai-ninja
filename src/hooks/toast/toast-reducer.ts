@@ -1,5 +1,6 @@
 
 import { ToasterToast, Action, actionTypes } from "./toast-types"
+import { dispatchFunction } from "./toast-provider"
 
 // A map of toast ids to their timeout ids
 export const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
@@ -29,9 +30,6 @@ export function reducer(state: { toasts: ToasterToast[] }, action: Action): { to
       return state
   }
 }
-
-// Mutable dispatch function reference using an object with a current property
-export const dispatchFunction: { current?: React.Dispatch<Action> } = {}
 
 export function addToRemoveQueue(toastId: string) {
   if (toastTimeouts.has(toastId)) {
