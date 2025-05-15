@@ -9,6 +9,7 @@ import { Calendar, Search, Filter, BarChart2, PieChart } from 'lucide-react';
 import { ChartContainer } from '@/components/ui/chart';
 import { PieChart as RechartsChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, generatePaginationRange } from '@/components/ui/pagination';
+import { toast } from '@/hooks/use-toast';
 
 // 示例数据
 const companyData = [
@@ -134,7 +135,7 @@ export function CompanyTypeAnalysis() {
         <CardHeader>
           <CardTitle className="japanese-text">企業タイプ分析</CardTitle>
           <CardDescription className="japanese-text">
-            AIによって��類された企業のタイプ分析（案件系/技術者系/混合型）
+            AIによって分類された企業のタイプ分析（案件系/技術者系/混合型）
           </CardDescription>
 
           {/* フィルターセクション */}
@@ -213,14 +214,8 @@ export function CompanyTypeAnalysis() {
               </CardHeader>
               <CardContent>
                 <div className="h-[250px]">
-                  <ChartContainer 
-                    config={{
-                      cases: { label: '案件系', theme: { light: '#3b82f6', dark: '#2563eb' } },
-                      engineers: { label: '技術者系', theme: { light: '#22c55e', dark: '#16a34a' } },
-                      mixed: { label: '混合型', theme: { light: '#a855f7', dark: '#9333ea' } },
-                    }}
-                  >
-                    <PieChart>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsChart>
                       <Pie
                         data={chartData}
                         dataKey="value"
@@ -236,8 +231,8 @@ export function CompanyTypeAnalysis() {
                         ))}
                       </Pie>
                       <Tooltip />
-                    </PieChart>
-                  </ChartContainer>
+                    </RechartsChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
@@ -281,7 +276,7 @@ export function CompanyTypeAnalysis() {
                 <CardTitle className="text-sm font-medium japanese-text">
                   <div className="flex items-center">
                     <BarChart2 className="h-4 w-4 mr-2 text-purple-600" />
-                    統計サマリ���
+                    統計サマリー
                   </div>
                 </CardTitle>
               </CardHeader>
