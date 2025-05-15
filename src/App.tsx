@@ -11,6 +11,7 @@ import Matching from "./pages/Matching";
 import Email from "./pages/Email";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import EmailAnalysis from "./pages/EmailAnalysis";
 import { ToastProvider } from "@/hooks/use-toast";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/candidates" element={<Candidates />} />
             <Route path="/matching" element={<Matching />} />
             <Route path="/email" element={<Email />} />
+            <Route path="/email-analysis" element={<EmailAnalysis />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

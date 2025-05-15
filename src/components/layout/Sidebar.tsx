@@ -8,7 +8,8 @@ import {
   BarChart3,
   Inbox,
   Settings,
-  ListCheck
+  ListCheck,
+  BarChart2
 } from 'lucide-react';
 
 type SidebarItem = {
@@ -42,6 +43,11 @@ const sidebarItems: SidebarItem[] = [
     icon: <Inbox className="h-5 w-5" />,
     label: 'メール連携',
     href: '/email',
+  },
+  {
+    icon: <BarChart2 className="h-5 w-5" />,
+    label: 'メール解析・分析',
+    href: '/email-analysis',
   },
   {
     icon: <Settings className="h-5 w-5" />,
