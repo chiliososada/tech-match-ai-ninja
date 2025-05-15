@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -6,9 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { FileText, Loader, Search } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
 import { CaseSelectionDialog } from './CaseSelectionDialog';
 import { MatchingProgressCard } from './MatchingProgressCard';
 import { MatchingResultsCard } from './MatchingResultsCard';
@@ -157,7 +155,7 @@ export function CaseToCandidate() {
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="w-full japanese-text">
-                    <Textarea className="mr-2 h-4 w-4" />
+                    <FileText className="mr-2 h-4 w-4" />
                     案件テキスト検索
                   </Button>
                 </DialogTrigger>
