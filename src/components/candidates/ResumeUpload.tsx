@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -196,10 +197,10 @@ export function ResumeUpload() {
                     <SelectValue placeholder="日本語レベルを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="not-required">不問</SelectItem>
-                    <SelectItem value="daily">日常会話レベル</SelectItem>
-                    <SelectItem value="business">ビジネスレベル</SelectItem>
-                    <SelectItem value="native">ネイティブレベル</SelectItem>
+                    <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                    <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                    <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                    <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

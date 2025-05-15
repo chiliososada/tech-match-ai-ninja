@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -349,7 +350,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
       setSending(false);
       toast({
         title: "メール内容が改善されました",
-        variant: "default"
+        variant: "success"
       });
     }, 1500);
   };
@@ -663,7 +664,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                         <TableCell className="japanese-text">{engineer.rate}</TableCell>
                         <TableCell>
                           <Badge 
-                            variant={engineer.status === "待機中" ? "secondary" : "outline"}
+                            variant={engineer.status === "待機中" ? "success" : "secondary"}
                             className="japanese-text"
                           >
                             {engineer.status}
