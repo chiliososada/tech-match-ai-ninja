@@ -44,6 +44,19 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
   totalEngineerPages,
   filteredEngineersLength
 }) => {
+  // Helper functions for pagination
+  const goToPrevPage = () => {
+    if (engineerCurrentPage > 1) {
+      setEngineerCurrentPage(engineerCurrentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (engineerCurrentPage < totalEngineerPages) {
+      setEngineerCurrentPage(engineerCurrentPage + 1);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px]">
@@ -114,7 +127,7 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setEngineerCurrentPage(prev => Math.max(prev - 1, 1))}
+                      onClick={goToPrevPage}
                       className={engineerCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
@@ -142,7 +155,7 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
                   
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => setEngineerCurrentPage(prev => Math.min(prev + 1, totalEngineerPages))}
+                      onClick={goToNextPage}
                       className={engineerCurrentPage === totalEngineerPages ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>

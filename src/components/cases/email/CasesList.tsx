@@ -41,6 +41,19 @@ export const CasesList: React.FC<CasesListProps> = ({
   setCurrentPage,
   totalPages
 }) => {
+  // Helper functions for pagination
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <>
       <div className="rounded-md border">
@@ -88,7 +101,7 @@ export const CasesList: React.FC<CasesListProps> = ({
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious 
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  onClick={goToPrevPage}
                   className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
@@ -116,7 +129,7 @@ export const CasesList: React.FC<CasesListProps> = ({
               
               <PaginationItem>
                 <PaginationNext 
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  onClick={goToNextPage}
                   className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
