@@ -9,16 +9,84 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Check, Send, ListChecks, Building, FileDown, Wand2 } from 'lucide-react';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Search, Check, Send, ListChecks, Building, FileDown, Wand2, ChevronDown } from 'lucide-react';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious,
+  generatePaginationRange
+} from '@/components/ui/pagination';
 import { toast } from 'sonner';
 
-// 会社と件数のサンプルデータ
+// 会社と件数のサンプルデータ (担当者情報を追加)
 const companiesData = [
-  { id: '1', name: 'テックイノベーション株式会社', count: 3, email: 'contact@techinnovation.co.jp', lastSent: '2024-04-05' },
-  { id: '2', name: 'フロントエンドパートナーズ株式会社', count: 1, email: 'info@frontend-partners.co.jp', lastSent: '2024-03-20' },
-  { id: '3', name: 'クラウドシステムズ株式会社', count: 1, email: 'info@cloud-systems.co.jp', lastSent: '2024-05-01' },
-  { id: '4', name: 'ウェブソリューションズ株式会社', count: 1, email: 'contact@web-solutions.co.jp', lastSent: '2024-04-15' },
+  { 
+    id: '1', 
+    name: 'テックイノベーション株式会社', 
+    count: 3, 
+    email: 'contact@techinnovation.co.jp', 
+    lastSent: '2024-04-05',
+    representatives: [
+      { id: '1-1', name: '佐藤 雄一', email: 'sato@techinnovation.co.jp', position: '技術部長' },
+      { id: '1-2', name: '田中 誠', email: 'tanaka@techinnovation.co.jp', position: '採用担当' }
+    ]
+  },
+  { 
+    id: '2', 
+    name: 'フロントエンドパートナーズ株式会社', 
+    count: 1, 
+    email: 'info@frontend-partners.co.jp', 
+    lastSent: '2024-03-20',
+    representatives: [
+      { id: '2-1', name: '山田 健太', email: 'yamada@frontend-partners.co.jp', position: '代表取締役' }
+    ]
+  },
+  { 
+    id: '3', 
+    name: 'クラウドシステムズ株式会社', 
+    count: 1, 
+    email: 'info@cloud-systems.co.jp', 
+    lastSent: '2024-05-01',
+    representatives: [
+      { id: '3-1', name: '鈴木 一郎', email: 'suzuki@cloud-systems.co.jp', position: '技術マネージャー' },
+      { id: '3-2', name: '伊藤 直子', email: 'ito@cloud-systems.co.jp', position: '人事部長' }
+    ]
+  },
+  { 
+    id: '4', 
+    name: 'ウェブソリューションズ株式会社', 
+    count: 1, 
+    email: 'contact@web-solutions.co.jp', 
+    lastSent: '2024-04-15',
+    representatives: [
+      { id: '4-1', name: '木村 大輔', email: 'kimura@web-solutions.co.jp', position: 'CTO' },
+      { id: '4-2', name: '中村 美咲', email: 'nakamura@web-solutions.co.jp', position: '人事担当' }
+    ]
+  },
+  { 
+    id: '5', 
+    name: 'デジタルフューチャー株式会社', 
+    count: 2, 
+    email: 'info@digital-future.co.jp', 
+    lastSent: '2024-05-10',
+    representatives: [
+      { id: '5-1', name: '高橋 誠', email: 'takahashi@digital-future.co.jp', position: '代表取締役' }
+    ]
+  },
+  { 
+    id: '6', 
+    name: 'テックサポート株式会社', 
+    count: 3, 
+    email: 'support@tech-support.co.jp', 
+    lastSent: '2024-04-20',
+    representatives: [
+      { id: '6-1', name: '加藤 健一', email: 'kato@tech-support.co.jp', position: '営業部長' },
+      { id: '6-2', name: '渡辺 真理', email: 'watanabe@tech-support.co.jp', position: '採用担当' }
+    ]
+  }
 ];
 
 // 案件のサンプルデータ
@@ -139,7 +207,8 @@ const defaultSignature = `------------------------------
 export function BulkEmailTab() {
   // 状態管理
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+  const [selectedRepresentatives, setSelectedRepresentatives] = useState<string[]>([]);
+  const [expandedCompanies, setExpandedCompanies] = useState<string[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState(companiesData);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSelectCaseOpen, setIsSelectCaseOpen] = useState(false);
@@ -147,12 +216,12 @@ export function BulkEmailTab() {
   const [emailTemplate, setEmailTemplate] = useState('');
   const [emailSubject, setEmailSubject] = useState('');
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
-  const [previewCompany, setPreviewCompany] = useState<any>(null);
+  const [previewRecipient, setPreviewRecipient] = useState<any>(null);
   const [signature, setSignature] = useState(defaultSignature);
   const [sampleTemplate, setSampleTemplate] = useState("");
   const [enhancingEmail, setEnhancingEmail] = useState(false);
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 3;
   const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
 
   // ページネーションで表示する企業
@@ -160,6 +229,9 @@ export function BulkEmailTab() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // ページネーションの範囲を生成
+  const paginationRange = generatePaginationRange(currentPage, totalPages);
 
   // ヘルパー関数：前のページへ移動
   const goToPrevPage = () => {
@@ -184,9 +256,9 @@ export function BulkEmailTab() {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // 企業の選択状態を切り替える
-  const toggleCompanySelection = (companyId: string) => {
-    setSelectedCompanies(prev => {
+  // 企業の展開状態を切り替える
+  const toggleCompanyExpand = (companyId: string) => {
+    setExpandedCompanies(prev => {
       if (prev.includes(companyId)) {
         return prev.filter(id => id !== companyId);
       } else {
@@ -195,12 +267,40 @@ export function BulkEmailTab() {
     });
   };
 
-  // すべての企業を選択/解除する
-  const toggleAllCompanies = () => {
-    if (selectedCompanies.length === filteredCompanies.length) {
-      setSelectedCompanies([]);
+  // 担当者の選択状態を切り替える
+  const toggleRepresentativeSelection = (representativeId: string) => {
+    setSelectedRepresentatives(prev => {
+      if (prev.includes(representativeId)) {
+        return prev.filter(id => id !== representativeId);
+      } else {
+        return [...prev, representativeId];
+      }
+    });
+  };
+
+  // 企業に所属する担当者を全て選択/解除する
+  const toggleAllRepresentativesForCompany = (company: any) => {
+    const companyRepIds = company.representatives.map((rep: any) => rep.id);
+    
+    // 全ての担当者が選択されているかチェック
+    const allSelected = companyRepIds.every(id => selectedRepresentatives.includes(id));
+    
+    if (allSelected) {
+      // 全て選択されている場合は解除
+      setSelectedRepresentatives(prev => 
+        prev.filter(id => !companyRepIds.includes(id))
+      );
     } else {
-      setSelectedCompanies(filteredCompanies.map(company => company.id));
+      // 一部または全て選択されていない場合は全て選択
+      const newSelected = [...selectedRepresentatives];
+      
+      companyRepIds.forEach(id => {
+        if (!newSelected.includes(id)) {
+          newSelected.push(id);
+        }
+      });
+      
+      setSelectedRepresentatives(newSelected);
     }
   };
 
@@ -266,21 +366,26 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
     }, 1500);
   };
 
-  // メール送信プレビュー表示
-  const handleShowPreview = (company: any) => {
-    setPreviewCompany(company);
+  // メール送信プレビュー表示（担当者用に更新）
+  const handleShowPreview = (representative: any, company: any) => {
+    const previewData = {
+      ...representative,
+      companyName: company.name,
+      companyId: company.id
+    };
+    setPreviewRecipient(previewData);
     setPreviewDialogOpen(true);
   };
 
-  // メール送信処理
+  // メール送信処理（担当者用に更新）
   const handleSendEmails = () => {
     if (!selectedCase) {
       toast.error('案件を選択してください');
       return;
     }
 
-    if (selectedCompanies.length === 0) {
-      toast.error('送信先企業を選択してください');
+    if (selectedRepresentatives.length === 0) {
+      toast.error('送信先担当者を選択してください');
       return;
     }
 
@@ -294,16 +399,39 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
       return;
     }
 
+    // 選択された担当者のカウント
+    const selectedCompaniesCount = new Set(
+      selectedRepresentatives.map(repId => {
+        // 担当者IDから企業IDを取得（最初のハイフンの前の部分）
+        return repId.split('-')[0];
+      })
+    ).size;
+
     // メール送信処理（実際のアプリケーションではAPIコールなど）
-    toast.success(`${selectedCompanies.length}社に案件情報のメールを送信しました`, {
+    toast.success(`${selectedRepresentatives.length}名の担当者（${selectedCompaniesCount}社）に案件情報のメールを送信しました`, {
       description: `案件「${selectedCase.title}」の情報が送信されました`
     });
 
     // 選択状態をリセット
-    setSelectedCompanies([]);
+    setSelectedRepresentatives([]);
     setSelectedCase(null);
     setEmailTemplate('');
     setEmailSubject('');
+  };
+
+  // 特定の企業の担当者が全て選択されているか
+  const isCompanyFullySelected = (company: any) => {
+    return company.representatives.every((rep: any) => 
+      selectedRepresentatives.includes(rep.id)
+    );
+  };
+
+  // 特定の企業の担当者が一部選択されているか
+  const isCompanyPartiallySelected = (company: any) => {
+    const hasSelected = company.representatives.some((rep: any) => 
+      selectedRepresentatives.includes(rep.id)
+    );
+    return hasSelected && !isCompanyFullySelected(company);
   };
 
   return (
@@ -386,12 +514,12 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
             <div>
               <CardTitle className="japanese-text">送信先企業</CardTitle>
               <CardDescription className="japanese-text">
-                候補者を保有する企業一覧（選択した企業に案件情報をメール送信します）
+                候補者を保有する企業一覧（選択した担当者に案件情報をメール送信します）
               </CardDescription>
             </div>
-            {selectedCompanies.length > 0 && (
+            {selectedRepresentatives.length > 0 && (
               <div className="flex items-center">
-                <span className="mr-2 text-sm japanese-text">{selectedCompanies.length}社を選択中</span>
+                <span className="mr-2 text-sm japanese-text">{selectedRepresentatives.length}名を選択中</span>
                 <Button 
                   disabled={!selectedCase} 
                   onClick={handleSendEmails} 
@@ -425,47 +553,100 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[40px]">
-                      <Checkbox 
-                        checked={selectedCompanies.length === filteredCompanies.length && filteredCompanies.length > 0}
-                        onCheckedChange={toggleAllCompanies} 
-                        aria-label="全て選択"
-                      />
-                    </TableHead>
+                    <TableHead className="w-[40px]"></TableHead>
                     <TableHead className="japanese-text">企業名</TableHead>
                     <TableHead className="japanese-text">保有技術者数</TableHead>
-                    <TableHead className="japanese-text">メールアドレス</TableHead>
+                    <TableHead className="japanese-text">担当者数</TableHead>
                     <TableHead className="japanese-text">最終送信日</TableHead>
-                    <TableHead className="japanese-text">アクション</TableHead>
+                    <TableHead className="w-[100px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paginatedCompanies.length > 0 ? (
                     paginatedCompanies.map((company) => (
-                      <TableRow key={company.id}>
-                        <TableCell>
-                          <Checkbox 
-                            checked={selectedCompanies.includes(company.id)}
-                            onCheckedChange={() => toggleCompanySelection(company.id)}
-                            aria-label={`${company.name}を選択`}
-                          />
-                        </TableCell>
-                        <TableCell className="japanese-text font-medium">{company.name}</TableCell>
-                        <TableCell>{company.count}</TableCell>
-                        <TableCell>{company.email}</TableCell>
-                        <TableCell className="japanese-text">{company.lastSent || '-'}</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleShowPreview(company)} 
-                            disabled={!selectedCase}
-                            title="プレビュー"
+                      <React.Fragment key={company.id}>
+                        <TableRow className="cursor-pointer hover:bg-muted/50">
+                          <TableCell>
+                            <Checkbox 
+                              checked={isCompanyFullySelected(company)}
+                              indeterminate={isCompanyPartiallySelected(company)}
+                              onCheckedChange={() => toggleAllRepresentativesForCompany(company)}
+                              aria-label={`${company.name}の担当者を全て選択`}
+                            />
+                          </TableCell>
+                          <TableCell 
+                            className="japanese-text font-medium"
+                            onClick={() => toggleCompanyExpand(company.id)}
                           >
-                            <FileDown className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                            <div className="flex items-center">
+                              <span>{company.name}</span>
+                              <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${expandedCompanies.includes(company.id) ? 'rotate-180' : ''}`} />
+                            </div>
+                          </TableCell>
+                          <TableCell>{company.count}</TableCell>
+                          <TableCell>{company.representatives.length}</TableCell>
+                          <TableCell className="japanese-text">{company.lastSent || '-'}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleCompanyExpand(company.id)}
+                              className="japanese-text"
+                            >
+                              {expandedCompanies.includes(company.id) ? '閉じる' : '詳細'}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        
+                        {/* 担当者リスト（展開時に表示） */}
+                        {expandedCompanies.includes(company.id) && (
+                          <TableRow className="bg-muted/30">
+                            <TableCell colSpan={6} className="p-0">
+                              <div className="p-4">
+                                <h4 className="text-sm font-medium mb-2 japanese-text">担当者一覧</h4>
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead className="w-[40px]"></TableHead>
+                                      <TableHead className="japanese-text">名前</TableHead>
+                                      <TableHead className="japanese-text">役職</TableHead>
+                                      <TableHead className="japanese-text">メールアドレス</TableHead>
+                                      <TableHead className="w-[80px]"></TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {company.representatives.map((rep: any) => (
+                                      <TableRow key={rep.id}>
+                                        <TableCell>
+                                          <Checkbox 
+                                            checked={selectedRepresentatives.includes(rep.id)}
+                                            onCheckedChange={() => toggleRepresentativeSelection(rep.id)}
+                                            aria-label={`${rep.name}を選択`}
+                                          />
+                                        </TableCell>
+                                        <TableCell className="japanese-text">{rep.name}</TableCell>
+                                        <TableCell className="japanese-text">{rep.position}</TableCell>
+                                        <TableCell>{rep.email}</TableCell>
+                                        <TableCell>
+                                          <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            onClick={() => handleShowPreview(rep, company)}
+                                            disabled={!selectedCase}
+                                            title="プレビュー"
+                                          >
+                                            <FileDown className="h-4 w-4" />
+                                          </Button>
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
                     ))
                   ) : (
                     <TableRow>
@@ -490,15 +671,24 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
                       />
                     </PaginationItem>
                     
-                    {Array.from({ length: totalPages }).map((_, index) => {
-                      const pageNumber = index + 1;
+                    {paginationRange.map((page, index) => {
+                      if (page === 'ellipsis') {
+                        return (
+                          <PaginationItem key={`ellipsis-${index}`}>
+                            <div className="flex h-9 w-9 items-center justify-center">
+                              ...
+                            </div>
+                          </PaginationItem>
+                        );
+                      }
+                      
                       return (
-                        <PaginationItem key={pageNumber}>
+                        <PaginationItem key={page}>
                           <PaginationLink 
-                            isActive={currentPage === pageNumber}
-                            onClick={() => setCurrentPage(pageNumber)}
+                            isActive={currentPage === page}
+                            onClick={() => setCurrentPage(page)}
                           >
-                            {pageNumber}
+                            {page}
                           </PaginationLink>
                         </PaginationItem>
                       );
@@ -608,12 +798,12 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button 
-            disabled={!selectedCase || selectedCompanies.length === 0} 
+            disabled={!selectedCase || selectedRepresentatives.length === 0} 
             onClick={handleSendEmails}
             className="japanese-text"
           >
             <Send className="h-4 w-4 mr-2" />
-            {selectedCompanies.length > 0 ? `${selectedCompanies.length}社にメール送信` : 'メール送信'}
+            {selectedRepresentatives.length > 0 ? `${selectedRepresentatives.length}名にメール送信` : 'メール送信'}
           </Button>
         </CardFooter>
       </Card>
@@ -672,31 +862,39 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
         </DialogContent>
       </Dialog>
       
-      {/* メールプレビューダイアログ */}
+      {/* メールプレビューダイアログ - 担当者対応に更新 */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="japanese-text">メールプレビュー</DialogTitle>
             <DialogDescription className="japanese-text">
-              {previewCompany && `${previewCompany.name}宛のメール内容です`}
+              {previewRecipient && `${previewRecipient.name}様宛のメール内容です`}
             </DialogDescription>
           </DialogHeader>
           
-          {previewCompany && selectedCase && (
+          {previewRecipient && selectedCase && (
             <div className="space-y-4">
               <div className="space-y-1">
                 <div className="flex">
                   <span className="text-sm font-medium japanese-text w-16">宛先:</span>
-                  <span className="text-sm">{previewCompany.email}</span>
+                  <span className="text-sm">{previewRecipient.email}</span>
                 </div>
                 <div className="flex">
                   <span className="text-sm font-medium japanese-text w-16">件名:</span>
                   <span className="text-sm japanese-text">{emailSubject}</span>
                 </div>
+                <div className="flex">
+                  <span className="text-sm font-medium japanese-text w-16">会社:</span>
+                  <span className="text-sm japanese-text">{previewRecipient.companyName}</span>
+                </div>
               </div>
               
               <div className="rounded-md border p-4 max-h-[300px] overflow-y-auto">
-                <pre className="text-sm japanese-text whitespace-pre-wrap">{emailTemplate}</pre>
+                <pre className="text-sm japanese-text whitespace-pre-wrap">{`${previewRecipient.name}様
+
+${emailTemplate}
+
+${signature}`}</pre>
               </div>
             </div>
           )}
@@ -711,13 +909,13 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
             </Button>
             <Button 
               onClick={() => {
-                if (previewCompany) {
-                  setSelectedCompanies(prev => 
-                    prev.includes(previewCompany.id) ? prev : [...prev, previewCompany.id]
+                if (previewRecipient) {
+                  setSelectedRepresentatives(prev => 
+                    prev.includes(previewRecipient.id) ? prev : [...prev, previewRecipient.id]
                   );
                 }
                 setPreviewDialogOpen(false);
-                toast.success(`${previewCompany?.name}を送信リストに追加しました`);
+                toast.success(`${previewRecipient.name}様を送信リストに追加しました`);
               }}
               className="japanese-text"
             >
