@@ -205,9 +205,9 @@ export function CompanyTypeAnalysis() {
                 <div className="h-[250px]">
                   <ChartContainer 
                     config={{
-                      cases: { label: '案件系', theme: { light: '#3b82f6' } },
-                      engineers: { label: '技術者系', theme: { light: '#22c55e' } },
-                      mixed: { label: '混合型', theme: { light: '#a855f7' } },
+                      cases: { label: '案件系', theme: { light: '#3b82f6', dark: '#2563eb' } },
+                      engineers: { label: '技術者系', theme: { light: '#22c55e', dark: '#16a34a' } },
+                      mixed: { label: '混合型', theme: { light: '#a855f7', dark: '#9333ea' } },
                     }}
                   >
                     <PieChart>
@@ -365,3 +365,4 @@ export function CompanyTypeAnalysis() {
     </>
   );
 }
+
