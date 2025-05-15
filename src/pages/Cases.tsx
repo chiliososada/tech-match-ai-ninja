@@ -518,7 +518,7 @@ export function Cases() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col lg:flex-row gap-6">
-                  {/* 案件一覧テーブル（左側） */}
+                  {/* 案件一覧テーブル（左側） - 会社と作成日列を削除 */}
                   <div className="lg:w-1/2">
                     <div className="rounded-md border">
                       <Table>
@@ -529,8 +529,8 @@ export function Cases() {
                             <TableHead className="japanese-text">スキル</TableHead>
                             <TableHead className="japanese-text">勤務地</TableHead>
                             <TableHead className="japanese-text">単価</TableHead>
-                            <TableHead className="japanese-text">会社</TableHead>
-                            <TableHead className="japanese-text">作成日</TableHead>
+                            {/* 会社列を削除 */}
+                            {/* 作成日列を削除 */}
                             <TableHead className="japanese-text">ステータス</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -556,10 +556,8 @@ export function Cases() {
                               </TableCell>
                               <TableCell className="japanese-text text-sm">{item.location}</TableCell>
                               <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
-                              <TableCell className="japanese-text text-sm">
-                                {item.company || "-"}
-                              </TableCell>
-                              <TableCell className="japanese-text text-sm">{item.createdAt}</TableCell>
+                              {/* 会社列を削除 */}
+                              {/* 作成日列を削除 */}
                               <TableCell>
                                 <Badge className={getStatusBadgeColor(item.status)}>
                                   <span className="japanese-text">{item.status}</span>
