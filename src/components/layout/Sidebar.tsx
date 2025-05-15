@@ -39,13 +39,11 @@ const sidebarItems: SidebarItem[] = [
     icon: <ListCheck className="h-5 w-5" />,
     label: '案件とのマッチング',
     href: '/matching',
-    subItems: [
-      {
-        icon: <ListCheck className="h-4 w-4" />,
-        label: '一括マッチング',
-        href: '/batch-matching',
-      }
-    ]
+  },
+  {
+    icon: <ListCheck className="h-5 w-5" />,
+    label: '一括マッチング',
+    href: '/batch-matching',
   },
   {
     icon: <Inbox className="h-5 w-5" />,
