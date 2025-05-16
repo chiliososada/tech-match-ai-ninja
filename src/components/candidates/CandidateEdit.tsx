@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -62,7 +63,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="japanese-text">氏名</Label>
+              <Label className="japanese-text">氏名 <span className="text-red-500">*</span></Label>
               <Input 
                 value={localEngineer.name}
                 onChange={(e) => handleChange('name', e.target.value)}
@@ -72,7 +73,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
 
             {!isOwnCompany && (
               <div className="space-y-2">
-                <Label className="japanese-text">所属会社</Label>
+                <Label className="japanese-text">所属会社 <span className="text-red-500">*</span></Label>
                 <Input 
                   value={localEngineer.companyName || ''}
                   onChange={(e) => handleChange('companyName', e.target.value)}
@@ -84,14 +85,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">国籍</Label>
               <Select
-                value={localEngineer.nationality || "未設定"}
+                value={localEngineer.nationality || "未選択"}
                 onValueChange={(value) => handleChange('nationality', value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="国籍を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未設定" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="日本" className="japanese-text">日本</SelectItem>
                   <SelectItem value="中国" className="japanese-text">中国</SelectItem>
                   <SelectItem value="インド" className="japanese-text">インド</SelectItem>
@@ -113,14 +114,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">性別</Label>
               <Select
-                value={localEngineer.gender || "未設定"}
+                value={localEngineer.gender || "未選択"}
                 onValueChange={(value) => handleChange('gender', value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="性別を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未設定" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="男性" className="japanese-text">男性</SelectItem>
                   <SelectItem value="女性" className="japanese-text">女性</SelectItem>
                   <SelectItem value="その他" className="japanese-text">その他</SelectItem>
@@ -157,6 +158,134 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             </div>
             
             <div className="space-y-2">
+              <Label className="japanese-text">保有スキル <span className="text-red-500">*</span></Label>
+              <Input 
+                value={Array.isArray(localEngineer.skills) ? localEngineer.skills.join(', ') : ''}
+                onChange={(e) => handleSkillsChange(e.target.value)}
+                className="japanese-text"
+                placeholder="例: Java, Spring Boot, AWS（カンマ区切り）"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">技術キーワード</Label>
+              <Input 
+                value={Array.isArray(localEngineer.technicalKeywords) ? localEngineer.technicalKeywords.join(', ') : localEngineer.technicalKeywords || ''}
+                onChange={(e) => handleChange('technicalKeywords', e.target.value.split(',').map(kw => kw.trim()))}
+                className="japanese-text"
+                placeholder="例: クラウド, マイクロサービス, CI/CD"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">資格</Label>
+              <Input 
+                value={Array.isArray(localEngineer.certifications) ? localEngineer.certifications.join(', ') : localEngineer.certifications || ''}
+                onChange={(e) => handleChange('certifications', e.target.value.split(',').map(cert => cert.trim()))}
+                className="japanese-text"
+                placeholder="例: AWS認定ソリューションアーキテクト, Oracle認定Javaプログラマー"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">日本語レベル <span className="text-red-500">*</span></Label>
+              <Select
+                value={localEngineer.japaneseLevel || "未選択"}
+                onValueChange={(value) => handleChange('japaneseLevel', value)}
+              >
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="日本語レベルを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                  <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                  <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                  <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">英語レベル</Label>
+              <Select
+                value={localEngineer.englishLevel || "未選択"}
+                onValueChange={(value) => handleChange('englishLevel', value)}
+              >
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="英語レベルを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                  <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                  <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                  <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">経験年数 <span className="text-red-500">*</span></Label>
+              <Input 
+                value={localEngineer.experience}
+                onChange={(e) => handleChange('experience', e.target.value)}
+                className="japanese-text"
+                placeholder="例: 5年"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">業務範囲</Label>
+              <Input 
+                value={localEngineer.workScope || ''}
+                onChange={(e) => handleChange('workScope', e.target.value)}
+                className="japanese-text"
+                placeholder="例: 製造, テスト, 要件定義"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">業務経験</Label>
+              <Input 
+                value={localEngineer.workExperience || ''}
+                onChange={(e) => handleChange('workExperience', e.target.value)}
+                className="japanese-text"
+                placeholder="例: 金融, 保険, EC"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">稼働可能時期</Label>
+              <Input 
+                value={localEngineer.availability}
+                onChange={(e) => handleChange('availability', e.target.value)}
+                className="japanese-text"
+                placeholder="例: 即日、1ヶ月後、応相談"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">ステータス</Label>
+              <Select
+                value={localEngineer.status ? (Array.isArray(localEngineer.status) ? localEngineer.status[0] : localEngineer.status) : "未選択"}
+                onValueChange={(value) => handleChange('status', [value])}
+              >
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="ステータスを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
+                  <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
+                  <SelectItem value="面談" className="japanese-text">面談</SelectItem>
+                  <SelectItem value="結果待ち" className="japanese-text">結果待ち</SelectItem>
+                  <SelectItem value="営業終了" className="japanese-text">営業終了</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
               <Label className="japanese-text">メールアドレス</Label>
               <Input 
                 value={localEngineer.email || ''}
@@ -172,107 +301,6 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
                 className="japanese-text"
               />
             </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">保有スキル</Label>
-              <Input 
-                value={Array.isArray(localEngineer.skills) ? localEngineer.skills.join(', ') : ''}
-                onChange={(e) => handleSkillsChange(e.target.value)}
-                className="japanese-text"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">技術キーワード</Label>
-              <Input 
-                value={Array.isArray(localEngineer.technicalKeywords) ? localEngineer.technicalKeywords.join(', ') : localEngineer.technicalKeywords || ''}
-                onChange={(e) => handleChange('technicalKeywords', e.target.value.split(',').map(kw => kw.trim()))}
-                className="japanese-text"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">資格</Label>
-              <Input 
-                value={Array.isArray(localEngineer.certifications) ? localEngineer.certifications.join(', ') : localEngineer.certifications || ''}
-                onChange={(e) => handleChange('certifications', e.target.value.split(',').map(cert => cert.trim()))}
-                className="japanese-text"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">日本語レベル</Label>
-              <Select
-                value={localEngineer.japaneseLevel || "未設定"}
-                onValueChange={(value) => handleChange('japaneseLevel', value)}
-              >
-                <SelectTrigger className="japanese-text">
-                  <SelectValue placeholder="日本語レベルを選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="未設定">選択してください</SelectItem>
-                  <SelectItem value="不問">不問</SelectItem>
-                  <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                  <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                  <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">英語レベル</Label>
-              <Select
-                value={localEngineer.englishLevel || "未設定"}
-                onValueChange={(value) => handleChange('englishLevel', value)}
-              >
-                <SelectTrigger className="japanese-text">
-                  <SelectValue placeholder="英語レベルを選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="未設定">選択してください</SelectItem>
-                  <SelectItem value="不問">不問</SelectItem>
-                  <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                  <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                  <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">経験年数</Label>
-              <Input 
-                value={localEngineer.experience}
-                onChange={(e) => handleChange('experience', e.target.value)}
-                className="japanese-text"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">業務範囲</Label>
-              <Input 
-                value={localEngineer.workScope || ''}
-                onChange={(e) => handleChange('workScope', e.target.value)}
-                className="japanese-text"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">業務経験</Label>
-              <Input 
-                value={localEngineer.workExperience || ''}
-                onChange={(e) => handleChange('workExperience', e.target.value)}
-                className="japanese-text"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">稼働可能時期</Label>
-              <Input 
-                value={localEngineer.availability}
-                onChange={(e) => handleChange('availability', e.target.value)}
-                className="japanese-text"
-              />
-            </div>
           </div>
           
           <div className="space-y-2">
@@ -282,6 +310,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
               onChange={(e) => handleChange('selfPromotion', e.target.value)}
               className="japanese-text"
               rows={4}
+              placeholder="候補者の自己アピールを入力"
             />
           </div>
           
@@ -292,6 +321,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
               onChange={(e) => handleChange('remarks', e.target.value)}
               className="japanese-text"
               rows={4}
+              placeholder="出勤制限、出張可否などを記入"
             />
           </div>
           
