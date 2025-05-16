@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -31,12 +31,12 @@ const sidebarItems: SidebarItem[] = [
       {
         icon: <FileText className="h-5 w-5" />,
         label: '案件管理',
-        href: '/cases',
+        href: '/cases/company/own',
       },
       {
         icon: <Users className="h-5 w-5" />,
         label: '人材管理',
-        href: '/candidates',
+        href: '/candidates/company/own',
       }
     ]
   },
@@ -48,12 +48,12 @@ const sidebarItems: SidebarItem[] = [
       {
         icon: <FileText className="h-5 w-5" />,
         label: '案件管理',
-        href: '/cases',
+        href: '/cases/company/other',
       },
       {
         icon: <Users className="h-5 w-5" />,
         label: '人材管理',
-        href: '/candidates',
+        href: '/candidates/company/other',
       }
     ]
   },
@@ -90,6 +90,19 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 export function Sidebar() {
+  // Add state to track which submenus are expanded
+  const [expandedItems, setExpandedItems] = useState<{[key: string]: boolean}>({
+    '自社': true,
+    '他社': true
+  });
+
+  const toggleSubMenu = (label: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
+
   return (
     <div className="h-screen flex flex-col bg-sidebar border-r border-sidebar-border">
       <div className="p-6">
@@ -102,32 +115,38 @@ export function Sidebar() {
               // Render item with submenu
               <div className="space-y-1">
                 <div 
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all text-sidebar-foreground"
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all text-sidebar-foreground cursor-pointer"
+                  onClick={() => toggleSubMenu(item.label)}
                 >
                   {item.icon}
-                  <span className="japanese-text">{item.label}</span>
+                  <span className="japanese-text flex-1">{item.label}</span>
+                  <span className="text-xs">
+                    {expandedItems[item.label] ? '▼' : '▶'}
+                  </span>
                 </div>
                 
                 {/* Sub items */}
-                <div className="pl-6 space-y-1 mt-1">
-                  {item.subItems.map((subItem, j) => (
-                    <NavLink
-                      key={`${i}-${j}`}
-                      to={subItem.href}
-                      className={({ isActive }) =>
-                        cn(
-                          'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
-                          isActive
-                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                            : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
-                        )
-                      }
-                    >
-                      {subItem.icon}
-                      <span className="japanese-text">{subItem.label}</span>
-                    </NavLink>
-                  ))}
-                </div>
+                {expandedItems[item.label] && (
+                  <div className="pl-6 space-y-1 mt-1">
+                    {item.subItems.map((subItem, j) => (
+                      <NavLink
+                        key={`${i}-${j}`}
+                        to={subItem.href}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+                            isActive
+                              ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                              : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                          )
+                        }
+                      >
+                        {subItem.icon}
+                        <span className="japanese-text">{subItem.label}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               // Render regular menu item without submenu

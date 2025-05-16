@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -41,8 +40,20 @@ const App = () => (
               
               {/* Protected routes */}
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/cases" element={<ProtectedRoute><Cases /></ProtectedRoute>} />
-              <Route path="/candidates" element={<ProtectedRoute><Candidates /></ProtectedRoute>} />
+              
+              {/* Own company routes */}
+              <Route path="/cases/company/own" element={<ProtectedRoute><Cases companyType="own" /></ProtectedRoute>} />
+              <Route path="/candidates/company/own" element={<ProtectedRoute><Candidates companyType="own" /></ProtectedRoute>} />
+              
+              {/* Other company routes */}
+              <Route path="/cases/company/other" element={<ProtectedRoute><Cases companyType="other" /></ProtectedRoute>} />
+              <Route path="/candidates/company/other" element={<ProtectedRoute><Candidates companyType="other" /></ProtectedRoute>} />
+              
+              {/* Legacy route - redirect handling */}
+              <Route path="/cases" element={<ProtectedRoute><Cases companyType="own" /></ProtectedRoute>} />
+              <Route path="/candidates" element={<ProtectedRoute><Candidates companyType="own" /></ProtectedRoute>} />
+              
+              {/* Other routes */}
               <Route path="/matching" element={<ProtectedRoute><Matching /></ProtectedRoute>} />
               <Route path="/batch-matching" element={<ProtectedRoute><BatchMatching /></ProtectedRoute>} />
               <Route path="/email" element={<ProtectedRoute><Email /></ProtectedRoute>} />

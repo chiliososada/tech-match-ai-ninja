@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { toast } from "@/hooks/toast";
+import { useLocation } from 'react-router-dom';
 
 // 案件のサンプルデータ（案件詳細を追加）
 const caseData = [
@@ -311,7 +312,11 @@ const getSourceIcon = (source: string) => {
   );
 };
 
-export function Cases() {
+interface CasesProps {
+  companyType?: 'own' | 'other';
+}
+
+export function Cases({ companyType = 'own' }: CasesProps) {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [techKeyword, setTechKeyword] = useState("");
@@ -320,6 +325,7 @@ export function Cases() {
   const [casesCurrentPage, setCasesCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [companyFilter, setCompanyFilter] = useState("all");
+  const location = useLocation();
   
   // 新しい日付範囲フィルター
   const [emailDateFrom, setEmailDateFrom] = useState("");
@@ -328,11 +334,25 @@ export function Cases() {
   // 選択された案件のステート
   const [selectedCase, setSelectedCase] = useState<(typeof caseData)[0] | null>(null);
   
+  // Company type from URL for backward compatibility
+  const urlCompanyType = location.pathname.includes('/company/other') ? 'other' : 'own';
+  const effectiveCompanyType = urlCompanyType || companyType;
+  
+  // Page title based on company type
+  const pageTitle = effectiveCompanyType === 'own' ? '自社案件管理' : '他社案件管理';
+  
   // 会社のリストを取得
   const companyList = Array.from(new Set(caseData.filter(item => item.company).map(item => item.company)));
   
   // フィルタリングさ��た案件を取得
   const filteredCases = caseData.filter(item => {
+    // Filter by company type using some mock logic
+    // In a real app, you would have a companyType field in your data
+    // Here we're simulating it by using even/odd IDs as a placeholder
+    const matchesCompanyType = effectiveCompanyType === 'own' 
+      ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
+      : parseInt(item.id) % 2 === 0;  // even IDs for 他社
+    
     const matchesSource = filter === "all" || item.source === filter;
     
     const matchesSearch = searchTerm === "" || 
@@ -345,9 +365,9 @@ export function Cases() {
     
     const matchesDate = dateRange === "" || item.createdAt === dateRange;
 
-    const matchesCompany = companyFilter === "all" || item.company === companyFilter;
+    const matchesCompanyFilter = companyFilter === "all" || item.company === companyFilter;
     
-    return matchesSource && matchesSearch && matchesTech && matchesDate && matchesCompany;
+    return matchesCompanyType && matchesSource && matchesSearch && matchesTech && matchesDate && matchesCompanyFilter;
   });
 
   // 案件一覧のページネーション
@@ -365,6 +385,11 @@ export function Cases() {
   // メール案件のフィルタリング（日付フィルターを追加）
   const filteredMailCases = caseData.filter(item => {
     if (item.source !== "mail") return false;
+    
+    // Filter by company type
+    const matchesCompanyType = effectiveCompanyType === 'own' 
+      ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
+      : parseInt(item.id) % 2 === 0;  // even IDs for 他社
     
     // 会社フィルター
     const matchesCompany = companyFilter === "all" || item.company === companyFilter;
@@ -392,7 +417,7 @@ export function Cases() {
       }
     }
     
-    return matchesCompany && matchesTech && matchesDateRange;
+    return matchesCompanyType && matchesCompany && matchesTech && matchesDateRange;
   });
   
   // ページネーション用のメール案件取得
@@ -451,7 +476,7 @@ export function Cases() {
     <MainLayout>
       <div className="flex-1 space-y-8 p-8 pt-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight japanese-text">案件管理</h2>
+          <h2 className="text-3xl font-bold tracking-tight japanese-text">{pageTitle}</h2>
         </div>
 
         <Tabs defaultValue="list" className="space-y-6">
