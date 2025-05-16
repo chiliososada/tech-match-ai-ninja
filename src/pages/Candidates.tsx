@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CandidateList } from '@/components/candidates/CandidateList';
@@ -7,6 +7,7 @@ import { CandidateForm } from '@/components/candidates/CandidateForm';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
 import { BulkEmailTab } from '@/components/candidates/BulkEmailTab';
 import { useLocation } from 'react-router-dom';
+import { Engineer, CategoryType } from '@/components/candidates/types';
 
 interface CandidatesProps {
   companyType?: 'own' | 'other';
@@ -29,6 +30,31 @@ const initialCandidateData = {
   updatedAt: '',
 };
 
+// Mock data for CandidateList
+const mockEngineers: Engineer[] = [
+  {
+    id: '1',
+    name: '山田太郎',
+    skills: ['JavaScript', 'React', 'Node.js'],
+    japaneseLevel: 'ネイティブレベル',
+    experience: '5年',
+    availability: '即日',
+    status: '案件探し中',
+    desiredConditions: '東京/リモート, 60~80万円',
+    companyType: '自社',
+    companyName: 'テックイノベーション株式会社',
+    source: '直接応募',
+    registeredAt: '2023-01-15',
+    updatedAt: '2023-03-20',
+  },
+];
+
+const mockCategories: CategoryType[] = [
+  { id: '1', name: 'フロントエンド' },
+  { id: '2', name: 'バックエンド' },
+  { id: '3', name: 'フルスタック' },
+];
+
 export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const location = useLocation();
   
@@ -39,9 +65,27 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   // Page title based on company type
   const pageTitle = effectiveCompanyType === 'own' ? '自社人材管理' : '他社人材管理';
 
-  const [recommendationTemplate, setRecommendationTemplate] = React.useState<string>('');
-  const [recommendationText, setRecommendationText] = React.useState<string>('');
+  const [recommendationTemplate, setRecommendationTemplate] = useState<string>('');
+  const [recommendationText, setRecommendationText] = useState<string>('');
 
+  // Handle candidate view/edit actions
+  const handleViewDetails = (id: string) => {
+    console.log(`View details for candidate: ${id}`);
+  };
+
+  const handleEditEngineer = (id: string) => {
+    console.log(`Edit candidate: ${id}`);
+  };
+
+  const handleDeleteEngineer = (id: string) => {
+    console.log(`Delete candidate: ${id}`);
+  };
+
+  const handleStatusChange = (id: string, newStatus: string) => {
+    console.log(`Change status of candidate ${id} to ${newStatus}`);
+  };
+
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
@@ -69,7 +113,14 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
           </TabsList>
           
           <TabsContent value="list">
-            <CandidateList />
+            <CandidateList 
+              engineers={mockEngineers}
+              categories={mockCategories}
+              onViewDetails={handleViewDetails}
+              onEditEngineer={handleEditEngineer}
+              onDeleteEngineer={handleDeleteEngineer}
+              onStatusChange={handleStatusChange}
+            />
           </TabsContent>
           
           <TabsContent value="add">
