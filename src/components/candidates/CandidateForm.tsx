@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -89,12 +88,12 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectValue placeholder="国籍を選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択">選択してください</SelectItem>
-                    <SelectItem value="日本">日本</SelectItem>
-                    <SelectItem value="中国">中国</SelectItem>
-                    <SelectItem value="インド">インド</SelectItem>
-                    <SelectItem value="ベトナム">ベトナム</SelectItem>
-                    <SelectItem value="その他">その他</SelectItem>
+                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="日本" className="japanese-text">日本</SelectItem>
+                    <SelectItem value="中国" className="japanese-text">中国</SelectItem>
+                    <SelectItem value="インド" className="japanese-text">インド</SelectItem>
+                    <SelectItem value="ベトナム" className="japanese-text">ベトナム</SelectItem>
+                    <SelectItem value="その他" className="japanese-text">その他</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -120,11 +119,11 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectValue placeholder="性別を選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択">選択してください</SelectItem>
-                    <SelectItem value="男性">男性</SelectItem>
-                    <SelectItem value="女性">女性</SelectItem>
-                    <SelectItem value="その他">その他</SelectItem>
-                    <SelectItem value="回答しない">回答しない</SelectItem>
+                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="男性" className="japanese-text">男性</SelectItem>
+                    <SelectItem value="女性" className="japanese-text">女性</SelectItem>
+                    <SelectItem value="その他" className="japanese-text">その他</SelectItem>
+                    <SelectItem value="回答しない" className="japanese-text">回答しない</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -206,11 +205,11 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectValue placeholder="日本語レベルを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択">選択してください</SelectItem>
-                    <SelectItem value="不問">不問</SelectItem>
-                    <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                    <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                    <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
+                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                    <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                    <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                    <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -225,11 +224,11 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectValue placeholder="英語レベルを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択">選択してください</SelectItem>
-                    <SelectItem value="不問">不問</SelectItem>
-                    <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                    <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                    <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
+                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                    <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                    <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                    <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -289,12 +288,12 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectValue placeholder="ステータスを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択">選択してください</SelectItem>
-                    <SelectItem value="提案中">提案中</SelectItem>
-                    <SelectItem value="事前面談">事前面談</SelectItem>
-                    <SelectItem value="面談">面談</SelectItem>
-                    <SelectItem value="結果待ち">結果待ち</SelectItem>
-                    <SelectItem value="営業終了">営業終了</SelectItem>
+                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
+                    <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
+                    <SelectItem value="面談" className="japanese-text">面談</SelectItem>
+                    <SelectItem value="結果待ち" className="japanese-text">結果待ち</SelectItem>
+                    <SelectItem value="営業終了" className="japanese-text">営業終了</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -376,4 +375,3 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
     </>
   );
 };
-

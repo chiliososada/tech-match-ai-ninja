@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -92,12 +91,12 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
                   <SelectValue placeholder="国籍を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未設定">選択してください</SelectItem>
-                  <SelectItem value="日本">日本</SelectItem>
-                  <SelectItem value="中国">中国</SelectItem>
-                  <SelectItem value="インド">インド</SelectItem>
-                  <SelectItem value="ベトナム">ベトナム</SelectItem>
-                  <SelectItem value="その他">その他</SelectItem>
+                  <SelectItem value="未設定" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="日本" className="japanese-text">日本</SelectItem>
+                  <SelectItem value="中国" className="japanese-text">中国</SelectItem>
+                  <SelectItem value="インド" className="japanese-text">インド</SelectItem>
+                  <SelectItem value="ベトナム" className="japanese-text">ベトナム</SelectItem>
+                  <SelectItem value="その他" className="japanese-text">その他</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -121,11 +120,11 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
                   <SelectValue placeholder="性別を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未設定">選択してください</SelectItem>
-                  <SelectItem value="男性">男性</SelectItem>
-                  <SelectItem value="女性">女性</SelectItem>
-                  <SelectItem value="その他">その他</SelectItem>
-                  <SelectItem value="回答しない">回答しない</SelectItem>
+                  <SelectItem value="未設定" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="男性" className="japanese-text">男性</SelectItem>
+                  <SelectItem value="女性" className="japanese-text">女性</SelectItem>
+                  <SelectItem value="その他" className="japanese-text">その他</SelectItem>
+                  <SelectItem value="回答しない" className="japanese-text">回答しない</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -310,4 +309,3 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
     </Dialog>
   );
 };
-
