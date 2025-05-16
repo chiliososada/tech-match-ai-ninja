@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +8,9 @@ import { ResumeUpload } from '@/components/candidates/ResumeUpload';
 import { useLocation } from 'react-router-dom';
 import { Engineer, CategoryType, NewEngineerType } from '@/components/candidates/types';
 import { toast } from 'sonner';
+import { CandidateDetails } from '@/components/candidates/CandidateDetails';
+import { CandidateEdit } from '@/components/candidates/CandidateEdit';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface CandidatesProps {
   companyType?: 'own' | 'other';
@@ -120,25 +124,49 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const [recommendationTemplate, setRecommendationTemplate] = useState<string>('');
   const [recommendationText, setRecommendationText] = useState<string>('');
 
+  // Add state for modal visibility and selected engineer
+  const [selectedEngineer, setSelectedEngineer] = useState<Engineer | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [engineerToDelete, setEngineerToDelete] = useState<string | null>(null);
+
   // Handle candidate view/edit actions
   const handleViewDetails = (engineer: Engineer) => {
-    console.log(`View details for candidate: ${engineer.id}`);
+    setSelectedEngineer(engineer);
+    setIsDetailsOpen(true);
     toast.info(`${engineer.name}の詳細を表示`);
   };
 
   const handleEditEngineer = (engineer: Engineer) => {
-    console.log(`Edit candidate: ${engineer.id}`);
+    setSelectedEngineer(engineer);
+    setIsEditOpen(true);
     toast.info(`${engineer.name}の編集を開始`);
   };
 
   const handleDeleteEngineer = (id: string) => {
-    console.log(`Delete candidate: ${id}`);
-    toast.success('候補者を削除しました');
+    setEngineerToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (engineerToDelete) {
+      console.log(`Delete candidate: ${engineerToDelete}`);
+      toast.success('候補者を削除しました');
+      setIsDeleteDialogOpen(false);
+      setEngineerToDelete(null);
+    }
   };
 
   const handleStatusChange = (id: string, newStatus: string) => {
     console.log(`Change status of candidate ${id} to ${newStatus}`);
     toast.success('ステータスを更新しました');
+  };
+
+  const handleEngineerStatusChange = (value: string) => {
+    if (selectedEngineer) {
+      handleStatusChange(selectedEngineer.id, value);
+    }
   };
   
   // Add a function to handle resume downloads
@@ -161,6 +189,17 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const handleGenerateRecommendation = () => {
     // Handle recommendation generation
     toast.success('推薦文を生成しました');
+  };
+
+  // Handle engineer edit
+  const handleEngineerChange = (engineer: Engineer) => {
+    setSelectedEngineer(engineer);
+    console.log('Updated engineer:', engineer);
+  };
+
+  const handleSaveEdit = () => {
+    toast.success('技術者情報を更新しました');
+    setIsEditOpen(false);
   };
 
   return (
@@ -205,6 +244,46 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
             <ResumeUpload />
           </TabsContent>
         </Tabs>
+
+        {/* 候補者詳細モーダル */}
+        <CandidateDetails 
+          open={isDetailsOpen} 
+          onOpenChange={setIsDetailsOpen}
+          engineer={selectedEngineer}
+          onStatusChange={handleEngineerStatusChange}
+          onEditClick={() => {
+            setIsDetailsOpen(false);
+            setIsEditOpen(true);
+          }}
+        />
+
+        {/* 候補者編集モーダル */}
+        <CandidateEdit 
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          engineer={selectedEngineer}
+          onEngineerChange={handleEngineerChange}
+          onSave={handleSaveEdit}
+          isOwnCompany={effectiveCompanyType === 'own'}
+        />
+
+        {/* 削除確認ダイアログ */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="japanese-text">候補者削除の確認</AlertDialogTitle>
+              <AlertDialogDescription className="japanese-text">
+                この候補者を削除してもよろしいですか？この操作は元に戻すことができません。
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="japanese-text">キャンセル</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="japanese-text bg-red-600 hover:bg-red-700">
+                削除
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </MainLayout>
   );
