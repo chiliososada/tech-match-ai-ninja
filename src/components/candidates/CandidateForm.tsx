@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Wand2 } from 'lucide-react';
@@ -20,6 +19,7 @@ interface CandidateFormProps {
   onRecommendationTemplateChange: (value: string) => void;
   onRecommendationTextChange: (value: string) => void;
   onGenerateRecommendation: () => void;
+  isOwnCompany: boolean;
 }
 
 export const CandidateForm: React.FC<CandidateFormProps> = ({
@@ -30,7 +30,8 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
   recommendationText,
   onRecommendationTemplateChange,
   onRecommendationTextChange,
-  onGenerateRecommendation
+  onGenerateRecommendation,
+  isOwnCompany
 }) => {
   const [formData, setFormData] = useState<NewEngineerType>(initialData);
 
@@ -46,29 +47,11 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
         <CardHeader>
           <CardTitle className="japanese-text">新規技術者登録</CardTitle>
           <CardDescription className="japanese-text">
-            自社や協力会社の技術者情報を登録します
+            技術者情報を登録します
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label className="japanese-text">区分</Label>
-              <RadioGroup 
-                value={formData.companyType}
-                onValueChange={(value) => handleChange('companyType', value)}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="自社" id="own-company" />
-                  <Label htmlFor="own-company" className="japanese-text">自社</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="他社" id="other-company" />
-                  <Label htmlFor="other-company" className="japanese-text">他社</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
+          <form onSubmit={onSubmit} className="space-y-6">            
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="japanese-text">氏名 <span className="text-red-500">*</span></Label>
@@ -82,17 +65,19 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="companyName" className="japanese-text">所属会社 <span className="text-red-500">*</span></Label>
-                <Input 
-                  id="companyName" 
-                  value={formData.companyName}
-                  onChange={(e) => handleChange('companyName', e.target.value)}
-                  placeholder="例: テックイノベーション株式会社"
-                  className="japanese-text"
-                  required
-                />
-              </div>
+              {!isOwnCompany && (
+                <div className="space-y-2">
+                  <Label htmlFor="companyName" className="japanese-text">所属会社 <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="companyName" 
+                    value={formData.companyName}
+                    onChange={(e) => handleChange('companyName', e.target.value)}
+                    placeholder="例: テックイノベーション株式会社"
+                    className="japanese-text"
+                    required
+                  />
+                </div>
+              )}
               
               <div className="space-y-2">
                 <Label htmlFor="nationality" className="japanese-text">国籍</Label>

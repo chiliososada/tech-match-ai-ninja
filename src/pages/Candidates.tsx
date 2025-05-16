@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,7 +29,7 @@ const initialCandidateData: NewEngineerType = {
   arrivalYear: '',
   certifications: '',
   remarks: '',
-  companyType: '',
+  companyType: '自社', // Default to 自社
   companyName: '',
   source: '',
   technicalKeywords: '',
@@ -148,12 +147,6 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
     toast.success('履歴書のダウンロードを開始しました');
   };
 
-  // Add a function to handle remarks editing
-  const handleEditRemarks = (id: string, newRemarks: string) => {
-    console.log(`Edit remarks for candidate ${id}: ${newRemarks}`);
-    toast.success('備考を更新しました');
-  };
-
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,26 +168,22 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
       <div className="flex-1 space-y-8 p-8 pt-6">
         <h1 className="text-3xl font-bold mb-6 japanese-text">{pageTitle}</h1>
         
-        <Tabs defaultValue="list">
+        <Tabs defaultValue="list" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="list" className="japanese-text">人材一覧</TabsTrigger>
             <TabsTrigger value="add" className="japanese-text">新規登録</TabsTrigger>
             <TabsTrigger value="resume" className="japanese-text">履歴書アップロード</TabsTrigger>
-            {effectiveCompanyType === 'own' && (
-              <TabsTrigger value="email" className="japanese-text">一括メール</TabsTrigger>
-            )}
           </TabsList>
           
-          <TabsContent value="list">
+          <TabsContent value="list" className="w-full">
             <CandidateList 
               engineers={mockEngineers}
-              categories={mockCategories}
               onViewDetails={handleViewDetails}
               onEditEngineer={handleEditEngineer}
               onDeleteEngineer={handleDeleteEngineer}
               onStatusChange={handleStatusChange}
               onDownloadResume={handleDownloadResume}
-              onEditRemarks={handleEditRemarks}
+              isOwnCompany={effectiveCompanyType === 'own'}
             />
           </TabsContent>
           
@@ -208,20 +197,13 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
               onRecommendationTemplateChange={setRecommendationTemplate}
               onRecommendationTextChange={setRecommendationText}
               onGenerateRecommendation={handleGenerateRecommendation}
+              isOwnCompany={effectiveCompanyType === 'own'}
             />
           </TabsContent>
           
           <TabsContent value="resume">
             <ResumeUpload />
           </TabsContent>
-          
-          {effectiveCompanyType === 'own' && (
-            <TabsContent value="email">
-              <div className="bg-gray-100 p-8 rounded-lg text-center">
-                <p className="text-lg font-medium japanese-text">この機能は現在整備中です</p>
-              </div>
-            </TabsContent>
-          )}
         </Tabs>
       </div>
     </MainLayout>

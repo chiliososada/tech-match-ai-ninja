@@ -1,32 +1,13 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Save } from 'lucide-react';
-
-interface Engineer {
-  id: string;
-  name: string;
-  skills?: string[];
-  japaneseLevel: string;
-  experience: string;
-  availability: string;
-  status: string;
-  desiredConditions: string;
-  companyType: string;
-  companyName?: string;
-  source: string;
-  recommendation?: string;
-  email?: string;
-  phone?: string;
-  registeredAt: string;
-  updatedAt: string;
-}
+import { Engineer } from './types';
 
 interface CandidateEditProps {
   open: boolean;
@@ -34,6 +15,7 @@ interface CandidateEditProps {
   engineer: Engineer | null;
   onEngineerChange: (engineer: Engineer) => void;
   onSave: () => void;
+  isOwnCompany: boolean;
 }
 
 export const CandidateEdit: React.FC<CandidateEditProps> = ({
@@ -41,17 +23,36 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
   onOpenChange,
   engineer,
   onEngineerChange,
-  onSave
+  onSave,
+  isOwnCompany
 }) => {
-  if (!engineer) return null;
+  const [localEngineer, setLocalEngineer] = useState<Engineer | null>(engineer);
+
+  useEffect(() => {
+    setLocalEngineer(engineer);
+  }, [engineer]);
+
+  if (!localEngineer) return null;
 
   const handleChange = (field: keyof Engineer, value: any) => {
-    onEngineerChange({ ...engineer, [field]: value });
+    setLocalEngineer({ ...localEngineer, [field]: value });
+  };
+
+  const handleSave = () => {
+    if (localEngineer) {
+      onEngineerChange(localEngineer);
+      onSave();
+    }
+  };
+
+  const handleSkillsChange = (value: string) => {
+    const skillsArray = value.split(',').map(skill => skill.trim());
+    handleChange('skills', skillsArray);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="japanese-text">技術者情報編集</DialogTitle>
           <DialogDescription className="japanese-text">
@@ -60,39 +61,96 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label className="japanese-text">区分</Label>
-            <RadioGroup 
-              value={engineer.companyType}
-              onValueChange={(value) => handleChange('companyType', value)}
-              className="flex space-x-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="自社" id="edit-own-company" />
-                <Label htmlFor="edit-own-company" className="japanese-text">自社</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="他社" id="edit-other-company" />
-                <Label htmlFor="edit-other-company" className="japanese-text">他社</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="japanese-text">氏名</Label>
               <Input 
-                value={engineer.name}
+                value={localEngineer.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 className="japanese-text"
               />
             </div>
 
+            {!isOwnCompany && (
+              <div className="space-y-2">
+                <Label className="japanese-text">所属会社</Label>
+                <Input 
+                  value={localEngineer.companyName || ''}
+                  onChange={(e) => handleChange('companyName', e.target.value)}
+                  className="japanese-text"
+                />
+              </div>
+            )}
+            
             <div className="space-y-2">
-              <Label className="japanese-text">所属会社</Label>
+              <Label className="japanese-text">国籍</Label>
+              <Select
+                value={localEngineer.nationality || ''}
+                onValueChange={(value) => handleChange('nationality', value)}
+              >
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="国籍を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="日本">日本</SelectItem>
+                  <SelectItem value="中国">中国</SelectItem>
+                  <SelectItem value="インド">インド</SelectItem>
+                  <SelectItem value="ベトナム">ベトナム</SelectItem>
+                  <SelectItem value="その他">その他</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">年齢</Label>
               <Input 
-                value={engineer.companyName || ''}
-                onChange={(e) => handleChange('companyName', e.target.value)}
+                value={localEngineer.age || ''}
+                onChange={(e) => handleChange('age', e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">性別</Label>
+              <Select
+                value={localEngineer.gender || ''}
+                onValueChange={(value) => handleChange('gender', value)}
+              >
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="性別を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="男性">男性</SelectItem>
+                  <SelectItem value="女性">女性</SelectItem>
+                  <SelectItem value="その他">その他</SelectItem>
+                  <SelectItem value="回答しない">回答しない</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">最寄駅</Label>
+              <Input 
+                value={localEngineer.nearestStation || ''}
+                onChange={(e) => handleChange('nearestStation', e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">学歴</Label>
+              <Input 
+                value={localEngineer.education || ''}
+                onChange={(e) => handleChange('education', e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">来日年度</Label>
+              <Input 
+                value={localEngineer.arrivalYear || ''}
+                onChange={(e) => handleChange('arrivalYear', e.target.value)}
                 className="japanese-text"
               />
             </div>
@@ -100,7 +158,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">メールアドレス</Label>
               <Input 
-                value={engineer.email || ''}
+                value={localEngineer.email || ''}
                 onChange={(e) => handleChange('email', e.target.value)}
               />
             </div>
@@ -108,8 +166,35 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">電話番号</Label>
               <Input 
-                value={engineer.phone || ''}
+                value={localEngineer.phone || ''}
                 onChange={(e) => handleChange('phone', e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">保有スキル</Label>
+              <Input 
+                value={Array.isArray(localEngineer.skills) ? localEngineer.skills.join(', ') : ''}
+                onChange={(e) => handleSkillsChange(e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">技術キーワード</Label>
+              <Input 
+                value={Array.isArray(localEngineer.technicalKeywords) ? localEngineer.technicalKeywords.join(', ') : localEngineer.technicalKeywords || ''}
+                onChange={(e) => handleChange('technicalKeywords', e.target.value.split(',').map(kw => kw.trim()))}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">資格</Label>
+              <Input 
+                value={Array.isArray(localEngineer.certifications) ? localEngineer.certifications.join(', ') : localEngineer.certifications || ''}
+                onChange={(e) => handleChange('certifications', e.target.value.split(',').map(cert => cert.trim()))}
                 className="japanese-text"
               />
             </div>
@@ -117,7 +202,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">日本語レベル</Label>
               <Select
-                value={engineer.japaneseLevel}
+                value={localEngineer.japaneseLevel}
                 onValueChange={(value) => handleChange('japaneseLevel', value)}
               >
                 <SelectTrigger className="japanese-text">
@@ -133,28 +218,46 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label className="japanese-text">保有スキル</Label>
-              <Input 
-                value={engineer.skills && engineer.skills.join(', ')}
-                onChange={(e) => handleChange('skills', e.target.value.split(', '))}
-                className="japanese-text"
-              />
+              <Label className="japanese-text">英語レベル</Label>
+              <Select
+                value={localEngineer.englishLevel || ''}
+                onValueChange={(value) => handleChange('englishLevel', value)}
+              >
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="英語レベルを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                  <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                  <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                  <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">
               <Label className="japanese-text">経験年数</Label>
               <Input 
-                value={engineer.experience}
+                value={localEngineer.experience}
                 onChange={(e) => handleChange('experience', e.target.value)}
                 className="japanese-text"
               />
             </div>
             
             <div className="space-y-2">
-              <Label className="japanese-text">希望条件</Label>
+              <Label className="japanese-text">業務範囲</Label>
               <Input 
-                value={engineer.desiredConditions}
-                onChange={(e) => handleChange('desiredConditions', e.target.value)}
+                value={localEngineer.workScope || ''}
+                onChange={(e) => handleChange('workScope', e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">業務経験</Label>
+              <Input 
+                value={localEngineer.workExperience || ''}
+                onChange={(e) => handleChange('workExperience', e.target.value)}
                 className="japanese-text"
               />
             </div>
@@ -162,58 +265,30 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">稼働可能時期</Label>
               <Input 
-                value={engineer.availability}
+                value={localEngineer.availability}
                 onChange={(e) => handleChange('availability', e.target.value)}
                 className="japanese-text"
               />
             </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">登録日</Label>
-              <Input 
-                value={engineer.registeredAt}
-                readOnly
-                disabled
-                className="japanese-text bg-muted"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">更新日</Label>
-              <Input 
-                value={new Date().toISOString().split('T')[0]} 
-                readOnly
-                disabled
-                className="japanese-text bg-muted"
-              />
-              <p className="text-xs text-muted-foreground japanese-text">保存時に自動で更新されます</p>
-            </div>
           </div>
           
           <div className="space-y-2">
-            <Label className="japanese-text">ステータス</Label>
-            <Select
-              value={engineer.status}
-              onValueChange={(value) => handleChange('status', value)}
-            >
-              <SelectTrigger className="japanese-text">
-                <SelectValue placeholder="ステータスを選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="案件探し中" className="japanese-text">案件探し中</SelectItem>
-                <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
-                <SelectItem value="稼働中" className="japanese-text">稼働中</SelectItem>
-                <SelectItem value="非稼働" className="japanese-text">非稼働</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label className="japanese-text">推薦文</Label>
+            <Label className="japanese-text">自己アピール</Label>
             <Textarea 
-              value={engineer.recommendation || ''}
-              onChange={(e) => handleChange('recommendation', e.target.value)}
-              className="min-h-[150px] japanese-text" 
+              value={localEngineer.selfPromotion || ''}
+              onChange={(e) => handleChange('selfPromotion', e.target.value)}
+              className="japanese-text"
+              rows={4}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="japanese-text">備考</Label>
+            <Textarea 
+              value={localEngineer.remarks}
+              onChange={(e) => handleChange('remarks', e.target.value)}
+              className="japanese-text"
+              rows={4}
             />
           </div>
           
@@ -221,7 +296,7 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <Button variant="outline" onClick={() => onOpenChange(false)} className="japanese-text">
               キャンセル
             </Button>
-            <Button onClick={onSave} className="japanese-text">
+            <Button onClick={handleSave} className="japanese-text">
               <Save className="mr-2 h-4 w-4" />
               保存
             </Button>

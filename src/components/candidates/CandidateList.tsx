@@ -10,32 +10,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Eye, FileDown, Edit, Trash2, Search, Flag, Cake, User, Train } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Engineer, CategoryType, FiltersType } from './types';
+import { Engineer, FiltersType } from './types';
 
 interface CandidateListProps {
   engineers: Engineer[];
-  categories: CategoryType[];
   onViewDetails: (engineer: Engineer) => void;
   onEditEngineer: (engineer: Engineer) => void;
   onDeleteEngineer: (id: string) => void;
   onDownloadResume?: (id: string) => void;
   onStatusChange: (id: string, newStatus: string) => void;
-  onEditRemarks?: (id: string, newRemarks: string) => void;
+  isOwnCompany: boolean;
 }
 
 export const CandidateList: React.FC<CandidateListProps> = ({
   engineers,
-  categories,
   onViewDetails,
   onEditEngineer,
   onDeleteEngineer,
   onDownloadResume,
   onStatusChange,
-  onEditRemarks
+  isOwnCompany
 }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState('all');
   const [filters, setFilters] = React.useState<FiltersType>({
     name: '',
     companyType: '',
@@ -103,28 +100,6 @@ export const CandidateList: React.FC<CandidateListProps> = ({
     }
   };
   
-  // カテゴリー選択時の処理
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setCurrentPage(1);
-    
-    let filtered = engineers;
-    
-    // カテゴリーでフィルタリング
-    if (categoryId === 'self') {
-      filtered = filtered.filter(engineer => engineer.companyType === '自社');
-    } else if (categoryId === 'other') {
-      filtered = filtered.filter(engineer => engineer.companyType === '他社');
-    }
-    
-    // 既存の検索クエリや他のフィルターも適用
-    if (searchQuery || filters.japaneseLevel || filters.nationality || filters.status) {
-      filtered = applyFilters(filtered);
-    }
-    
-    setFilteredEngineers(filtered);
-  };
-  
   // 既存のフィルター適用処理
   const applyFilters = (engineersList: Engineer[]) => {
     const query = searchQuery.toLowerCase();
@@ -150,7 +125,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
         return false;
       }
       
-      // 国籍でフィルター (新規追加)
+      // 国籍でフィルター
       if (filters.nationality && engineer.nationality !== filters.nationality) {
         return false;
       }
@@ -161,7 +136,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
       }
       
       // 他社の場合は所属会社でフィルター
-      if (engineer.companyType === '他社' && filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
+      if (!isOwnCompany && filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
         return false;
       }
       
@@ -183,11 +158,10 @@ export const CandidateList: React.FC<CandidateListProps> = ({
   const handleSearch = () => {
     let filtered = engineers;
     
-    // カテゴリーでフィルタリング
-    if (selectedCategory === 'self') {
-      filtered = filtered.filter(engineer => engineer.companyType === '自社');
-    } else if (selectedCategory === 'other') {
+    if (!isOwnCompany) {
       filtered = filtered.filter(engineer => engineer.companyType === '他社');
+    } else {
+      filtered = filtered.filter(engineer => engineer.companyType === '自社');
     }
     
     // その他のフィルターを適用
@@ -215,12 +189,10 @@ export const CandidateList: React.FC<CandidateListProps> = ({
       status: ''
     });
     
-    // カテゴリーに基づいてエンジニアをフィルタリング
-    if (selectedCategory === 'all') {
-      setFilteredEngineers(engineers);
-    } else if (selectedCategory === 'self') {
+    // 対象の会社タイプに基づいてエンジニアをフィルタリング
+    if (isOwnCompany) {
       setFilteredEngineers(engineers.filter(engineer => engineer.companyType === '自社'));
-    } else if (selectedCategory === 'other') {
+    } else {
       setFilteredEngineers(engineers.filter(engineer => engineer.companyType === '他社'));
     }
   };
@@ -243,18 +215,11 @@ export const CandidateList: React.FC<CandidateListProps> = ({
     }
   };
 
-  // 備考編集用の仮関数
-  const handleEditRemarksClick = (engineer: Engineer) => {
-    const newRemarks = prompt('備考を入力してください', engineer.remarks);
-    if (newRemarks !== null && onEditRemarks) {
-      onEditRemarks(engineer.id, newRemarks);
-    }
-  };
-
-  const showCompanyName = selectedCategory === 'other' || engineers.some(engineer => engineer.companyType === '他社');
+  // Filter option for company names (only shown for 他社)
+  const showCompanyNameFilter = !isOwnCompany;
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="japanese-text">技術者一覧</CardTitle>
         <CardDescription className="japanese-text">
@@ -262,129 +227,113 @@ export const CandidateList: React.FC<CandidateListProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* カテゴリー選択 */}
-        <div className="mb-6">
-          <div className="flex space-x-2 mb-4">
-            {categories.map((category) => (
-              <Button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.id)}
-                variant={selectedCategory === category.id ? "default" : "outline"}
-                className="japanese-text"
-              >
-                {category.name}
-              </Button>
-            ))}
+        {/* 検索フィールドと絞り込みオプション */}
+        <div className="space-y-4 mb-6">
+          {/* 検索フィールド */}
+          <div>
+            <div className="flex items-center border-b px-3 rounded-md border">
+              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <Input
+                placeholder="名前、スキル、経験などで検索..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="japanese-text w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
           </div>
-        
-          {/* 検索フィールドと絞り込みオプション */}
-          <div className="space-y-4">
-            {/* 検索フィールド */}
-            <div>
-              <div className="flex items-center border-b px-3 rounded-md border">
-                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                <Input
-                  placeholder="名前、スキル、経験などで検索..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="japanese-text w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
+          
+          {/* 絞り込みオプション */}
+          <div className="flex flex-wrap gap-3">
+            {showCompanyNameFilter && (
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium japanese-text whitespace-nowrap">所属会社:</Label>
+                <Select
+                  value={filters.companyName}
+                  onValueChange={(value) => setFilters({...filters, companyName: value})}
+                >
+                  <SelectTrigger className="h-8 w-[200px] japanese-text">
+                    <SelectValue placeholder="全て" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">全て</SelectItem>
+                    <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
+                    <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
+                    <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
+                    <SelectItem value="ウェブソリューションズ株式会社">ウェブソリューションズ株式会社</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+            )}
+            
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
+              <Select
+                value={filters.japaneseLevel}
+                onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
+              >
+                <SelectTrigger className="h-8 w-[160px] japanese-text">
+                  <SelectValue placeholder="全て" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">全て</SelectItem>
+                  <SelectItem value="不問">不問</SelectItem>
+                  <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                  <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                  <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium japanese-text whitespace-nowrap">国籍:</Label>
+              <Select
+                value={filters.nationality}
+                onValueChange={(value) => setFilters({...filters, nationality: value})}
+              >
+                <SelectTrigger className="h-8 w-[160px] japanese-text">
+                  <SelectValue placeholder="全て" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">全て</SelectItem>
+                  <SelectItem value="日本">日本</SelectItem>
+                  <SelectItem value="中国">中国</SelectItem>
+                  <SelectItem value="インド">インド</SelectItem>
+                  <SelectItem value="ベトナム">ベトナム</SelectItem>
+                  <SelectItem value="その他">その他</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
-            {/* 絞り込みオプション */}
-            <div className="flex flex-wrap gap-3">
-              {showCompanyName && (
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm font-medium japanese-text whitespace-nowrap">所属会社:</Label>
-                  <Select
-                    value={filters.companyName}
-                    onValueChange={(value) => setFilters({...filters, companyName: value})}
-                  >
-                    <SelectTrigger className="h-8 w-[200px] japanese-text">
-                      <SelectValue placeholder="全て" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">全て</SelectItem>
-                      <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
-                      <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
-                      <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
-                      <SelectItem value="ウェブソリューションズ株式会社">ウェブソリューションズ株式会社</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
-                <Select
-                  value={filters.japaneseLevel}
-                  onValueChange={(value) => setFilters({...filters, japaneseLevel: value})}
-                >
-                  <SelectTrigger className="h-8 w-[160px] japanese-text">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全て</SelectItem>
-                    <SelectItem value="不問">不問</SelectItem>
-                    <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
-                    <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
-                    <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium japanese-text whitespace-nowrap">国籍:</Label>
-                <Select
-                  value={filters.nationality}
-                  onValueChange={(value) => setFilters({...filters, nationality: value})}
-                >
-                  <SelectTrigger className="h-8 w-[160px] japanese-text">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全て</SelectItem>
-                    <SelectItem value="日本">日本</SelectItem>
-                    <SelectItem value="中国">中国</SelectItem>
-                    <SelectItem value="インド">インド</SelectItem>
-                    <SelectItem value="ベトナム">ベトナム</SelectItem>
-                    <SelectItem value="その他">その他</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
-                <Select
-                  value={filters.status}
-                  onValueChange={(value) => setFilters({...filters, status: value})}
-                >
-                  <SelectTrigger className="h-8 w-[120px] japanese-text">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全て</SelectItem>
-                    <SelectItem value="提案中">提案中</SelectItem>
-                    <SelectItem value="事前面談">事前面談</SelectItem>
-                    <SelectItem value="面談">面談</SelectItem>
-                    <SelectItem value="結果待ち">結果待ち</SelectItem>
-                    <SelectItem value="営業終了">営業終了</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {(searchQuery || filters.japaneseLevel || filters.nationality || filters.status || filters.companyName) && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={resetFilters} 
-                  className="h-8 px-2 text-xs japanese-text"
-                >
-                  リセット
-                </Button>
-              )}
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
+              <Select
+                value={filters.status}
+                onValueChange={(value) => setFilters({...filters, status: value})}
+              >
+                <SelectTrigger className="h-8 w-[120px] japanese-text">
+                  <SelectValue placeholder="全て" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">全て</SelectItem>
+                  <SelectItem value="提案中">提案中</SelectItem>
+                  <SelectItem value="事前面談">事前面談</SelectItem>
+                  <SelectItem value="面談">面談</SelectItem>
+                  <SelectItem value="結果待ち">結果待ち</SelectItem>
+                  <SelectItem value="営業終了">営業終了</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            
+            {(searchQuery || filters.japaneseLevel || filters.nationality || filters.status || filters.companyName) && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={resetFilters} 
+                className="h-8 px-2 text-xs japanese-text"
+              >
+                リセット
+              </Button>
+            )}
           </div>
         </div>
         
@@ -398,7 +347,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                 <TableHead className="japanese-text">国籍</TableHead>
                 <TableHead className="japanese-text">年齢</TableHead>
                 <TableHead className="japanese-text">性別</TableHead>
-                {showCompanyName && (
+                {showCompanyNameFilter && (
                   <TableHead className="japanese-text">所属会社</TableHead>
                 )}
                 <TableHead className="japanese-text cursor-pointer" onClick={() => handleSort('skills')}>
@@ -439,7 +388,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                         <span className="japanese-text text-sm">{engineer.gender || '未設定'}</span>
                       </div>
                     </TableCell>
-                    {showCompanyName && (
+                    {showCompanyNameFilter && (
                       <TableCell className="japanese-text text-sm">{engineer.companyName}</TableCell>
                     )}
                     <TableCell className="japanese-text text-sm truncate">
@@ -453,18 +402,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                       </div>
                     </TableCell>
                     <TableCell className="japanese-text text-sm truncate">
-                      <div className="flex items-center">
-                        <span className="truncate">{engineer.remarks}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleEditRemarksClick(engineer)}
-                          title="備考を編集"
-                          className="ml-1 h-6 w-6 p-0"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      <span className="truncate">{engineer.remarks}</span>
                     </TableCell>
                     <TableCell className="japanese-text text-sm">
                       <div className="flex flex-wrap gap-1">
@@ -519,7 +457,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={showCompanyName ? 12 : 11} className="h-24 text-center">
+                  <TableCell colSpan={showCompanyNameFilter ? 12 : 11} className="h-24 text-center">
                     データが見つかりません
                   </TableCell>
                 </TableRow>
