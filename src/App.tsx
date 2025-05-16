@@ -17,7 +17,7 @@ import EmailAnalysis from "./pages/EmailAnalysis";
 import BatchMatching from "./pages/BatchMatching";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { ToastProvider } from "@/hooks/use-toast";
+import { ToastProvider } from "@/hooks/toast/toast-provider";
 
 const queryClient = new QueryClient();
 
