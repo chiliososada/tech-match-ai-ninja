@@ -68,13 +68,13 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const [recommendationTemplate, setRecommendationTemplate] = useState<string>('');
   const [recommendationText, setRecommendationText] = useState<string>('');
 
-  // Handle candidate view/edit actions
-  const handleViewDetails = (id: string) => {
-    console.log(`View details for candidate: ${id}`);
+  // Handle candidate view/edit actions - Updated to accept Engineer object
+  const handleViewDetails = (engineer: Engineer) => {
+    console.log(`View details for candidate: ${engineer.id}`);
   };
 
-  const handleEditEngineer = (id: string) => {
-    console.log(`Edit candidate: ${id}`);
+  const handleEditEngineer = (engineer: Engineer) => {
+    console.log(`Edit candidate: ${engineer.id}`);
   };
 
   const handleDeleteEngineer = (id: string) => {
