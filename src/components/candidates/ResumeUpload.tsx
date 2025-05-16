@@ -16,18 +16,27 @@ export function ResumeUpload() {
   // 技術者情報抽出の編集可能なフォームデータ
   const [candidateData, setCandidateData] = useState({
     name: '鈴木太郎',
-    japaneseLevel: 'ビジネスレベル',
-    email: 'taro.suzuki@example.com',
-    phone: '090-1234-5678',
+    age: '32歳',
+    gender: '男性',
+    nationality: '日本',
+    education: '東京工業大学 情報工学科',
+    arrivalYear: '日本国籍',
+    japaneseLevel: 'ネイティブレベル',
+    englishLevel: 'ビジネスレベル',
+    nearestStation: '品川駅',
     skills: [
       { name: 'Java', years: '7' },
       { name: 'Spring Boot', years: '5' },
       { name: 'AWS', years: '3' },
       { name: 'Docker', years: '2' }
     ],
-    location: '東京, リモート',
-    rate: '60万円〜80万円',
-    companyType: '自社'
+    technicalKeywords: 'クラウド, マイクロサービス, CI/CD',
+    selfPromotion: '金融系システム開発においてリーダー経験あり。Java技術を中心に長年の経験があります。',
+    workScope: '要件定義, 設計, 実装, テスト',
+    workExperience: '金融, 保険',
+    remarks: '週4日勤務希望, 出張可, リモート可',
+    companyType: '自社',
+    certifications: 'AWS認定ソリューションアーキテクト, Oracle認定Javaプログラマー'
   });
 
   // 推薦文生成関連
@@ -35,10 +44,10 @@ export function ResumeUpload() {
     `[名前]は[スキル]を中心に[経験]年の開発経験があり、日本語は[日本語レベル]です。
 [得意分野]に強みがあり、[ツール]などの技術も習得しています。
 チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。
-希望条件は[勤務地]で、単価は[単価]です。`
+[備考]`
   );
   const [recommendationText, setRecommendationText] = useState(
-    "鈴木さんはJavaとSpring Bootを中心に7年以上の開発経験があり、日本語はビジネスレベルです。金融系のプロジェクトに強みがあり、AWSやDockerなどのクラウド技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。直近では大手金融機関のオンラインバンキングシステム開発に5年間携わっており、セキュリティに関する知識も豊富です。希望条件は東京またはリモートワークで、単価は60万円〜80万円です。"
+    "鈴木さんはJavaとSpring Bootを中心に7年以上の開発経験があり、日本語はネイティブレベルです。金融系のプロジェクトに強みがあり、AWSやDockerなどのクラウド技術も習得しています。チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。直近では大手金融機関のオンラインバンキングシステム開発に5年間携わっており、セキュリティに関する知識も豊富です。週4日勤務希望、出張可能、リモート勤務可能。"
   );
   
   // 处理表单变更
@@ -68,8 +77,7 @@ export function ResumeUpload() {
         .replace('[日本語レベル]', candidateData.japaneseLevel)
         .replace('[得意分野]', '金融系のプロジェクト')
         .replace('[ツール]', candidateData.skills.slice(2).map(s => s.name).join('や'))
-        .replace('[勤務地]', candidateData.location)
-        .replace('[単価]', candidateData.rate);
+        .replace('[備考]', candidateData.remarks);
         
       setRecommendationText(newText);
       toast.success('推薦文が生成されました');
@@ -188,6 +196,93 @@ export function ResumeUpload() {
                 />
               </div>
               <div className="space-y-2">
+                <Label className="japanese-text">年齢</Label>
+                <Input 
+                  value={candidateData.age} 
+                  className="japanese-text" 
+                  onChange={(e) => handleFormChange('age', e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="japanese-text">性別</Label>
+                <Select 
+                  value={candidateData.gender}
+                  onValueChange={(value) => handleFormChange('gender', value)}
+                >
+                  <SelectTrigger className="japanese-text">
+                    <SelectValue placeholder="性別を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="男性" className="japanese-text">男性</SelectItem>
+                    <SelectItem value="女性" className="japanese-text">女性</SelectItem>
+                    <SelectItem value="その他" className="japanese-text">その他</SelectItem>
+                    <SelectItem value="回答しない" className="japanese-text">回答しない</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="japanese-text">国籍</Label>
+                <Select 
+                  value={candidateData.nationality}
+                  onValueChange={(value) => handleFormChange('nationality', value)}
+                >
+                  <SelectTrigger className="japanese-text">
+                    <SelectValue placeholder="国籍を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="日本" className="japanese-text">日本</SelectItem>
+                    <SelectItem value="中国" className="japanese-text">中国</SelectItem>
+                    <SelectItem value="インド" className="japanese-text">インド</SelectItem>
+                    <SelectItem value="ベトナム" className="japanese-text">ベトナム</SelectItem>
+                    <SelectItem value="その他" className="japanese-text">その他</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="japanese-text">学歴</Label>
+                <Input 
+                  value={candidateData.education} 
+                  className="japanese-text" 
+                  onChange={(e) => handleFormChange('education', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="japanese-text">来日年度</Label>
+                <Input 
+                  value={candidateData.arrivalYear} 
+                  className="japanese-text" 
+                  onChange={(e) => handleFormChange('arrivalYear', e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="japanese-text">資格</Label>
+                <Input 
+                  value={candidateData.certifications} 
+                  className="japanese-text" 
+                  onChange={(e) => handleFormChange('certifications', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="japanese-text">最寄駅</Label>
+                <Input 
+                  value={candidateData.nearestStation} 
+                  className="japanese-text" 
+                  onChange={(e) => handleFormChange('nearestStation', e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label className="japanese-text">日本語レベル</Label>
                 <Select 
                   value={candidateData.japaneseLevel}
@@ -204,22 +299,22 @@ export function ResumeUpload() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="japanese-text">メールアドレス</Label>
-                <Input 
-                  value={candidateData.email} 
-                  onChange={(e) => handleFormChange('email', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="japanese-text">電話番号</Label>
-                <Input 
-                  value={candidateData.phone} 
-                  onChange={(e) => handleFormChange('phone', e.target.value)}
-                />
+                <Label className="japanese-text">英語レベル</Label>
+                <Select 
+                  value={candidateData.englishLevel}
+                  onValueChange={(value) => handleFormChange('englishLevel', value)}
+                >
+                  <SelectTrigger className="japanese-text">
+                    <SelectValue placeholder="英語レベルを選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="不問" className="japanese-text">不問</SelectItem>
+                    <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
+                    <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
+                    <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -246,19 +341,49 @@ export function ResumeUpload() {
             </div>
             
             <div className="space-y-2">
-              <Label className="japanese-text">希望条件</Label>
-              <div className="grid grid-cols-2 gap-4">
-                <Input 
-                  value={candidateData.location} 
-                  className="japanese-text" 
-                  onChange={(e) => handleFormChange('location', e.target.value)}
-                />
-                <Input 
-                  value={candidateData.rate} 
-                  className="japanese-text" 
-                  onChange={(e) => handleFormChange('rate', e.target.value)}
-                />
-              </div>
+              <Label className="japanese-text">技術キーワード</Label>
+              <Input 
+                value={candidateData.technicalKeywords} 
+                className="japanese-text" 
+                onChange={(e) => handleFormChange('technicalKeywords', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">業務範囲</Label>
+              <Input 
+                value={candidateData.workScope} 
+                className="japanese-text" 
+                onChange={(e) => handleFormChange('workScope', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">業務経験</Label>
+              <Input 
+                value={candidateData.workExperience} 
+                className="japanese-text" 
+                onChange={(e) => handleFormChange('workExperience', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">自己アピール</Label>
+              <Textarea 
+                value={candidateData.selfPromotion} 
+                className="japanese-text" 
+                onChange={(e) => handleFormChange('selfPromotion', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">備考</Label>
+              <Textarea 
+                value={candidateData.remarks} 
+                className="japanese-text" 
+                onChange={(e) => handleFormChange('remarks', e.target.value)}
+                placeholder="出勤制限、出張可否などを記入"
+              />
             </div>
           </div>
         </CardContent>

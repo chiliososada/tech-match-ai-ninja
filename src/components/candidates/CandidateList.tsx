@@ -7,44 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Eye, FileDown, Edit, Trash2, Search } from 'lucide-react';
+import { Eye, FileDown, Edit, Trash2, Search, Flag, Cake, User, Train } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-
-interface Engineer {
-  id: string;
-  name: string;
-  skills?: string[];
-  japaneseLevel: string;
-  experience: string;
-  availability: string;
-  status: string;
-  desiredConditions: string;
-  companyType: string;
-  companyName?: string;
-  source: string;
-  recommendation?: string;
-  email?: string;
-  phone?: string;
-  registeredAt: string;
-  updatedAt: string;
-}
-
-interface CategoryType {
-  id: string;
-  name: string;
-}
-
-interface FiltersType {
-  name: string;
-  companyType: string;
-  companyName: string;
-  skills: string;
-  experience: string;
-  japaneseLevel: string;
-  desiredConditions: string;
-  status: string;
-}
+import { Engineer, CategoryType, FiltersType } from './types';
 
 interface CandidateListProps {
   engineers: Engineer[];
@@ -53,7 +19,8 @@ interface CandidateListProps {
   onEditEngineer: (engineer: Engineer) => void;
   onDeleteEngineer: (id: string) => void;
   onDownloadResume?: (id: string) => void;
-  onStatusChange: (id: string, newStatus: string) => void; // Added this line to match the props being passed
+  onStatusChange: (id: string, newStatus: string) => void;
+  onEditRemarks?: (id: string, newRemarks: string) => void;
 }
 
 export const CandidateList: React.FC<CandidateListProps> = ({
@@ -63,7 +30,8 @@ export const CandidateList: React.FC<CandidateListProps> = ({
   onEditEngineer,
   onDeleteEngineer,
   onDownloadResume,
-  onStatusChange // Make sure to include the new prop here as well
+  onStatusChange,
+  onEditRemarks
 }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -75,10 +43,13 @@ export const CandidateList: React.FC<CandidateListProps> = ({
     skills: '',
     experience: '',
     japaneseLevel: '',
-    desiredConditions: '',
+    nationality: '',
+    remarks: '',
     status: ''
   });
   const [filteredEngineers, setFilteredEngineers] = React.useState<Engineer[]>(engineers);
+  const [sortField, setSortField] = React.useState<keyof Engineer | ''>('');
+  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredEngineers.length / itemsPerPage);
@@ -88,6 +59,35 @@ export const CandidateList: React.FC<CandidateListProps> = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // ソート機能
+  const handleSort = (field: keyof Engineer) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+
+    const sorted = [...filteredEngineers].sort((a, b) => {
+      if (!a[field] || !b[field]) return 0;
+      
+      let valueA = a[field];
+      let valueB = b[field];
+      
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        if (sortDirection === 'asc') {
+          return valueA.localeCompare(valueB);
+        } else {
+          return valueB.localeCompare(valueA);
+        }
+      }
+      
+      return 0;
+    });
+    
+    setFilteredEngineers(sorted);
+  };
 
   // ヘルパー関数：前のページへ移動
   const goToPrevPage = () => {
@@ -118,7 +118,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
     }
     
     // 既存の検索クエリや他のフィルターも適用
-    if (searchQuery || filters.companyType || filters.japaneseLevel || filters.status) {
+    if (searchQuery || filters.japaneseLevel || filters.nationality || filters.status) {
       filtered = applyFilters(filtered);
     }
     
@@ -137,22 +137,12 @@ export const CandidateList: React.FC<CandidateListProps> = ({
           skill.toLowerCase().includes(query)
         );
         const experienceMatch = engineer.experience.toLowerCase().includes(query);
-        const conditionsMatch = engineer.desiredConditions.toLowerCase().includes(query);
+        const remarksMatch = engineer.remarks.toLowerCase().includes(query);
         const companyNameMatch = engineer.companyName?.toLowerCase().includes(query);
         
-        if (!(nameMatch || skillsMatch || experienceMatch || conditionsMatch || companyNameMatch)) {
+        if (!(nameMatch || skillsMatch || experienceMatch || remarksMatch || companyNameMatch)) {
           return false;
         }
-      }
-      
-      // 区分でフィルター
-      if (filters.companyType && engineer.companyType !== filters.companyType) {
-        return false;
-      }
-      
-      // 所属会社でフィルター
-      if (filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
-        return false;
       }
       
       // 日本語レベルでフィルター
@@ -160,8 +150,18 @@ export const CandidateList: React.FC<CandidateListProps> = ({
         return false;
       }
       
-      // ステータスでフィルター
-      if (filters.status && engineer.status !== filters.status) {
+      // 国籍でフィルター (新規追加)
+      if (filters.nationality && engineer.nationality !== filters.nationality) {
+        return false;
+      }
+      
+      // ステータスでフィルター(配列対応)
+      if (filters.status && !engineer.status.includes(filters.status)) {
+        return false;
+      }
+      
+      // 他社の場合は所属会社でフィルター
+      if (engineer.companyType === '他社' && filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
         return false;
       }
       
@@ -177,7 +177,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
   // 検索クエリが変更されたときに検索を実行
   React.useEffect(() => {
     handleSearch();
-  }, [searchQuery, filters.companyType, filters.companyName, filters.japaneseLevel, filters.status, engineers]);
+  }, [searchQuery, filters.japaneseLevel, filters.nationality, filters.status, filters.companyName, engineers]);
   
   // 検索を実行
   const handleSearch = () => {
@@ -195,7 +195,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
     
     setFilteredEngineers(filtered);
     
-    if (filtered.length === 0 && (searchQuery || filters.companyType || filters.companyName || filters.japaneseLevel || filters.status)) {
+    if (filtered.length === 0 && (searchQuery || filters.japaneseLevel || filters.nationality || filters.status || filters.companyName)) {
       toast.info('該当する技術者が見つかりませんでした');
     }
   };
@@ -210,7 +210,8 @@ export const CandidateList: React.FC<CandidateListProps> = ({
       skills: '',
       experience: '',
       japaneseLevel: '',
-      desiredConditions: '',
+      nationality: '',
+      remarks: '',
       status: ''
     });
     
@@ -223,6 +224,34 @@ export const CandidateList: React.FC<CandidateListProps> = ({
       setFilteredEngineers(engineers.filter(engineer => engineer.companyType === '他社'));
     }
   };
+
+  // ステータス表示用のヘルパー関数
+  const getStatusBadge = (status: string) => {
+    switch(status) {
+      case '提案中':
+        return <Badge variant="default" className="bg-blue-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+      case '事前面談':
+        return <Badge variant="default" className="bg-orange-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+      case '面談':
+        return <Badge variant="default" className="bg-green-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+      case '結果待ち':
+        return <Badge variant="default" className="bg-purple-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+      case '営業終了':
+        return <Badge variant="default" className="bg-gray-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+      default:
+        return <Badge variant="outline" className="japanese-text text-xs mr-1">{status}</Badge>;
+    }
+  };
+
+  // 備考編集用の仮関数
+  const handleEditRemarksClick = (engineer: Engineer) => {
+    const newRemarks = prompt('備考を入力してください', engineer.remarks);
+    if (newRemarks !== null && onEditRemarks) {
+      onEditRemarks(engineer.id, newRemarks);
+    }
+  };
+
+  const showCompanyName = selectedCategory === 'other' || engineers.some(engineer => engineer.companyType === '他社');
 
   return (
     <Card>
@@ -265,41 +294,26 @@ export const CandidateList: React.FC<CandidateListProps> = ({
             
             {/* 絞り込みオプション */}
             <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium japanese-text whitespace-nowrap">区分:</Label>
-                <Select
-                  value={filters.companyType}
-                  onValueChange={(value) => setFilters({...filters, companyType: value})}
-                >
-                  <SelectTrigger className="h-8 w-[120px] japanese-text">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全て</SelectItem>
-                    <SelectItem value="自社">自社</SelectItem>
-                    <SelectItem value="他社">他社</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium japanese-text whitespace-nowrap">所属会社:</Label>
-                <Select
-                  value={filters.companyName}
-                  onValueChange={(value) => setFilters({...filters, companyName: value})}
-                >
-                  <SelectTrigger className="h-8 w-[200px] japanese-text">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全て</SelectItem>
-                    <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
-                    <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
-                    <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
-                    <SelectItem value="ウェブソリューションズ株式会社">ウェブソリューションズ株式会社</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {showCompanyName && (
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium japanese-text whitespace-nowrap">所属会社:</Label>
+                  <Select
+                    value={filters.companyName}
+                    onValueChange={(value) => setFilters({...filters, companyName: value})}
+                  >
+                    <SelectTrigger className="h-8 w-[200px] japanese-text">
+                      <SelectValue placeholder="全て" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全て</SelectItem>
+                      <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
+                      <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
+                      <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
+                      <SelectItem value="ウェブソリューションズ株式会社">ウェブソリューションズ株式会社</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               
               <div className="flex items-center gap-2">
                 <Label className="text-sm font-medium japanese-text whitespace-nowrap">日本語レベル:</Label>
@@ -319,6 +333,26 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium japanese-text whitespace-nowrap">国籍:</Label>
+                <Select
+                  value={filters.nationality}
+                  onValueChange={(value) => setFilters({...filters, nationality: value})}
+                >
+                  <SelectTrigger className="h-8 w-[160px] japanese-text">
+                    <SelectValue placeholder="全て" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全て</SelectItem>
+                    <SelectItem value="日本">日本</SelectItem>
+                    <SelectItem value="中国">中国</SelectItem>
+                    <SelectItem value="インド">インド</SelectItem>
+                    <SelectItem value="ベトナム">ベトナム</SelectItem>
+                    <SelectItem value="その他">その他</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               
               <div className="flex items-center gap-2">
                 <Label className="text-sm font-medium japanese-text whitespace-nowrap">ステータス:</Label>
@@ -331,15 +365,16 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全て</SelectItem>
-                    <SelectItem value="案件探し中">案件探し中</SelectItem>
                     <SelectItem value="提案中">提案中</SelectItem>
-                    <SelectItem value="稼働中">稼働中</SelectItem>
-                    <SelectItem value="非稼働">非稼働</SelectItem>
+                    <SelectItem value="事前面談">事前面談</SelectItem>
+                    <SelectItem value="面談">面談</SelectItem>
+                    <SelectItem value="結果待ち">結果待ち</SelectItem>
+                    <SelectItem value="営業終了">営業終了</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
-              {(searchQuery || filters.companyType || filters.companyName || filters.japaneseLevel || filters.status) && (
+              {(searchQuery || filters.japaneseLevel || filters.nationality || filters.status || filters.companyName) && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -357,15 +392,27 @@ export const CandidateList: React.FC<CandidateListProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="japanese-text">名前</TableHead>
-                <TableHead className="japanese-text">区分</TableHead>
-                <TableHead className="japanese-text">所属会社</TableHead>
-                <TableHead className="japanese-text">スキル</TableHead>
-                <TableHead className="japanese-text">経験年数</TableHead>
-                <TableHead className="japanese-text">希望条件</TableHead>
+                <TableHead className="japanese-text cursor-pointer" onClick={() => handleSort('name')}>
+                  名前 {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </TableHead>
+                <TableHead className="japanese-text">国籍</TableHead>
+                <TableHead className="japanese-text">年齢</TableHead>
+                <TableHead className="japanese-text">性別</TableHead>
+                {showCompanyName && (
+                  <TableHead className="japanese-text">所属会社</TableHead>
+                )}
+                <TableHead className="japanese-text cursor-pointer" onClick={() => handleSort('skills')}>
+                  スキル {sortField === 'skills' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </TableHead>
+                <TableHead className="japanese-text cursor-pointer" onClick={() => handleSort('experience')}>
+                  経験年数 {sortField === 'experience' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </TableHead>
+                <TableHead className="japanese-text">最寄駅</TableHead>
+                <TableHead className="japanese-text">備考</TableHead>
                 <TableHead className="japanese-text">ステータス</TableHead>
-                <TableHead className="japanese-text">登録日</TableHead>
-                <TableHead className="japanese-text">更新日</TableHead>
+                <TableHead className="japanese-text cursor-pointer" onClick={() => handleSort('registeredAt')}>
+                  登録日 {sortField === 'registeredAt' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </TableHead>
                 <TableHead className="japanese-text">アクション</TableHead>
               </TableRow>
             </TableHeader>
@@ -375,23 +422,63 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   <TableRow key={engineer.id}>
                     <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={engineer.companyType === "自社" ? "default" : "secondary"} 
-                        className="japanese-text text-xs"
-                      >
-                        {engineer.companyType}
-                        {engineer.source === "メール" && " (メール)"}
-                      </Badge>
+                      <div className="flex items-center">
+                        <Flag className="h-4 w-4 mr-2" />
+                        <span className="japanese-text text-sm">{engineer.nationality || '未設定'}</span>
+                      </div>
                     </TableCell>
-                    <TableCell className="japanese-text text-sm">{engineer.companyName}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Cake className="h-4 w-4 mr-2" />
+                        <span className="japanese-text text-sm">{engineer.age || '未設定'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <User className="h-4 w-4 mr-2" />
+                        <span className="japanese-text text-sm">{engineer.gender || '未設定'}</span>
+                      </div>
+                    </TableCell>
+                    {showCompanyName && (
+                      <TableCell className="japanese-text text-sm">{engineer.companyName}</TableCell>
+                    )}
                     <TableCell className="japanese-text text-sm truncate">
                       {engineer.skills && engineer.skills.join(", ")}
                     </TableCell>
                     <TableCell className="japanese-text text-sm">{engineer.experience}</TableCell>
-                    <TableCell className="japanese-text text-sm truncate">{engineer.desiredConditions}</TableCell>
-                    <TableCell className="japanese-text text-sm">{engineer.status}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Train className="h-4 w-4 mr-2" />
+                        <span className="japanese-text text-sm">{engineer.nearestStation || '未設定'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="japanese-text text-sm truncate">
+                      <div className="flex items-center">
+                        <span className="truncate">{engineer.remarks}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEditRemarksClick(engineer)}
+                          title="備考を編集"
+                          className="ml-1 h-6 w-6 p-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell className="japanese-text text-sm">
+                      <div className="flex flex-wrap gap-1">
+                        {Array.isArray(engineer.status) ? 
+                          engineer.status.map((status, idx) => (
+                            <React.Fragment key={idx}>
+                              {getStatusBadge(status)}
+                            </React.Fragment>
+                          )) : 
+                          getStatusBadge(engineer.status)
+                        }
+                      </div>
+                    </TableCell>
                     <TableCell className="japanese-text text-sm">{engineer.registeredAt}</TableCell>
-                    <TableCell className="japanese-text text-sm">{engineer.updatedAt}</TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Button 
@@ -405,7 +492,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          onClick={() => onDownloadResume(engineer.id)}
+                          onClick={() => onDownloadResume && onDownloadResume(engineer.id)}
                           title="履歴書をダウンロード"
                         >
                           <FileDown className="h-4 w-4" />
@@ -432,7 +519,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={10} className="h-24 text-center">
+                  <TableCell colSpan={showCompanyName ? 12 : 11} className="h-24 text-center">
                     データが見つかりません
                   </TableCell>
                 </TableRow>

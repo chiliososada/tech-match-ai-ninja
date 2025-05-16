@@ -8,22 +8,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Wand2 } from 'lucide-react';
-import { toast } from 'sonner';
 
-interface NewEngineerType {
-  name: string;
-  skills: string;
-  japaneseLevel: string;
-  experience: string;
-  availability: string;
-  status: string;
-  desiredConditions: string;
-  companyType: string;
-  companyName: string;
-  source: string;
-  registeredAt: string;
-  updatedAt: string;
-}
+import { NewEngineerType } from './types';
 
 interface CandidateFormProps {
   initialData: NewEngineerType;
@@ -109,6 +95,87 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               </div>
               
               <div className="space-y-2">
+                <Label htmlFor="nationality" className="japanese-text">国籍</Label>
+                <Select
+                  value={formData.nationality}
+                  onValueChange={(value) => handleChange('nationality', value)}
+                >
+                  <SelectTrigger className="japanese-text">
+                    <SelectValue placeholder="国籍を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="日本">日本</SelectItem>
+                    <SelectItem value="中国">中国</SelectItem>
+                    <SelectItem value="インド">インド</SelectItem>
+                    <SelectItem value="ベトナム">ベトナム</SelectItem>
+                    <SelectItem value="その他">その他</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="age" className="japanese-text">年齢</Label>
+                <Input 
+                  id="age" 
+                  value={formData.age}
+                  onChange={(e) => handleChange('age', e.target.value)}
+                  placeholder="例: 30歳"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="gender" className="japanese-text">性別</Label>
+                <Select
+                  value={formData.gender}
+                  onValueChange={(value) => handleChange('gender', value)}
+                >
+                  <SelectTrigger className="japanese-text">
+                    <SelectValue placeholder="性別を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="男性">男性</SelectItem>
+                    <SelectItem value="女性">女性</SelectItem>
+                    <SelectItem value="その他">その他</SelectItem>
+                    <SelectItem value="回答しない">回答しない</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="nearestStation" className="japanese-text">最寄駅</Label>
+                <Input 
+                  id="nearestStation" 
+                  value={formData.nearestStation}
+                  onChange={(e) => handleChange('nearestStation', e.target.value)}
+                  placeholder="例: 東京駅"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="education" className="japanese-text">学歴</Label>
+                <Input 
+                  id="education" 
+                  value={formData.education}
+                  onChange={(e) => handleChange('education', e.target.value)}
+                  placeholder="例: 東京大学工学部"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="arrivalYear" className="japanese-text">来日年度</Label>
+                <Input 
+                  id="arrivalYear" 
+                  value={formData.arrivalYear}
+                  onChange={(e) => handleChange('arrivalYear', e.target.value)}
+                  placeholder="例: 2015年"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
                 <Label htmlFor="skills" className="japanese-text">保有スキル <span className="text-red-500">*</span></Label>
                 <Input 
                   id="skills" 
@@ -117,6 +184,28 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                   placeholder="例: Java, Spring Boot, AWS（カンマ区切り）"
                   className="japanese-text"
                   required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="technicalKeywords" className="japanese-text">技術キーワード</Label>
+                <Input 
+                  id="technicalKeywords" 
+                  value={formData.technicalKeywords}
+                  onChange={(e) => handleChange('technicalKeywords', e.target.value)}
+                  placeholder="例: クラウド, マイクロサービス, CI/CD"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="certifications" className="japanese-text">資格</Label>
+                <Input 
+                  id="certifications" 
+                  value={formData.certifications}
+                  onChange={(e) => handleChange('certifications', e.target.value)}
+                  placeholder="例: AWS認定ソリューションアーキテクト, Oracle認定Javaプログラマー"
+                  className="japanese-text"
                 />
               </div>
               
@@ -139,6 +228,24 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               </div>
               
               <div className="space-y-2">
+                <Label htmlFor="english" className="japanese-text">英語レベル</Label>
+                <Select
+                  value={formData.englishLevel}
+                  onValueChange={(value) => handleChange('englishLevel', value)}
+                >
+                  <SelectTrigger className="japanese-text">
+                    <SelectValue placeholder="英語レベルを選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="不問">不問</SelectItem>
+                    <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                    <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                    <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
                 <Label htmlFor="experience" className="japanese-text">経験年数 <span className="text-red-500">*</span></Label>
                 <Input 
                   id="experience" 
@@ -147,6 +254,28 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                   placeholder="例: 5年"
                   className="japanese-text"
                   required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="workScope" className="japanese-text">業務範囲</Label>
+                <Input 
+                  id="workScope" 
+                  value={formData.workScope}
+                  onChange={(e) => handleChange('workScope', e.target.value)}
+                  placeholder="例: 製造, テスト, 要件定義"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="workExperience" className="japanese-text">業務経験</Label>
+                <Input 
+                  id="workExperience" 
+                  value={formData.workExperience}
+                  onChange={(e) => handleChange('workExperience', e.target.value)}
+                  placeholder="例: 金融, 保険, EC"
+                  className="japanese-text"
                 />
               </div>
               
@@ -171,22 +300,34 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectValue placeholder="ステータスを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="案件探し中">案件探し中</SelectItem>
                     <SelectItem value="提案中">提案中</SelectItem>
-                    <SelectItem value="稼働中">稼働中</SelectItem>
-                    <SelectItem value="非稼働">非稼働</SelectItem>
+                    <SelectItem value="事前面談">事前面談</SelectItem>
+                    <SelectItem value="面談">面談</SelectItem>
+                    <SelectItem value="結果待ち">結果待ち</SelectItem>
+                    <SelectItem value="営業終了">営業終了</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="desired-conditions" className="japanese-text">希望条件</Label>
-              <Input 
-                id="desired-conditions" 
-                value={formData.desiredConditions}
-                onChange={(e) => handleChange('desiredConditions', e.target.value)}
-                placeholder="例: 東京/リモート, 60~80万円"
+              <Label htmlFor="selfPromotion" className="japanese-text">自己アピール</Label>
+              <Textarea 
+                id="selfPromotion" 
+                value={formData.selfPromotion}
+                onChange={(e) => handleChange('selfPromotion', e.target.value)}
+                placeholder="候補者の自己アピールを入力"
+                className="japanese-text"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="remarks" className="japanese-text">備考</Label>
+              <Textarea 
+                id="remarks" 
+                value={formData.remarks}
+                onChange={(e) => handleChange('remarks', e.target.value)}
+                placeholder="出勤制限、出張可否などを記入"
                 className="japanese-text"
               />
             </div>
