@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -121,22 +120,22 @@ export const CandidateList: React.FC<CandidateListProps> = ({
       }
       
       // 日本語レベルでフィルター
-      if (filters.japaneseLevel && engineer.japaneseLevel !== filters.japaneseLevel) {
+      if (filters.japaneseLevel && filters.japaneseLevel !== 'all' && engineer.japaneseLevel !== filters.japaneseLevel) {
         return false;
       }
       
       // 国籍でフィルター
-      if (filters.nationality && engineer.nationality !== filters.nationality) {
+      if (filters.nationality && filters.nationality !== 'all' && engineer.nationality !== filters.nationality) {
         return false;
       }
       
       // ステータスでフィルター(配列対応)
-      if (filters.status && !engineer.status.includes(filters.status)) {
+      if (filters.status && filters.status !== 'all' && !engineer.status.includes(filters.status)) {
         return false;
       }
       
       // 他社の場合は所属会社でフィルター
-      if (!isOwnCompany && filters.companyName && !(engineer.companyName?.includes(filters.companyName))) {
+      if (!isOwnCompany && filters.companyName && filters.companyName !== 'all' && !(engineer.companyName?.includes(filters.companyName))) {
         return false;
       }
       
@@ -255,7 +254,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                     <SelectValue placeholder="全て" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">全て</SelectItem>
+                    <SelectItem value="all">全て</SelectItem>
                     <SelectItem value="テックイノベーション株式会社">テックイノベーション株式会社</SelectItem>
                     <SelectItem value="フロントエンドパートナーズ株式会社">フロントエンドパートナーズ株式会社</SelectItem>
                     <SelectItem value="クラウドシステムズ株式会社">クラウドシステムズ株式会社</SelectItem>
@@ -275,7 +274,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   <SelectValue placeholder="全て" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全て</SelectItem>
+                  <SelectItem value="all">全て</SelectItem>
                   <SelectItem value="不問">不問</SelectItem>
                   <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
                   <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
@@ -294,7 +293,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   <SelectValue placeholder="全て" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全て</SelectItem>
+                  <SelectItem value="all">全て</SelectItem>
                   <SelectItem value="日本">日本</SelectItem>
                   <SelectItem value="中国">中国</SelectItem>
                   <SelectItem value="インド">インド</SelectItem>
@@ -314,7 +313,7 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   <SelectValue placeholder="全て" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全て</SelectItem>
+                  <SelectItem value="all">全て</SelectItem>
                   <SelectItem value="提案中">提案中</SelectItem>
                   <SelectItem value="事前面談">事前面談</SelectItem>
                   <SelectItem value="面談">面談</SelectItem>
