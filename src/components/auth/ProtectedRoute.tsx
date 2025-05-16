@@ -2,6 +2,7 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthLoader } from './AuthLoader';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -12,20 +13,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <AuthLoader />;
   }
 
   if (!user) {
-    // Redirect to the auth page, but save the current location in state
-    // so we can redirect back after authentication
-    console.log("User not authenticated, redirecting to /auth");
+    // 重定向到认证页面，但保存当前位置以便认证后重定向回来
+    console.log("用户未认证，重定向到/auth，当前路径:", location.pathname);
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // User is authenticated, render the children
+  // 用户已认证，渲染子组件
   return <>{children}</>;
 }

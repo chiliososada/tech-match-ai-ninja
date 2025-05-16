@@ -15,26 +15,39 @@ export function Auth() {
   const { user, loading, signInWithGoogle } = useAuth();
   const location = useLocation();
   
-  // Get the intended destination from location state or default to "/"
+  // 获取预期目标路径，默认为"/"
   const from = location.state?.from?.pathname || "/";
 
-  // Check for redirect from OAuth sign in
+  // 检查OAuth登录重定向
   useEffect(() => {
+    console.log('检查OAuth重定向状态');
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
     
     if (accessToken) {
-      // If we have an access token in the URL, show a toast
+      console.log('在URL中发现访问令牌');
       toast({
         title: "身份验证成功",
         description: "正在登录中...",
       });
     }
+    
+    // 检查URL中是否有错误信息
+    const url = new URL(window.location.href);
+    const errorDescription = url.searchParams.get('error_description');
+    if (errorDescription) {
+      console.error('OAuth错误:', errorDescription);
+      toast({
+        title: "登录失败",
+        description: errorDescription,
+        variant: "destructive",
+      });
+    }
   }, []);
 
-  // Redirect to intended destination if user is already authenticated
+  // 如果用户已认证，重定向到预期目标
   if (user && !loading) {
-    console.log("User authenticated, redirecting to:", from);
+    console.log("用户已认证，重定向到:", from);
     return <Navigate to={from} replace />;
   }
 

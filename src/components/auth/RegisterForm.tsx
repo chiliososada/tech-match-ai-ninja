@@ -19,29 +19,78 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
+
+  const validateInputs = () => {
+    const newErrors: {email?: string; password?: string} = {};
+    let isValid = true;
+
+    if (!email) {
+      newErrors.email = "邮箱不能为空";
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "请输入有效的邮箱地址";
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = "密码不能为空";
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = "密码长度至少6个字符";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({
-        title: "请填写所有字段",
-        description: "邮箱和密码是必填项", 
-        variant: "destructive",
-      });
+    
+    if (!validateInputs()) {
       return;
     }
     
     setIsSubmitting(true);
     
     try {
+      console.log('尝试注册:', email);
       const { error } = await signUp(email, password, {
         first_name: firstName,
         last_name: lastName,
       });
       
       if (error) {
-        console.error("Registration error:", error);
+        console.error("注册错误:", error);
+        
+        if (error.message.includes("is invalid")) {
+          toast({
+            title: "注册失败",
+            description: "请输入有效的邮箱地址",
+            variant: "destructive",
+          });
+        } else if (error.message.includes("already registered")) {
+          toast({
+            title: "注册失败",
+            description: "该邮箱已被注册",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "注册失败",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       }
+    } catch (error) {
+      console.error('意外的注册错误:', error);
+      toast({
+        title: "注册失败",
+        description: "发生未知错误，请稍后重试",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -77,10 +126,13 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
             type="email" 
             placeholder="your@email.com" 
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required 
-            disabled={isSubmitting}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors({...errors, email: undefined});
+            }}
+            className={errors.email ? "border-red-500" : ""}
           />
+          {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="registerPassword" className="japanese-text">密码</Label>
@@ -89,10 +141,13 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
             type="password"
             placeholder="••••••••" 
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-            disabled={isSubmitting}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password) setErrors({...errors, password: undefined});
+            }}
+            className={errors.password ? "border-red-500" : ""}
           />
+          {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
         </div>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">

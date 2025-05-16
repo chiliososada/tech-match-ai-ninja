@@ -17,25 +17,70 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
+
+  const validateInputs = () => {
+    const newErrors: {email?: string; password?: string} = {};
+    let isValid = true;
+
+    if (!email) {
+      newErrors.email = "邮箱不能为空";
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "请输入有效的邮箱地址";
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = "密码不能为空";
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = "密码长度至少6个字符";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({
-        title: "请填写所有字段",
-        description: "邮箱和密码是必填项",
-        variant: "destructive",
-      });
+    
+    if (!validateInputs()) {
       return;
     }
     
     setIsSubmitting(true);
     
     try {
+      console.log('尝试登录:', email);
       const { error } = await signIn(email, password);
+      
       if (error) {
-        console.error("Login error:", error);
+        console.error("登录错误:", error);
+        
+        // 根据错误类型显示不同的错误信息
+        if (error.message.includes("Invalid login credentials")) {
+          toast({
+            title: "登录失败",
+            description: "邮箱或密码错误，请重试",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "登录失败",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       }
+    } catch (error) {
+      console.error('意外的登录错误:', error);
+      toast({
+        title: "登录失败",
+        description: "发生未知错误，请稍后重试",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -51,10 +96,13 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
             type="email" 
             placeholder="your@email.com" 
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required 
-            disabled={isSubmitting}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors({...errors, email: undefined});
+            }}
+            className={errors.email ? "border-red-500" : ""}
           />
+          {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="password" className="japanese-text">密码</Label>
@@ -63,10 +111,13 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
             type="password"
             placeholder="••••••••" 
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-            disabled={isSubmitting}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password) setErrors({...errors, password: undefined});
+            }}
+            className={errors.password ? "border-red-500" : ""}
           />
+          {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
         </div>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">

@@ -22,33 +22,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up the auth state listener FIRST
+    // 设置认证状态监听器（最先执行）
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log('认证状态变化:', event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
-        // Log event for debugging
-        console.log('Auth state changed:', event, currentSession?.user?.id);
-        
-        // Only update loading state if we're not already loaded
         if (loading) {
           setLoading(false);
+        }
+
+        // 根据不同的认证事件显示不同的提示
+        if (event === 'SIGNED_IN') {
+          toast({
+            title: "登录成功",
+            description: "欢迎回来",
+          });
+        } else if (event === 'SIGNED_OUT') {
+          toast({
+            title: "已退出登录",
+          });
+        } else if (event === 'USER_UPDATED') {
+          toast({
+            title: "用户信息已更新",
+          });
         }
       }
     );
 
-    // THEN check for existing session
+    // 然后检查现有会话
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setLoading(false);
       
-      // Log for debugging
       if (currentSession) {
-        console.log('Existing session found:', currentSession.user.id);
+        console.log('找到现有会话:', currentSession.user.id);
       } else {
-        console.log('No existing session');
+        console.log('没有找到现有会话');
       }
     });
 
@@ -59,36 +71,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting sign in with:', email);
+      if (!email || !password) {
+        const error = new Error("邮箱和密码不能为空");
+        console.error('登录错误:', error);
+        return { error };
+      }
+
+      console.log('尝试以邮箱登录:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        console.error('Sign in error:', error);
-        toast({
-          title: "登录失败",
-          description: error.message,
-          variant: "destructive",
-        });
+        console.error('登录错误:', error);
         return { error };
       }
       
-      console.log('Sign in successful:', data.user?.id);
-      toast({
-        title: "登录成功",
-        description: "欢迎回来",
-      });
-      
+      console.log('登录成功:', data.user?.id);
       return { error: null };
     } catch (error) {
-      console.error('Unexpected sign in error:', error);
-      toast({
-        title: "登录失败",
-        description: "发生未知错误，请稍后重试",
-        variant: "destructive",
-      });
+      console.error('意外的登录错误:', error);
       return { error: error as Error };
     }
   };
@@ -99,25 +102,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userData?: { first_name?: string; last_name?: string }
   ) => {
     try {
-      console.log('Attempting sign up with:', email);
+      if (!email || !password) {
+        const error = new Error("邮箱和密码不能为空");
+        console.error('注册错误:', error);
+        return { error };
+      }
+
+      // 验证邮箱格式
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        const error = new Error("请输入有效的邮箱地址");
+        console.error('注册错误:', error);
+        return { error };
+      }
+
+      // 验证密码长度
+      if (password.length < 6) {
+        const error = new Error("密码长度至少6个字符");
+        console.error('注册错误:', error);
+        return { error };
+      }
+
+      console.log('尝试注册:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: userData,
+          emailRedirectTo: `${window.location.origin}/auth`,
         },
       });
       
       if (error) {
-        console.error('Sign up error:', error);
-        toast({
-          title: "注册失败",
-          description: error.message,
-          variant: "destructive",
-        });
+        console.error('注册错误:', error);
         return { error };
       } else {
-        console.log('Sign up successful:', data.user?.id);
+        console.log('注册成功:', data.user?.id);
         toast({
           title: "注册成功",
           description: data.session ? "您已成功登录" : "请检查您的电子邮箱以完成验证",
@@ -126,35 +146,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return { error: null };
     } catch (error) {
-      console.error('Unexpected sign up error:', error);
-      toast({
-        title: "注册失败",
-        description: "发生未知错误，请稍后重试",
-        variant: "destructive",
-      });
+      console.error('意外的注册错误:', error);
       return { error: error as Error };
     }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Sign out error:', error);
+    try {
+      console.log('尝试退出登录');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('退出错误:', error);
+        toast({
+          title: "退出失败",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('意外的退出错误:', error);
       toast({
         title: "退出失败",
-        description: error.message,
+        description: "发生未知错误，请稍后重试",
         variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "已退出登录",
       });
     }
   };
 
   const signInWithGoogle = async () => {
     try {
-      console.log('Attempting Google sign in');
+      console.log('尝试Google登录');
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -163,17 +184,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       if (error) {
-        console.error('Google sign in error:', error);
+        console.error('Google登录错误:', error);
         toast({
           title: "Google登录失败",
           description: error.message,
           variant: "destructive",
         });
       } else {
-        console.log('Google sign in redirect initiated:', data);
+        console.log('Google登录重定向已发起:', data);
       }
     } catch (error) {
-      console.error('Unexpected Google sign in error:', error);
+      console.error('意外的Google登录错误:', error);
+      toast({
+        title: "Google登录失败",
+        description: "发生未知错误，请稍后重试",
+        variant: "destructive",
+      });
     }
   };
 
@@ -195,7 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth必须在AuthProvider内部使用');
   }
   return context;
 };
