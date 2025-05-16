@@ -10,7 +10,9 @@ import {
   Settings,
   ListCheck,
   BarChart2,
-  ServerCog
+  ServerCog,
+  Building,
+  Building2
 } from 'lucide-react';
 
 type SidebarItem = {
@@ -22,19 +24,43 @@ type SidebarItem = {
 
 const sidebarItems: SidebarItem[] = [
   {
+    icon: <Building className="h-5 w-5" />,
+    label: '自社',
+    href: '#',
+    subItems: [
+      {
+        icon: <FileText className="h-5 w-5" />,
+        label: '案件管理',
+        href: '/cases',
+      },
+      {
+        icon: <Users className="h-5 w-5" />,
+        label: '人材管理',
+        href: '/candidates',
+      }
+    ]
+  },
+  {
+    icon: <Building2 className="h-5 w-5" />,
+    label: '他社',
+    href: '#',
+    subItems: [
+      {
+        icon: <FileText className="h-5 w-5" />,
+        label: '案件管理',
+        href: '/cases',
+      },
+      {
+        icon: <Users className="h-5 w-5" />,
+        label: '人材管理',
+        href: '/candidates',
+      }
+    ]
+  },
+  {
     icon: <BarChart3 className="h-5 w-5" />,
     label: 'ダッシュボード',
     href: '/',
-  },
-  {
-    icon: <FileText className="h-5 w-5" />,
-    label: '案件管理',
-    href: '/cases',
-  },
-  {
-    icon: <Users className="h-5 w-5" />,
-    label: '人材管理',
-    href: '/candidates',
   },
   {
     icon: <ListCheck className="h-5 w-5" />,
@@ -72,42 +98,53 @@ export function Sidebar() {
       <div className="flex-1 px-4 space-y-2 overflow-y-auto py-2">
         {sidebarItems.map((item, i) => (
           <React.Fragment key={i}>
-            <NavLink
-              to={item.href}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
-                  isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
-                )
-              }
-            >
-              {item.icon}
-              <span className="japanese-text">{item.label}</span>
-            </NavLink>
-            
-            {/* Sub items */}
-            {item.subItems && item.subItems.length > 0 && (
-              <div className="pl-6 space-y-1 mt-1">
-                {item.subItems.map((subItem, j) => (
-                  <NavLink
-                    key={`${i}-${j}`}
-                    to={subItem.href}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
-                        isActive
-                          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                          : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
-                      )
-                    }
-                  >
-                    {subItem.icon}
-                    <span className="japanese-text">{subItem.label}</span>
-                  </NavLink>
-                ))}
+            {item.subItems ? (
+              // Render item with submenu
+              <div className="space-y-1">
+                <div 
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all text-sidebar-foreground"
+                >
+                  {item.icon}
+                  <span className="japanese-text">{item.label}</span>
+                </div>
+                
+                {/* Sub items */}
+                <div className="pl-6 space-y-1 mt-1">
+                  {item.subItems.map((subItem, j) => (
+                    <NavLink
+                      key={`${i}-${j}`}
+                      to={subItem.href}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+                          isActive
+                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                            : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                        )
+                      }
+                    >
+                      {subItem.icon}
+                      <span className="japanese-text">{subItem.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
               </div>
+            ) : (
+              // Render regular menu item without submenu
+              <NavLink
+                to={item.href}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+                    isActive
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                  )
+                }
+              >
+                {item.icon}
+                <span className="japanese-text">{item.label}</span>
+              </NavLink>
             )}
           </React.Fragment>
         ))}
