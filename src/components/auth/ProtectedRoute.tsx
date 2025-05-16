@@ -20,9 +20,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!user) {
-    // Redirect to the auth page, but save the current location so we can redirect back
+    // Redirect to the auth page, but save the current location in state
+    // so we can redirect back after authentication
+    console.log("User not authenticated, redirecting to /auth");
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
+  // User is authenticated, render the children
   return <>{children}</>;
 }

@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FcGoogle } from 'react-icons/fc';
+import { toast } from '@/hooks/use-toast';
 
 export function Auth() {
   const { user, loading, signIn, signUp, signInWithGoogle } = useAuth();
@@ -16,31 +17,82 @@ export function Auth() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the intended destination from location state or default to "/"
+  const from = location.state?.from?.pathname || "/";
 
-  // Redirect to dashboard if user is already authenticated
+  // Check for redirect from OAuth sign in
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    
+    if (accessToken) {
+      // If we have an access token in the URL, show a toast
+      toast({
+        title: "身份验证成功",
+        description: "正在登录中...",
+      });
+    }
+  }, []);
+
+  // Redirect to intended destination if user is already authenticated
   if (user && !loading) {
-    return <Navigate to="/" />;
+    console.log("User authenticated, redirecting to:", from);
+    return <Navigate to={from} replace />;
   }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast({
+        title: "请填写所有字段",
+        description: "邮箱和密码是必填项",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    await signIn(email, password);
-    
-    setIsSubmitting(false);
+    try {
+      const { error } = await signIn(email, password);
+      if (!error) {
+        // Navigate will happen automatically when auth state updates
+        console.log("Sign in successful, auth state will update");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast({
+        title: "请填写所有字段",
+        description: "邮箱和密码是必填项", 
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    await signUp(email, password, {
-      first_name: firstName,
-      last_name: lastName,
-    });
-    
-    setIsSubmitting(false);
+    try {
+      const { error } = await signUp(email, password, {
+        first_name: firstName,
+        last_name: lastName,
+      });
+      
+      if (!error) {
+        // If signup is successful but requires email verification, don't redirect
+        console.log("Sign up successful");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -77,6 +129,7 @@ export function Auth() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required 
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="space-y-2">
@@ -88,6 +141,7 @@ export function Auth() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required 
+                    disabled={isSubmitting}
                   />
                 </div>
               </CardContent>
@@ -110,8 +164,9 @@ export function Auth() {
                 <Button 
                   type="button" 
                   variant="outline" 
-                  onClick={signInWithGoogle} 
+                  onClick={() => signInWithGoogle()} 
                   className="w-full flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
                 >
                   <FcGoogle className="h-5 w-5" />
                   <span className="japanese-text">使用谷歌账号登录</span>
@@ -130,6 +185,7 @@ export function Auth() {
                       id="firstName" 
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div className="space-y-2">
@@ -138,6 +194,7 @@ export function Auth() {
                       id="lastName" 
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
+                      disabled={isSubmitting}
                     />
                   </div>
                 </div>
@@ -150,6 +207,7 @@ export function Auth() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required 
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="space-y-2">
@@ -161,6 +219,7 @@ export function Auth() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required 
+                    disabled={isSubmitting}
                   />
                 </div>
               </CardContent>
@@ -183,8 +242,9 @@ export function Auth() {
                 <Button 
                   type="button" 
                   variant="outline" 
-                  onClick={signInWithGoogle} 
+                  onClick={() => signInWithGoogle()} 
                   className="w-full flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
                 >
                   <FcGoogle className="h-5 w-5" />
                   <span className="japanese-text">使用谷歌账号注册</span>
