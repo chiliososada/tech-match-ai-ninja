@@ -6,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Save } from 'lucide-react';
+import { Save, Wand2 } from 'lucide-react';
 import { Engineer } from './types';
+import { toast } from 'sonner';
 
 interface CandidateEditProps {
   open: boolean;
@@ -27,6 +28,12 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
   isOwnCompany
 }) => {
   const [localEngineer, setLocalEngineer] = useState<Engineer | null>(engineer);
+  const [recommendationTemplate, setRecommendationTemplate] = useState<string>(
+    `[名前]は[スキル]を中心に[経験]年の開発経験があり、日本語は[日本語レベル]です。
+[得意分野]に強みがあり、[ツール]などの技術も習得しています。
+チームリーダーとしての経験もあり、要件定義から設計、実装、テストまでの一連の開発プロセスを担当できます。
+[備考]`
+  );
 
   useEffect(() => {
     setLocalEngineer(engineer);
@@ -48,6 +55,28 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
   const handleSkillsChange = (value: string) => {
     const skillsArray = value.split(',').map(skill => skill.trim());
     handleChange('skills', skillsArray);
+  };
+
+  // AI推薦文生成機能
+  const generateRecommendation = () => {
+    toast.info('推薦文を生成中...', { duration: 2000 });
+    
+    setTimeout(() => {
+      // テンプレートに基づいて推薦文を生成
+      if (!localEngineer) return;
+      
+      const newText = recommendationTemplate
+        .replace('[名前]', `${localEngineer.name}さん`)
+        .replace('[スキル]', Array.isArray(localEngineer.skills) ? localEngineer.skills.slice(0, 2).join('と') : '')
+        .replace('[経験]', localEngineer.experience || '5')
+        .replace('[日本語レベル]', localEngineer.japaneseLevel || 'ビジネスレベル')
+        .replace('[得意分野]', localEngineer.workExperience || 'プロジェクト開発')
+        .replace('[ツール]', Array.isArray(localEngineer.skills) ? localEngineer.skills.slice(2).join('や') : '')
+        .replace('[備考]', localEngineer.remarks || '');
+        
+      handleChange('recommendation', newText);
+      toast.success('推薦文が生成されました');
+    }, 2000);
   };
 
   return (
@@ -284,23 +313,6 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">メールアドレス</Label>
-              <Input 
-                value={localEngineer.email || ''}
-                onChange={(e) => handleChange('email', e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="japanese-text">電話番号</Label>
-              <Input 
-                value={localEngineer.phone || ''}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className="japanese-text"
-              />
-            </div>
           </div>
           
           <div className="space-y-2">
@@ -323,6 +335,46 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
               rows={4}
               placeholder="出勤制限、出張可否などを記入"
             />
+          </div>
+          
+          <div className="space-y-4 border-t pt-4">
+            <div className="flex justify-between items-center">
+              <Label className="japanese-text text-base font-medium">推薦文</Label>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="japanese-text"
+                onClick={generateRecommendation}
+              >
+                <Wand2 className="mr-2 h-4 w-4" />
+                AI生成
+              </Button>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">推薦テンプレート</Label>
+              <Textarea 
+                value={recommendationTemplate}
+                onChange={(e) => setRecommendationTemplate(e.target.value)}
+                className="japanese-text text-sm"
+                rows={3}
+                placeholder="[名前]、[スキル]などのプレースホルダーを使用"
+              />
+              <p className="text-xs text-muted-foreground japanese-text">
+                プレースホルダー: [名前]、[スキル]、[経験]、[日本語レベル]、[得意分野]、[ツール]、[備考]
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="japanese-text">推薦文</Label>
+              <Textarea 
+                value={localEngineer.recommendation || ''}
+                onChange={(e) => handleChange('recommendation', e.target.value)}
+                className="japanese-text"
+                rows={5}
+                placeholder="AIで生成するか、手動で入力してください"
+              />
+            </div>
           </div>
           
           <DialogFooter>

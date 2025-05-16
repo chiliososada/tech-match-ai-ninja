@@ -8,16 +8,9 @@ interface CandidateContactInfoProps {
 
 export const CandidateContactInfo: React.FC<CandidateContactInfoProps> = ({ engineer }) => {
   return (
-    <>
-      <div>
-        <h4 className="text-sm font-medium japanese-text">メールアドレス</h4>
-        <p>{engineer.email || '未設定'}</p>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium japanese-text">電話番号</h4>
-        <p>{engineer.phone || '未設定'}</p>
-      </div>
-    </>
+    <div>
+      <h4 className="text-sm font-medium japanese-text">連絡先情報が非表示</h4>
+      <p className="text-muted-foreground text-sm japanese-text">プライバシー保護のため、連絡先情報は表示されません</p>
+    </div>
   );
 };

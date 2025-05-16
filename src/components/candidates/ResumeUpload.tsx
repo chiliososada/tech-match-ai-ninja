@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export function ResumeUpload() {
   const [isUploading, setIsUploading] = useState(false);
@@ -168,24 +167,6 @@ export function ResumeUpload() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="japanese-text">区分</Label>
-              <RadioGroup 
-                value={candidateData.companyType}
-                onValueChange={(value) => handleFormChange('companyType', value)}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="自社" id="resume-own-company" />
-                  <Label htmlFor="resume-own-company" className="japanese-text">自社</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="他社" id="resume-other-company" />
-                  <Label htmlFor="resume-other-company" className="japanese-text">他社</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="japanese-text">氏名</Label>
