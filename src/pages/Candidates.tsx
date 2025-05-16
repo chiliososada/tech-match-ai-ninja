@@ -106,7 +106,7 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-6">
+      <div className="flex-1 space-y-8 p-8 pt-6">
         <h1 className="text-3xl font-bold mb-6 japanese-text">{pageTitle}</h1>
         
         <Tabs defaultValue="list">

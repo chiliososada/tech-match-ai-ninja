@@ -24,6 +24,11 @@ type SidebarItem = {
 
 const sidebarItems: SidebarItem[] = [
   {
+    icon: <BarChart3 className="h-5 w-5" />,
+    label: 'ダッシュボード',
+    href: '/',
+  },
+  {
     icon: <Building className="h-5 w-5" />,
     label: '自社',
     href: '#',
@@ -56,11 +61,6 @@ const sidebarItems: SidebarItem[] = [
         href: '/candidates/company/other',
       }
     ]
-  },
-  {
-    icon: <BarChart3 className="h-5 w-5" />,
-    label: 'ダッシュボード',
-    href: '/',
   },
   {
     icon: <ListCheck className="h-5 w-5" />,
