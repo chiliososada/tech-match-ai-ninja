@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, generatePaginationRange } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Eye, FileDown, Edit, Trash2, Search, Flag, Cake, User, Train } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -216,6 +216,9 @@ export const CandidateList: React.FC<CandidateListProps> = ({
 
   // Filter option for company names (only shown for 他社)
   const showCompanyNameFilter = !isOwnCompany;
+
+  // Generate the pagination items with ellipsis
+  const paginationItems = generatePaginationRange(currentPage, totalPages);
 
   return (
     <Card className="w-full">
@@ -476,19 +479,20 @@ export const CandidateList: React.FC<CandidateListProps> = ({
                   />
                 </PaginationItem>
                 
-                {Array.from({ length: totalPages }).map((_, index) => {
-                  const pageNumber = index + 1;
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink 
-                        isActive={currentPage === pageNumber}
-                        onClick={() => setCurrentPage(pageNumber)}
+                {paginationItems.map((item, index) => (
+                  <PaginationItem key={index}>
+                    {item === 'ellipsis' ? (
+                      <PaginationEllipsis />
+                    ) : (
+                      <PaginationLink
+                        isActive={currentPage === item}
+                        onClick={() => setCurrentPage(item)}
                       >
-                        {pageNumber}
+                        {item}
                       </PaginationLink>
-                    </PaginationItem>
-                  );
-                })}
+                    )}
+                  </PaginationItem>
+                ))}
                 
                 <PaginationItem>
                   <PaginationNext 
