@@ -208,11 +208,13 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({
             <div className="mt-3">
               <Select
                 onValueChange={onStatusChange}
+                defaultValue="選択してください"
               >
                 <SelectTrigger className="w-full japanese-text">
                   <SelectValue placeholder="ステータスを更新" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="選択してください" className="japanese-text">ステータスを選択</SelectItem>
                   <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
                   <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
                   <SelectItem value="面談" className="japanese-text">面談</SelectItem>
@@ -244,3 +246,4 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({
     </Dialog>
   );
 };
+

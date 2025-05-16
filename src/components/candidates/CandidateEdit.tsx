@@ -85,13 +85,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">国籍</Label>
               <Select
-                value={localEngineer.nationality || ''}
+                value={localEngineer.nationality || "未設定"}
                 onValueChange={(value) => handleChange('nationality', value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="国籍を選択" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="未設定">選択してください</SelectItem>
                   <SelectItem value="日本">日本</SelectItem>
                   <SelectItem value="中国">中国</SelectItem>
                   <SelectItem value="インド">インド</SelectItem>
@@ -113,13 +114,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">性別</Label>
               <Select
-                value={localEngineer.gender || ''}
+                value={localEngineer.gender || "未設定"}
                 onValueChange={(value) => handleChange('gender', value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="性別を選択" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="未設定">選択してください</SelectItem>
                   <SelectItem value="男性">男性</SelectItem>
                   <SelectItem value="女性">女性</SelectItem>
                   <SelectItem value="その他">その他</SelectItem>
@@ -202,17 +204,18 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">日本語レベル</Label>
               <Select
-                value={localEngineer.japaneseLevel}
+                value={localEngineer.japaneseLevel || "未設定"}
                 onValueChange={(value) => handleChange('japaneseLevel', value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="日本語レベルを選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="不問" className="japanese-text">不問</SelectItem>
-                  <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
-                  <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
-                  <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                  <SelectItem value="未設定">選択してください</SelectItem>
+                  <SelectItem value="不問">不問</SelectItem>
+                  <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                  <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                  <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -220,17 +223,18 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">英語レベル</Label>
               <Select
-                value={localEngineer.englishLevel || ''}
+                value={localEngineer.englishLevel || "未設定"}
                 onValueChange={(value) => handleChange('englishLevel', value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="英語レベルを選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="不問" className="japanese-text">不問</SelectItem>
-                  <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
-                  <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
-                  <SelectItem value="ネイティブレベル" className="japanese-text">ネイティブレベル</SelectItem>
+                  <SelectItem value="未設定">選択してください</SelectItem>
+                  <SelectItem value="不問">不問</SelectItem>
+                  <SelectItem value="日常会話レベル">日常会話レベル</SelectItem>
+                  <SelectItem value="ビジネスレベル">ビジネスレベル</SelectItem>
+                  <SelectItem value="ネイティブレベル">ネイティブレベル</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -306,3 +310,4 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
     </Dialog>
   );
 };
+
