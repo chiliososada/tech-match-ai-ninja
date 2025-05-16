@@ -22,6 +22,7 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { toast } from "@/hooks/toast";
 import { useLocation } from 'react-router-dom';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
 
 // 案件のサンプルデータ（案件詳細を追加）
 const caseData = [
@@ -43,7 +44,6 @@ const caseData = [
     foreignerAccepted: true,
     freelancerAccepted: false,
     desiredBudget: "70万円",
-    // 案件詳細情報を追加
     detailDescription: `
 金融系システムの新規開発プロジェクトにおけるJavaエンジニアの募集案件です。
 
@@ -100,7 +100,6 @@ const caseData = [
     senderName: null,
     createdAt: "2025-05-10",
     keyTechnologies: "React, TypeScript, Next.js",
-    // 案件詳細情報を追加
     detailDescription: `
 ECサイトのフロントエンド開発を担当するエンジニアを募集しています。
 
@@ -357,8 +356,6 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   // フィルタリングされた案件を取得
   const filteredCases = caseData.filter(item => {
     // Filter by company type using some mock logic
-    // In a real app, you would have a companyType field in your data
-    // Here we're simulating it by using even/odd IDs as a placeholder
     const matchesCompanyType = effectiveCompanyType === 'own' 
       ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
       : parseInt(item.id) % 2 === 0;  // even IDs for 他社
@@ -410,10 +407,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   // 編集保存ハンドラー
   const handleSaveEdit = () => {
     if (editingCaseData) {
-      // 実際のアプリではここでAPIリクエストを行います
-      // 今回はモックデータの更新をシミュレートします
-      toast.success('案件情報が更新されました', {
-        description: '変更が保存されました'
+      toast({
+        title: "案件情報が更新されました",
+        description: "変更が保存されました"
       });
       setSelectedCase(editingCaseData);
       setEditMode(false);
