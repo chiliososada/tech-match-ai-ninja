@@ -52,7 +52,8 @@ interface CandidateListProps {
   onViewDetails: (engineer: Engineer) => void;
   onEditEngineer: (engineer: Engineer) => void;
   onDeleteEngineer: (id: string) => void;
-  onDownloadResume: (id: string) => void;
+  onDownloadResume?: (id: string) => void;
+  onStatusChange: (id: string, newStatus: string) => void; // Added this line to match the props being passed
 }
 
 export const CandidateList: React.FC<CandidateListProps> = ({
@@ -61,7 +62,8 @@ export const CandidateList: React.FC<CandidateListProps> = ({
   onViewDetails,
   onEditEngineer,
   onDeleteEngineer,
-  onDownloadResume
+  onDownloadResume,
+  onStatusChange // Make sure to include the new prop here as well
 }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchQuery, setSearchQuery] = React.useState('');

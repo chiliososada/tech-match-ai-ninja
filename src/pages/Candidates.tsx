@@ -84,6 +84,11 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const handleStatusChange = (id: string, newStatus: string) => {
     console.log(`Change status of candidate ${id} to ${newStatus}`);
   };
+  
+  // Add a function to handle resume downloads
+  const handleDownloadResume = (id: string) => {
+    console.log(`Download resume for candidate: ${id}`);
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -120,6 +125,7 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
               onEditEngineer={handleEditEngineer}
               onDeleteEngineer={handleDeleteEngineer}
               onStatusChange={handleStatusChange}
+              onDownloadResume={handleDownloadResume}
             />
           </TabsContent>
           
