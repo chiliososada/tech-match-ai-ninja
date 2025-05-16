@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/card-tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CandidateList } from '@/components/candidates/CandidateList';
 import { CandidateForm } from '@/components/candidates/CandidateForm';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -12,6 +12,23 @@ interface CandidatesProps {
   companyType?: 'own' | 'other';
 }
 
+// First, let's fix the default props for the components
+// Creating mock initialData for CandidateForm
+const initialCandidateData = {
+  name: '',
+  skills: '',
+  japaneseLevel: '',
+  experience: '',
+  availability: '',
+  status: '',
+  desiredConditions: '',
+  companyType: '',
+  companyName: '',
+  source: '',
+  registeredAt: '',
+  updatedAt: '',
+};
+
 export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const location = useLocation();
   
@@ -21,6 +38,22 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   
   // Page title based on company type
   const pageTitle = effectiveCompanyType === 'own' ? '自社人材管理' : '他社人材管理';
+
+  const [recommendationTemplate, setRecommendationTemplate] = React.useState<string>('');
+  const [recommendationText, setRecommendationText] = React.useState<string>('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission
+  };
+
+  const handleDataChange = (data: any) => {
+    // Handle data change
+  };
+
+  const handleGenerateRecommendation = () => {
+    // Handle recommendation generation
+  };
 
   return (
     <MainLayout>
@@ -36,19 +69,28 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
           </TabsList>
           
           <TabsContent value="list">
-            <CandidateList companyType={effectiveCompanyType} />
+            <CandidateList />
           </TabsContent>
           
           <TabsContent value="add">
-            <CandidateForm companyType={effectiveCompanyType} />
+            <CandidateForm 
+              initialData={initialCandidateData}
+              onSubmit={handleSubmit}
+              onDataChange={handleDataChange}
+              recommendationTemplate={recommendationTemplate}
+              recommendationText={recommendationText}
+              onRecommendationTemplateChange={setRecommendationTemplate}
+              onRecommendationTextChange={setRecommendationText}
+              onGenerateRecommendation={handleGenerateRecommendation}
+            />
           </TabsContent>
           
           <TabsContent value="resume">
-            <ResumeUpload companyType={effectiveCompanyType} />
+            <ResumeUpload />
           </TabsContent>
           
           <TabsContent value="email">
-            <BulkEmailTab companyType={effectiveCompanyType} />
+            <BulkEmailTab />
           </TabsContent>
         </Tabs>
       </div>
