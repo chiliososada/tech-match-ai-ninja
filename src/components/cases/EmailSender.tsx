@@ -7,51 +7,34 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useLocation } from 'react-router-dom';
 
-import { EmailSenderProps, EMAIL_TEMPLATES } from './email/types';
 import { CasesList } from './email/CasesList';
-import { EmailForm } from './email/EmailForm';
-import { EngineerSelection } from './email/EngineerSelection';
+import { EmailSenderLayout } from './email/EmailSenderLayout';
+import { FilterBar } from './email/FilterBar';
 import { EngineerSearchDialog } from './email/EngineerSearchDialog';
-
-// Import custom hooks
-import { useEmailState } from './email/hooks/useEmailState';
-import { useEngineerState } from './email/hooks/useEngineerState';
+import { EMAIL_TEMPLATES, MailCase } from './email/types';
 
 // Import utility functions
 import { handleSelectAll, handleSelectCase, handleTemplateChange, handleEnhanceEmail, handleSendEmail } from './email/utils/emailHandlers';
 import { openEngineerDialog, toggleEngineerSelection, removeSelectedEngineer, applyEngineerToTemplate } from './email/utils/engineerHandlers';
-import { processCaseData, processEngineerData } from './email/utils/dataProcessing';
 
-export function EmailSender({ mailCases }: EmailSenderProps) {
-  const location = useLocation();
-  const isOtherCompanyMode = location.pathname.includes('/company/other');
-  const itemsPerPage = 10;
-  const engineerItemsPerPage = 6;
-  
-  // Use custom hooks for state management
-  const emailState = useEmailState(mailCases);
-  const engineerState = useEngineerState();
-  
-  // Process data
-  const caseData = processCaseData(
-    mailCases,
-    emailState.companyFilter,
-    emailState.techFilter,
-    emailState.currentPage,
-    itemsPerPage
-  );
+interface EmailSenderComponentProps {
+  mailCases: MailCase[];
+  isOtherCompanyMode: boolean;
+  caseData: any;
+  engineerData: any;
+  emailState: any;
+  engineerState: any;
+}
 
-  const engineerData = processEngineerData(
-    engineerState.engineerFilter,
-    engineerState.engineerCompanyFilter,
-    engineerState.engineerCurrentPage,
-    engineerItemsPerPage
-  );
-
+export function EmailSender({ 
+  mailCases, 
+  isOtherCompanyMode,
+  caseData,
+  engineerData,
+  emailState,
+  engineerState
+}: EmailSenderComponentProps) {
   // Handlers with proper state binding
   const casesHandleSelectAll = () => handleSelectAll(
     caseData.paginatedCases,
@@ -129,28 +112,13 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
           <CardDescription className="japanese-text">
             メール案件の送信者に一括でメールを送信します
           </CardDescription>
-          <div className="mt-4 flex flex-col sm:flex-row gap-4">
-            <Select value={emailState.companyFilter} onValueChange={emailState.setCompanyFilter}>
-              <SelectTrigger className="japanese-text w-full sm:w-[200px]">
-                <SelectValue placeholder="会社でフィルター" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-                {caseData.companyList.map((company) => (
-                  <SelectItem key={company as string} value={company as string} className="japanese-text">
-                    {company as string}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Input 
-              placeholder="技術キーワードでフィルター" 
-              value={emailState.techFilter}
-              onChange={(e) => emailState.setTechFilter(e.target.value)}
-              className="japanese-text"
-            />
-          </div>
+          <FilterBar 
+            companyFilter={emailState.companyFilter}
+            setCompanyFilter={emailState.setCompanyFilter}
+            techFilter={emailState.techFilter}
+            setTechFilter={emailState.setTechFilter}
+            companyList={caseData.companyList}
+          />
         </CardHeader>
         <CardContent>
           {/* 案件一覧 - 他社モードの場合は会社名と登録方法も表示 */}
@@ -166,38 +134,17 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
             showCompanyInfo={isOtherCompanyMode} // 他社モードの場合のみ会社情報を表示
           />
           
-          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* メール設定部分 - 左カラム（2/3幅） */}
-            <div className="lg:col-span-2">
-              <EmailForm
-                emailTemplates={EMAIL_TEMPLATES}
-                selectedTemplate={emailState.selectedTemplate}
-                handleTemplateChange={templateHandleChange}
-                subject={emailState.subject}
-                setSubject={emailState.setSubject}
-                emailBody={emailState.emailBody}
-                setEmailBody={emailState.setEmailBody}
-                signature={emailState.signature}
-                setSignature={emailState.setSignature}
-                handleEnhanceEmail={emailHandleEnhance}
-                handleSendEmail={emailHandleSend}
-                sending={emailState.sending}
-                selectedCasesCount={emailState.selectedCases.length}
-                hideOptimizationSection={isOtherCompanyMode} // 他社モードの場合、最適化セクションを非表示
-              />
-            </div>
-
-            {/* 技術者選択部分 - 右カラム（1/3幅） */}
-            <div>
-              <EngineerSelection 
-                selectedEngineers={engineerState.selectedEngineers}
-                openEngineerDialog={engineerHandleOpen}
-                removeSelectedEngineer={engineerHandleRemove}
-                applyEngineerToTemplate={engineerHandleApply}
-                selectedCasesLength={emailState.selectedCases.length}
-              />
-            </div>
-          </div>
+          <EmailSenderLayout
+            emailState={emailState}
+            engineerState={engineerState}
+            handleTemplateChange={templateHandleChange}
+            handleEnhanceEmail={emailHandleEnhance}
+            handleSendEmail={emailHandleSend}
+            openEngineerDialog={engineerHandleOpen}
+            removeSelectedEngineer={engineerHandleRemove}
+            applyEngineerToTemplate={engineerHandleApply}
+            isOtherCompanyMode={isOtherCompanyMode}
+          />
         </CardContent>
       </Card>
 
