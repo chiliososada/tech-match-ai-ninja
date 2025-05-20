@@ -60,24 +60,27 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   const [showOnlyDeletable, setShowOnlyDeletable] = useState(false);
   const [selectedCases, setSelectedCases] = useState<string[]>([]);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [showInfoTooltip, setShowInfoTooltip] = useState(false);
+  // Show the info tooltip by default
+  const [showInfoTooltip, setShowInfoTooltip] = useState(true);
   
   // Reset selection when filter changes
   useEffect(() => {
     setSelectedCases([]);
   }, [searchTerm, statusFilter, showOnlyDeletable]);
 
+  // Get the reference date for May 2025
+  const getMay2025Date = () => {
+    return new Date(2025, 4, 1); // May is month 4 (0-indexed)
+  };
+  
   // Check if case is considered "期限切れ" (expired)
-  // "期限切れ" means the start date is before the current month AND status is "募集終了"
+  // "期限切れ" means the start date is before May 2025
   const isExpired = (item: MailCase) => {
-    // Get the first day of current month
-    const currentDate = new Date();
-    const firstDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const may2025 = getMay2025Date();
     
-    // Cases with a start date before this month
     if (item.startDate) {
       const startDate = new Date(item.startDate);
-      if (startDate < firstDayOfCurrentMonth) {
+      if (startDate < may2025) {
         // For the purpose of visually marking it as expired
         return true;
       }
@@ -87,33 +90,27 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   };
   
   // A case is deletable if:
-  // 1. Its start date is before the current month AND
+  // 1. Its start date is before May 2025 OR
   // 2. Its status is "募集終了"
   const isDeletableCandidate = (item: MailCase) => {
-    // Get the first day of current month
-    const currentDate = new Date();
-    const firstDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const may2025 = getMay2025Date();
     
-    // Must meet both conditions to be deletable
+    // Changed logic to OR instead of AND
     if (item.startDate) {
       const startDate = new Date(item.startDate);
-      // Start date is before current month
-      if (startDate < firstDayOfCurrentMonth) {
-        // Status is "募集終了"
-        if (item.status === '募集終了') {
-          return true;
-        }
+      // Start date is before May 2025
+      if (startDate < may2025) {
+        return true;
       }
+    }
+    
+    // Status is "募集終了"
+    if (item.status === '募集終了') {
+      return true;
     }
     
     return false;
   }
-  
-  // Get current month and year for display
-  const getCurrentMonthDisplay = () => {
-    const now = new Date();
-    return `${now.getFullYear()}年${now.getMonth() + 1}月`;
-  };
   
   // Filter cases based on company type and user filters
   const filteredCases = cases.filter(item => {
@@ -221,16 +218,17 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
           
           <Separator className="my-2" />
           
+          {/* Show the deletion criteria info by default */}
           {showInfoTooltip && (
             <div className="mb-3">
               <Alert className="bg-blue-50 border-blue-200">
                 <AlertTitle className="japanese-text font-medium">削除対象の条件</AlertTitle>
                 <AlertDescription className="japanese-text text-sm">
                   <ul className="list-disc pl-5 space-y-1 mt-2">
-                    <li>参画開始日が{getCurrentMonthDisplay()}より前の案件</li>
+                    <li>参画開始日が2025年5月より前の案件</li>
                     <li>ステータスが「募集終了」の案件</li>
                   </ul>
-                  <p className="mt-2">上記の両方の条件を満たす案件が削除対象として表示されます。</p>
+                  <p className="mt-2">上記の条件のいずれかを満たす案件が削除対象として表示されます。</p>
                 </AlertDescription>
               </Alert>
             </div>
