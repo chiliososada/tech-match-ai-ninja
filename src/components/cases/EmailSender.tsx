@@ -22,8 +22,12 @@ import { CasesList } from './email/CasesList';
 import { EmailForm } from './email/EmailForm';
 import { EngineerSelection } from './email/EngineerSelection';
 import { EngineerSearchDialog } from './email/EngineerSearchDialog';
+import { useLocation } from 'react-router-dom';
 
 export function EmailSender({ mailCases }: EmailSenderProps) {
+  const location = useLocation();
+  const isOtherCompanyMode = location.pathname.includes('/company/other');
+  
   const [selectedCases, setSelectedCases] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [subject, setSubject] = useState('');
@@ -40,6 +44,7 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
   const [engineerFilter, setEngineerFilter] = useState("");
   const [engineerCurrentPage, setEngineerCurrentPage] = useState(1);
   const [selectedEngineers, setSelectedEngineers] = useState<Engineer[]>([]);
+  const [engineerCompanyFilter, setEngineerCompanyFilter] = useState("all");
   
   const itemsPerPage = 10;
   const engineerItemsPerPage = 6;
@@ -66,9 +71,14 @@ export function EmailSender({ mailCases }: EmailSenderProps) {
   // エンジニアのフィルタリング
   const filteredEngineers = SAMPLE_ENGINEERS.filter(engineer => {
     const searchTerm = engineerFilter.toLowerCase();
+    const matchesCompanyType = engineerCompanyFilter === "all" || 
+                              (engineerCompanyFilter === "own" && engineer.companyType === '自社') || 
+                              (engineerCompanyFilter === "other" && engineer.companyType === '他社');
+    
     return (
-      engineer.name.toLowerCase().includes(searchTerm) ||
-      engineer.skills.some(skill => skill.toLowerCase().includes(searchTerm))
+      (engineer.name.toLowerCase().includes(searchTerm) ||
+       engineer.skills.some(skill => skill.toLowerCase().includes(searchTerm))) &&
+      matchesCompanyType
     );
   });
 
@@ -150,6 +160,8 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
     setIsEngineerDialogOpen(true);
     setEngineerCurrentPage(1);
     setEngineerFilter("");
+    // Reset company filter when opening dialog
+    setEngineerCompanyFilter("all");
   };
 
   // エンジニアを選択する
@@ -283,6 +295,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
           </div>
         </CardHeader>
         <CardContent>
+          {/* 案件一覧 - 他社モードの場合は会社名と登録方法も表示 */}
           <CasesList
             paginatedCases={paginatedCases}
             selectedCases={selectedCases}
@@ -292,6 +305,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalPages={totalPages}
+            showCompanyInfo={isOtherCompanyMode} // 他社モードの場合のみ会社情報を表示
           />
           
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -311,6 +325,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
                 handleSendEmail={handleSendEmail}
                 sending={sending}
                 selectedCasesCount={selectedCases.length}
+                hideOptimizationSection={isOtherCompanyMode} // 他社モードの場合、最適化セクションを非表示
               />
             </div>
 
@@ -341,6 +356,9 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
         setEngineerCurrentPage={setEngineerCurrentPage}
         totalEngineerPages={totalEngineerPages}
         filteredEngineersLength={filteredEngineers.length}
+        engineerCompanyFilter={engineerCompanyFilter}
+        setEngineerCompanyFilter={setEngineerCompanyFilter}
+        showCompanyType={isOtherCompanyMode} // 他社モードの場合のみ会社区分を表示
       />
     </div>
   );

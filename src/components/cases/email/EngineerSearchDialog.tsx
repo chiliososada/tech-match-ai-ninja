@@ -16,6 +16,7 @@ import {
   generatePaginationRange
 } from '@/components/ui/pagination';
 import { Engineer } from './types';
+import { CompanyTypeDropdown } from './CompanyTypeDropdown';
 
 interface EngineerSearchDialogProps {
   isOpen: boolean;
@@ -29,6 +30,9 @@ interface EngineerSearchDialogProps {
   setEngineerCurrentPage: (page: number) => void;
   totalEngineerPages: number;
   filteredEngineersLength: number;
+  engineerCompanyFilter?: string;
+  setEngineerCompanyFilter?: (filter: string) => void;
+  showCompanyType?: boolean;
 }
 
 export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
@@ -42,7 +46,10 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
   engineerCurrentPage,
   setEngineerCurrentPage,
   totalEngineerPages,
-  filteredEngineersLength
+  filteredEngineersLength,
+  engineerCompanyFilter = 'all',
+  setEngineerCompanyFilter,
+  showCompanyType = false
 }) => {
   // Helper functions for pagination
   const goToPrevPage = () => {
@@ -68,14 +75,23 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
         </DialogHeader>
         
         <div className="py-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="名前やスキルで検索" 
-              value={engineerFilter}
-              onChange={(e) => setEngineerFilter(e.target.value)}
-              className="japanese-text"
-            />
+          <div className="flex flex-col space-y-4 mb-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="名前やスキルで検索" 
+                value={engineerFilter}
+                onChange={(e) => setEngineerFilter(e.target.value)}
+                className="japanese-text"
+              />
+            </div>
+            
+            {showCompanyType && setEngineerCompanyFilter && (
+              <CompanyTypeDropdown 
+                value={engineerCompanyFilter}
+                onChange={setEngineerCompanyFilter}
+              />
+            )}
           </div>
           
           <div className="space-y-2">
