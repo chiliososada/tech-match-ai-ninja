@@ -15,9 +15,21 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     
     // If found in our original data, use it; otherwise use the passed item as is
     if (fullCaseData) {
-      setSelectedCase(fullCaseData);
+      // Ensure the processes field exists
+      const caseWithProcesses = {
+        ...fullCaseData,
+        processes: fullCaseData.processes || [],
+        interviewCount: fullCaseData.interviewCount || '1'
+      };
+      setSelectedCase(caseWithProcesses);
     } else {
-      setSelectedCase(caseItem);
+      // Ensure the processes field exists for the passed item
+      const caseWithProcesses = {
+        ...caseItem,
+        processes: caseItem.processes || [],
+        interviewCount: caseItem.interviewCount || '1'
+      };
+      setSelectedCase(caseWithProcesses);
     }
     
     // Reset edit mode and data when selecting a new case
@@ -32,7 +44,11 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     
     // When entering edit mode, copy the selected case data for editing
     if (newEditMode && selectedCase) {
-      setEditingCaseData({...selectedCase});
+      setEditingCaseData({
+        ...selectedCase,
+        processes: selectedCase.processes || [],
+        interviewCount: selectedCase.interviewCount || '1'
+      });
     } else {
       // When exiting edit mode, clear the editing data
       setEditingCaseData(null);

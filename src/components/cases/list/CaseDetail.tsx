@@ -1,13 +1,16 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PencilIcon, FileText, Calendar, MapPin, Briefcase, Code, Users, Clock, Languages, Flag, User, CircleDollarSign } from 'lucide-react';
+import { PencilIcon, FileText, Calendar, MapPin, Briefcase, Code, Users, Clock, Languages, Flag, User, CircleDollarSign, FileCode, MessageSquare } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { getStatusBadgeColor } from '../utils/statusUtils';
 import { MailCase } from '../email/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface CaseDetailProps {
   selectedCase: MailCase | null;
@@ -29,6 +32,34 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
   // Toggle edit mode
   const toggleEditMode = () => {
     setEditMode(!editMode);
+  };
+
+  // Process options for display and selection
+  const processOptions = [
+    "要件定義", 
+    "基本設計", 
+    "詳細設計", 
+    "製造／開発", 
+    "単体テスト", 
+    "結合テスト", 
+    "総合テスト／システムテスト", 
+    "UAT／受け入れテスト", 
+    "運用・保守",
+    "アジャイル開発"
+  ];
+
+  // Helper function to toggle process selection
+  const toggleProcess = (process: string) => {
+    if (!editingCaseData) return;
+    
+    const currentProcesses = editingCaseData.processes || [];
+    const isSelected = currentProcesses.includes(process);
+    
+    const newProcesses = isSelected 
+      ? currentProcesses.filter(p => p !== process)
+      : [...currentProcesses, process];
+    
+    handleEditChange('processes', newProcesses);
   };
 
   if (!selectedCase) {
@@ -63,7 +94,6 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
       </CardHeader>
       <CardContent className="pt-5">
         {!editMode ? (
-          // ... keep existing code (display mode section with all the case details)
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-6">
               <div className="flex space-x-2">
@@ -157,6 +187,26 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
               </div>
               
               <div className="flex space-x-2">
+                <div className="bg-blue-100 p-2 rounded-md">
+                  <Calendar className="h-4 w-4 text-blue-700" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-1 japanese-text">参画期間</h4>
+                  <p className="text-sm japanese-text bg-muted/20 px-2 py-1 rounded-sm">{selectedCase.startDate || "未設定"}</p>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2">
+                <div className="bg-amber-100 p-2 rounded-md">
+                  <MessageSquare className="h-4 w-4 text-amber-700" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-1 japanese-text">面談回数</h4>
+                  <p className="text-sm japanese-text bg-muted/20 px-2 py-1 rounded-sm">{selectedCase.interviewCount || "1"}</p>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2">
                 <div className="bg-green-100 p-2 rounded-md">
                   <CircleDollarSign className="h-4 w-4 text-green-700" />
                 </div>
@@ -200,20 +250,10 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                 </div>
               </div>
               
-              <div className="flex space-x-2">
-                <div className="bg-blue-100 p-2 rounded-md">
-                  <Calendar className="h-4 w-4 text-blue-700" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium mb-1 japanese-text">開始日</h4>
-                  <p className="text-sm japanese-text bg-muted/20 px-2 py-1 rounded-sm">{selectedCase.startDate || "未設定"}</p>
-                </div>
-              </div>
-              
               <div className="col-span-2 mt-2">
                 <h4 className="text-sm font-medium mb-1 japanese-text flex items-center">
                   <Code className="h-4 w-4 mr-1 text-blue-600" />
-                  スキル
+                  スキル要件
                 </h4>
                 <div className="flex flex-wrap gap-1.5 bg-blue-50 p-2 rounded-md">
                   {selectedCase.skills.map((skill, index) => (
@@ -221,6 +261,24 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                       {skill}
                     </Badge>
                   ))}
+                </div>
+              </div>
+              
+              <div className="col-span-2 mt-2">
+                <h4 className="text-sm font-medium mb-1 japanese-text flex items-center">
+                  <FileCode className="h-4 w-4 mr-1 text-purple-600" />
+                  工程
+                </h4>
+                <div className="flex flex-wrap gap-1.5 bg-purple-50 p-2 rounded-md">
+                  {selectedCase.processes && selectedCase.processes.length > 0 ? (
+                    selectedCase.processes.map((process, index) => (
+                      <Badge key={index} className="bg-purple-100 text-purple-800 hover:bg-purple-200 border-none">
+                        {process}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">設定なし</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -236,7 +294,6 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
             </div>
           </>
         ) : (
-          // Edit mode - Fix the issue where the form disappears
           <>
             {/* Fix: Use the selectedCase as a fallback if editingCaseData is not available */}
             {(editingCaseData || selectedCase) && (
@@ -255,7 +312,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                 <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text flex items-center">
                     <Calendar className="h-4 w-4 mr-1 text-gray-600" />
-                    開始日
+                    参画期間
                   </label>
                   <Input 
                     type="date"
@@ -294,6 +351,19 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                   <Input 
                     value={editingCaseData?.desiredBudget || selectedCase.desiredBudget || ''} 
                     onChange={(e) => handleEditChange('desiredBudget', e.target.value)}
+                    className="border-primary/30 focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium japanese-text flex items-center">
+                    <MessageSquare className="h-4 w-4 mr-1 text-gray-600" />
+                    面談回数
+                  </label>
+                  <Input 
+                    type="number"
+                    min="1"
+                    value={editingCaseData?.interviewCount || selectedCase.interviewCount || '1'} 
+                    onChange={(e) => handleEditChange('interviewCount', e.target.value)}
                     className="border-primary/30 focus:border-primary"
                   />
                 </div>
@@ -355,13 +425,34 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                 <div className="col-span-2 space-y-2">
                   <label className="text-sm font-medium japanese-text flex items-center">
                     <Code className="h-4 w-4 mr-1 text-gray-600" />
-                    スキル（カンマ区切り）
+                    スキル要件（カンマ区切り）
                   </label>
                   <Input 
                     value={(editingCaseData?.skills || selectedCase.skills).join(', ')} 
                     onChange={(e) => handleEditChange('skills', e.target.value.split(',').map(s => s.trim()))}
                     className="border-primary/30 focus:border-primary"
                   />
+                </div>
+                
+                <div className="col-span-2 space-y-2">
+                  <label className="text-sm font-medium japanese-text flex items-center">
+                    <FileCode className="h-4 w-4 mr-1 text-gray-600" />
+                    工程
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 border rounded-md p-3 bg-muted/5">
+                    {processOptions.map((process) => (
+                      <div key={process} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`process-${process}`} 
+                          checked={(editingCaseData?.processes || selectedCase.processes || []).includes(process)}
+                          onCheckedChange={() => toggleProcess(process)}
+                        />
+                        <Label htmlFor={`process-${process}`} className="text-sm japanese-text">
+                          {process}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 
                 <div className="col-span-2 space-y-2">

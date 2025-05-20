@@ -2,7 +2,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Home, Calendar, Briefcase, Code, CircleDollarSign } from 'lucide-react';
+import { Home, Calendar, Briefcase, Code, CircleDollarSign, FileCode, MessageSquare } from 'lucide-react';
 import { MailCase } from '../email/types';
 import { getStatusBadgeColor } from '../utils/statusUtils';
 import { useLocation } from 'react-router-dom';
@@ -31,9 +31,11 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
             {isOtherCompany && (
               <TableHead className="japanese-text font-medium">会社名</TableHead>
             )}
-            <TableHead className="japanese-text font-medium">開始日</TableHead>
+            <TableHead className="japanese-text font-medium">参画期間</TableHead>
             <TableHead className="japanese-text font-medium">勤務地</TableHead>
-            <TableHead className="japanese-text font-medium">スキル</TableHead>
+            <TableHead className="japanese-text font-medium">スキル要件</TableHead>
+            <TableHead className="japanese-text font-medium">工程</TableHead>
+            <TableHead className="japanese-text font-medium">面談回数</TableHead>
             <TableHead className="japanese-text font-medium">予算</TableHead>
             <TableHead className="japanese-text font-medium">外国人</TableHead>
             <TableHead className="japanese-text font-medium">ステータス</TableHead>
@@ -85,6 +87,23 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
                       +{item.skills.length - 2}
                     </Badge>
                   )}
+                </div>
+              </TableCell>
+              <TableCell className="japanese-text text-sm">
+                <div className="flex items-center space-x-1">
+                  <FileCode className="h-3.5 w-3.5 text-purple-600" />
+                  <span>{item.processes?.slice(0, 1).join(', ') || '-'}</span>
+                  {(item.processes?.length || 0) > 1 && (
+                    <Badge variant="outline" className="bg-purple-50 text-xs">
+                      +{(item.processes?.length || 0) - 1}
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="japanese-text text-sm text-center">
+                <div className="flex items-center space-x-1">
+                  <MessageSquare className="h-3.5 w-3.5 text-amber-600" />
+                  <span>{item.interviewCount || '1'}</span>
                 </div>
               </TableCell>
               <TableCell className="japanese-text text-sm">

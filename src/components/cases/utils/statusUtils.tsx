@@ -22,3 +22,8 @@ export const getSourceIcon = (source: string) => {
     return <FileTextIcon className="h-4 w-4 mr-1 text-purple-600" />;
   }
 };
+
+// 工程データの初期値を設定する関数
+export const getDefaultProcesses = () => {
+  return [];
+};
