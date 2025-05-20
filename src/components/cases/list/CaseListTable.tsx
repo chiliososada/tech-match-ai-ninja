@@ -2,7 +2,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Home, Calendar, Briefcase, Code, Yen } from 'lucide-react';
+import { Home, Calendar, Briefcase, Code, CircleDollarSign } from 'lucide-react';
 import { MailCase } from '../email/types';
 import { getStatusBadgeColor } from '../utils/statusUtils';
 
@@ -72,12 +72,12 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
               </TableCell>
               <TableCell className="japanese-text text-sm">
                 <div className="flex items-center space-x-1">
-                  <Yen className="h-3.5 w-3.5 text-green-600" />
+                  <CircleDollarSign className="h-3.5 w-3.5 text-green-600" />
                   <span>{item.budget}</span>
                 </div>
               </TableCell>
               <TableCell className="japanese-text text-sm text-center">
-                <Badge variant={item.foreignerAccepted ? "success" : "destructive"} className="px-1.5 min-w-[24px]">
+                <Badge variant={item.foreignerAccepted ? "outline" : "destructive"} className={`px-1.5 min-w-[24px] ${item.foreignerAccepted ? 'bg-green-100 text-green-800 border-green-200' : ''}`}>
                   {item.foreignerAccepted ? '◯' : '✕'}
                 </Badge>
               </TableCell>
@@ -89,13 +89,13 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
               <TableCell className="japanese-text text-sm">
                 {item.desiredBudget ? (
                   <div className="flex items-center space-x-1">
-                    <Yen className="h-3.5 w-3.5 text-purple-600" />
+                    <CircleDollarSign className="h-3.5 w-3.5 text-purple-600" />
                     <span>{item.desiredBudget}</span>
                   </div>
                 ) : '-'}
               </TableCell>
               <TableCell className="japanese-text text-sm text-center">
-                <Badge variant={item.freelancerAccepted ? "success" : "destructive"} className="px-1.5 min-w-[24px]">
+                <Badge variant={item.freelancerAccepted ? "outline" : "destructive"} className={`px-1.5 min-w-[24px] ${item.freelancerAccepted ? 'bg-green-100 text-green-800 border-green-200' : ''}`}>
                   {item.freelancerAccepted ? '◯' : '✕'}
                 </Badge>
               </TableCell>

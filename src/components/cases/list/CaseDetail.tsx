@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PencilIcon, FileText, Calendar, MapPin, Briefcase, Code, Users, Clock, Languages, Flag, User, Yen } from 'lucide-react';
+import { PencilIcon, FileText, Calendar, MapPin, Briefcase, Code, Users, Clock, Languages, Flag, User, CircleDollarSign } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -159,7 +159,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
               
               <div className="flex space-x-2">
                 <div className="bg-green-100 p-2 rounded-md">
-                  <Yen className="h-4 w-4 text-green-700" />
+                  <CircleDollarSign className="h-4 w-4 text-green-700" />
                 </div>
                 <div>
                   <h4 className="text-sm font-medium mb-1 japanese-text">単価</h4>
@@ -193,7 +193,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
               
               <div className="flex space-x-2">
                 <div className="bg-purple-100 p-2 rounded-md">
-                  <Yen className="h-4 w-4 text-purple-700" />
+                  <CircleDollarSign className="h-4 w-4 text-purple-700" />
                 </div>
                 <div>
                   <h4 className="text-sm font-medium mb-1 japanese-text">希望単価</h4>
@@ -277,7 +277,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text flex items-center">
-                    <Yen className="h-4 w-4 mr-1 text-gray-600" />
+                    <CircleDollarSign className="h-4 w-4 mr-1 text-gray-600" />
                     単価
                   </label>
                   <Input 
@@ -288,7 +288,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text flex items-center">
-                    <Yen className="h-4 w-4 mr-1 text-gray-600" />
+                    <CircleDollarSign className="h-4 w-4 mr-1 text-gray-600" />
                     希望単価
                   </label>
                   <Input 
