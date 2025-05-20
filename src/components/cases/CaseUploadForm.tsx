@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, Wand2 } from 'lucide-react';
+import { Upload, Wand2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function CaseUploadForm() {
@@ -95,38 +96,53 @@ export function CaseUploadForm() {
         </CardHeader>
         <CardContent>
           <div className="grid w-full gap-4">
-            <div className="grid w-full gap-1.5">
-              <Label htmlFor="case-description" className="japanese-text">案件の説明</Label>
-              <Textarea
-                id="case-description"
-                placeholder="例：「Java、SpringBootの経験者を募集しています。勤務地は東京、期間は6ヶ月～、単価は60〜80万円です。」"
-                className="min-h-[120px] japanese-text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={isProcessing}
-              />
+            <div className="flex space-x-2">
+              <div className="bg-primary/10 p-2 rounded-md mt-1">
+                <FileText className="h-4 w-4 text-primary" />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="case-description" className="text-sm font-medium mb-1 japanese-text">案件の説明</Label>
+                <Textarea
+                  id="case-description"
+                  placeholder="例：「Java、SpringBootの経験者を募集しています。勤務地は東京、期間は6ヶ月～、単価は60〜80万円です。」"
+                  className="min-h-[120px] japanese-text border-primary/30 focus:border-primary mt-1"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  disabled={isProcessing}
+                />
+              </div>
             </div>
             
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor="format-template" className="japanese-text">出力フォーマット</Label>
-              <Textarea
-                id="format-template"
-                placeholder="出力フォーマットのテンプレート"
-                className="h-20 japanese-text"
-                value={formatTemplate}
-                onChange={(e) => setFormatTemplate(e.target.value)}
-                disabled={isProcessing}
-              />
-              <p className="text-xs text-muted-foreground japanese-text">
-                フォーマットに[案件名]、[スキル]、[年数]などのプレースホルダーを使用してください
-              </p>
+            <div className="flex space-x-2">
+              <div className="bg-blue-100 p-2 rounded-md mt-1">
+                <FileText className="h-4 w-4 text-blue-700" />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="format-template" className="text-sm font-medium mb-1 japanese-text">出力フォーマット</Label>
+                <Textarea
+                  id="format-template"
+                  placeholder="出力フォーマットのテンプレート"
+                  className="h-20 japanese-text border-primary/30 focus:border-primary mt-1"
+                  value={formatTemplate}
+                  onChange={(e) => setFormatTemplate(e.target.value)}
+                  disabled={isProcessing}
+                />
+                <p className="text-xs text-muted-foreground japanese-text mt-1">
+                  フォーマットに[案件名]、[スキル]、[年数]などのプレースホルダーを使用してください
+                </p>
+              </div>
             </div>
             
             {beautifiedText && (
-              <div className="space-y-2 mt-2">
-                <Label htmlFor="beautified-text" className="japanese-text">AI生成された案件情報</Label>
-                <div className="bg-muted p-4 rounded-md">
-                  <pre className="text-sm whitespace-pre-wrap japanese-text">{beautifiedText}</pre>
+              <div className="flex space-x-2 mt-2">
+                <div className="bg-green-100 p-2 rounded-md mt-1">
+                  <FileText className="h-4 w-4 text-green-700" />
+                </div>
+                <div className="flex-1">
+                  <Label htmlFor="beautified-text" className="text-sm font-medium mb-1 japanese-text">AI生成された案件情報</Label>
+                  <div className="bg-muted p-4 rounded-md mt-1">
+                    <pre className="text-sm whitespace-pre-wrap japanese-text">{beautifiedText}</pre>
+                  </div>
                 </div>
               </div>
             )}

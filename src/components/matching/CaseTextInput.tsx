@@ -36,6 +36,19 @@ export function CaseTextInput({ onStructuredData }: CaseTextInputProps) {
         budget: extractBudget(caseText),
         location: extractLocation(caseText),
         workType: extractWorkType(caseText),
+        title: extractTitle(caseText),
+        company: extractCompany(caseText),
+        manager: '担当者',
+        managerEmail: 'contact@example.com',
+        duration: '6ヶ月〜',
+        japanese: 'ビジネスレベル',
+        priority: '中',
+        status: '募集中',
+        foreignerAccepted: true,
+        freelancerAccepted: true,
+        interviewCount: '1',
+        processes: ['要件定義', '基本設計'],
+        detailDescription: caseText
       };
       
       onStructuredData(extractedData);
@@ -85,6 +98,33 @@ export function CaseTextInput({ onStructuredData }: CaseTextInputProps) {
     if (text.includes('フルリモート')) return 'フルリモート';
     if (text.includes('リモート')) return 'リモート可';
     return 'オンサイト';
+  };
+
+  const extractTitle = (text: string) => {
+    // Simple extraction of the first line or first sentence as title
+    const firstLine = text.split('\n')[0];
+    if (firstLine && firstLine.length < 50) {
+      return firstLine;
+    }
+    
+    const firstSentence = text.split('。')[0];
+    if (firstSentence && firstSentence.length < 50) {
+      return firstSentence;
+    }
+    
+    return text.substring(0, 30) + '...';
+  };
+  
+  const extractCompany = (text: string) => {
+    const companyNames = ['株式会社', 'テクノロジー', 'システムズ', 'ソリューションズ'];
+    for (const name of companyNames) {
+      if (text.includes(name)) {
+        const index = text.indexOf(name);
+        const possibleCompany = text.substring(index, index + 15);
+        return possibleCompany;
+      }
+    }
+    return '株式会社テック';
   };
 
   return (
