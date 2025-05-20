@@ -117,15 +117,17 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   
   // Filter cases based on company type and user filters
   const filteredCases = cases.filter(item => {
-    // Filter by company type using some mock logic
+    // Filter by company type using the companyType prop instead of item properties
+    // For 'own' company type, filter by cases that don't have a specified company or match certain criteria
+    // For 'other' company type, filter by cases that have a company specified
     const matchesCompanyType = companyType === 'own' 
-      ? (item.isOwnCompany || !item.isOtherCompany) 
-      : item.isOtherCompany;
+      ? !item.company || item.company === '自社' 
+      : item.company && item.company !== '自社';
     
     // Search term filter (search in title and company)
     const matchesSearch = searchTerm === '' || 
       item.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      item.company?.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.company && item.company.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // Status filter - only "募集中" and "募集終了" are valid statuses
     let matchesStatus = true;
