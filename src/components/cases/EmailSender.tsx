@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -11,7 +10,7 @@ import {
 import { CasesList } from './email/CasesList';
 import { EmailSenderLayout } from './email/EmailSenderLayout';
 import { FilterBar } from './email/FilterBar';
-import { EngineerSearchDialog } from './email/EngineerSearchDialog';
+import { EngineerSearchDialog } from './email/search/EngineerSearchDialog';
 import { EMAIL_TEMPLATES, MailCase } from './email/types';
 
 // Import utility functions
