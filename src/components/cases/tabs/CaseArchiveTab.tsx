@@ -6,12 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { MailCase } from '@/components/cases/email/types';
-import { Calendar, Archive, Filter, ArchiveX } from 'lucide-react';
+import { Archive, ArchiveX, Filter } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/toast';
-import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import Pagination from '@/components/ui/pagination';
@@ -29,6 +27,9 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showOnlyArchivable, setShowOnlyArchivable] = useState(false);
   const itemsPerPage = 10;
+  
+  // Check if we're in the own company view
+  const isOwnCompany = companyType === 'own';
   
   // Filter cases based on company type and user filters
   const filteredCases = cases.filter(item => {
@@ -140,32 +141,32 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="border-none shadow-md bg-gradient-to-b from-white to-gray-50">
+        <CardHeader className="pb-3 bg-slate-50 rounded-t-lg">
           <CardTitle className="text-xl font-semibold japanese-text flex items-center">
-            <Archive className="h-5 w-5 mr-2 text-muted-foreground" />
+            <Archive className="h-5 w-5 mr-2 text-purple-500" />
             案件アーカイブ
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="pt-6">
+          <div className="space-y-6">
             {/* Filter controls */}
-            <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+            <div className="flex flex-col sm:flex-row gap-4 flex-wrap bg-gray-50 p-4 rounded-lg border border-gray-100">
               <div className="w-full sm:w-64 space-y-1.5">
-                <Label htmlFor="archive-search" className="text-sm font-medium japanese-text">検索</Label>
+                <Label htmlFor="archive-search" className="text-sm font-medium japanese-text text-gray-700">検索</Label>
                 <Input
                   id="archive-search"
                   placeholder="案件名、会社名で検索"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="japanese-text"
+                  className="japanese-text shadow-sm"
                 />
               </div>
               
               <div className="w-full sm:w-48 space-y-1.5">
-                <Label htmlFor="status-filter" className="text-sm font-medium japanese-text">ステータス</Label>
+                <Label htmlFor="status-filter" className="text-sm font-medium japanese-text text-gray-700">ステータス</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger id="status-filter" className="japanese-text">
+                  <SelectTrigger id="status-filter" className="japanese-text shadow-sm">
                     <SelectValue placeholder="ステータス" />
                   </SelectTrigger>
                   <SelectContent>
@@ -184,26 +185,29 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                     checked={showOnlyArchivable}
                     onCheckedChange={(checked) => setShowOnlyArchivable(!!checked)}
                   />
-                  <Label htmlFor="show-archivable" className="japanese-text">
+                  <Label htmlFor="show-archivable" className="japanese-text text-gray-700">
                     アーカイブ対象のみ表示
                   </Label>
                 </div>
               </div>
             </div>
             
-            <Separator />
+            <Separator className="bg-gray-200" />
             
             {/* Archive controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-purple-50 p-4 rounded-lg">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium japanese-text">
+                <span className="text-sm font-medium japanese-text text-gray-700">
                   {selectedCases.length}件選択中 / 全{filteredCases.length}件
                 </span>
+                <Badge variant="outline" className="bg-purple-100 text-purple-800 text-xs">
+                  {showOnlyArchivable ? "アーカイブ対象のみ" : "全案件"}
+                </Badge>
               </div>
               
               <div className="flex flex-wrap gap-3 items-center">
                 <Select value={archiveReason} onValueChange={setArchiveReason}>
-                  <SelectTrigger className="w-[180px] japanese-text">
+                  <SelectTrigger className="w-[180px] japanese-text shadow-sm bg-white">
                     <SelectValue placeholder="アーカイブ理由" />
                   </SelectTrigger>
                   <SelectContent>
@@ -215,7 +219,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                 
                 <Button 
                   variant="default" 
-                  className="japanese-text"
+                  className="japanese-text bg-purple-600 hover:bg-purple-700 transition-all shadow-sm"
                   onClick={handleBatchArchive}
                   disabled={selectedCases.length === 0}
                 >
@@ -226,9 +230,9 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
             </div>
             
             {/* Cases table */}
-            <div className="border rounded-md">
+            <div className="border rounded-md overflow-hidden shadow-sm">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-gray-50">
                   <TableRow>
                     <TableHead className="w-[50px]">
                       <Checkbox 
@@ -238,16 +242,18 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                         indeterminate={selectedCases.length > 0 && !allSelected}
                       />
                     </TableHead>
-                    <TableHead>案件名</TableHead>
-                    <TableHead>会社名</TableHead>
-                    <TableHead>開始日</TableHead>
-                    <TableHead>作成日</TableHead>
-                    <TableHead>ステータス</TableHead>
+                    <TableHead className="japanese-text font-medium">案件名</TableHead>
+                    {!isOwnCompany && (
+                      <TableHead className="japanese-text font-medium">会社名</TableHead>
+                    )}
+                    <TableHead className="japanese-text font-medium">開始日</TableHead>
+                    <TableHead className="japanese-text font-medium">作成日</TableHead>
+                    <TableHead className="japanese-text font-medium">ステータス</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paginatedCases.length > 0 ? paginatedCases.map((item) => (
-                    <TableRow key={item.id}>
+                    <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
                       <TableCell>
                         <Checkbox 
                           checked={selectedCases.includes(item.id)}
@@ -255,26 +261,30 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                           aria-label={`案件 ${item.id} を選択`}
                         />
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium japanese-text">
                         {item.title || "無題案件"}
                       </TableCell>
-                      <TableCell>{item.company || "不明"}</TableCell>
-                      <TableCell>
+                      {!isOwnCompany && (
+                        <TableCell className="japanese-text">{item.company || "不明"}</TableCell>
+                      )}
+                      <TableCell className="japanese-text">
                         {item.startDate || "設定なし"}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="japanese-text">
                         {item.createdAt || "設定なし"}
                       </TableCell>
                       <TableCell>
                         <Badge variant={item.status === 'active' ? 'default' : 
-                               item.status === 'closed' ? 'secondary' : 'outline'}>
+                               item.status === 'closed' ? 'secondary' : 'outline'}
+                               className={item.status === 'closed' ? 'bg-gray-200 text-gray-700' : 
+                                          item.status === 'active' ? 'bg-green-100 text-green-800' : ''}>
                           {item.status || "不明"}
                         </Badge>
                       </TableCell>
                     </TableRow>
                   )) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
+                      <TableCell colSpan={isOwnCompany ? 5 : 6} className="h-24 text-center">
                         表示する案件がありません
                       </TableCell>
                     </TableRow>
@@ -285,7 +295,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
             
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-6">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
