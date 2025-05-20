@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
 
 import { EmailSenderProps } from './email/types';
 import { EmailSender } from './EmailSender';
