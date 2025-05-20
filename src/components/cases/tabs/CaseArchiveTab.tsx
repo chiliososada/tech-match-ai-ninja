@@ -21,7 +21,8 @@ import {
   Trash2,
   Info,
   Search as SearchIcon,
-  CheckCircle
+  CheckCircle,
+  Calendar
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -45,9 +46,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { format } from 'date-fns';
+import { format, addMonths } from 'date-fns';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
+import { DateRange } from 'react-day-picker';
 
 interface CaseArchiveTabProps {
   cases: MailCase[];
@@ -62,25 +65,36 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   const [confirmDelete, setConfirmDelete] = useState(false);
   // Show the info tooltip by default
   const [showInfoTooltip, setShowInfoTooltip] = useState(true);
+  // Add date range filter state
+  const [startDateRange, setStartDateRange] = useState<DateRange | undefined>(undefined);
   
   // Reset selection when filter changes
   useEffect(() => {
     setSelectedCases([]);
-  }, [searchTerm, statusFilter, showOnlyDeletable]);
+  }, [searchTerm, statusFilter, showOnlyDeletable, startDateRange]);
 
-  // Get the reference date for May 2025
-  const getMay2025Date = () => {
-    return new Date(2025, 4, 1); // May is month 4 (0-indexed)
+  // Get the reference date - current month
+  const getCurrentReferenceDate = () => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
   };
   
+  // Format date for display (YYYY年MM月)
+  const formatDateForDisplay = (date: Date) => {
+    return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+  };
+  
+  // Get the current reference date
+  const referenceDate = getCurrentReferenceDate();
+  
   // Check if case is considered "期限切れ" (expired)
-  // "期限切れ" means the start date is before May 2025
+  // "期限切れ" means the start date is before the current month
   const isExpired = (item: MailCase) => {
-    const may2025 = getMay2025Date();
+    const currentMonthStart = getCurrentReferenceDate();
     
     if (item.startDate) {
       const startDate = new Date(item.startDate);
-      if (startDate < may2025) {
+      if (startDate < currentMonthStart) {
         // For the purpose of visually marking it as expired
         return true;
       }
@@ -90,16 +104,16 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   };
   
   // A case is deletable if:
-  // 1. Its start date is before May 2025 OR
+  // 1. Its start date is before the current month OR
   // 2. Its status is "募集終了"
   const isDeletableCandidate = (item: MailCase) => {
-    const may2025 = getMay2025Date();
+    const currentMonthStart = getCurrentReferenceDate();
     
     // Changed logic to OR instead of AND
     if (item.startDate) {
       const startDate = new Date(item.startDate);
-      // Start date is before May 2025
-      if (startDate < may2025) {
+      // Start date is before current month
+      if (startDate < currentMonthStart) {
         return true;
       }
     }
@@ -136,10 +150,29 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
       matchesStatus = item.status === statusFilter;
     }
     
+    // Date range filter for start date
+    let matchesDateRange = true;
+    if (startDateRange && startDateRange.from) {
+      if (!item.startDate) {
+        matchesDateRange = false;
+      } else {
+        const itemStartDate = new Date(item.startDate);
+        const fromDate = startDateRange.from;
+        
+        // If we have both from and to dates, check if item's date is within the range
+        if (startDateRange.to) {
+          matchesDateRange = itemStartDate >= fromDate && itemStartDate <= startDateRange.to;
+        } else {
+          // If we only have from date, check if item's date is after or equal to it
+          matchesDateRange = itemStartDate >= fromDate;
+        }
+      }
+    }
+    
     // Only apply deletable candidates filter if the toggle is on
     const matchesDeletable = !showOnlyDeletable || isDeletableCandidate(item);
     
-    return matchesCompanyType && matchesSearch && matchesStatus && matchesDeletable;
+    return matchesCompanyType && matchesSearch && matchesStatus && matchesDateRange && matchesDeletable;
   });
   
   // Handle select all
@@ -225,7 +258,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
                 <AlertTitle className="japanese-text font-medium">削除対象の条件</AlertTitle>
                 <AlertDescription className="japanese-text text-sm">
                   <ul className="list-disc pl-5 space-y-1 mt-2">
-                    <li>参画開始日が2025年5月より前の案件</li>
+                    <li>参画開始日が{formatDateForDisplay(referenceDate)}より前の案件</li>
                     <li>ステータスが「募集終了」の案件</li>
                   </ul>
                   <p className="mt-2">上記の条件のいずれかを満たす案件が削除対象として表示されます。</p>
@@ -234,7 +267,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
             </div>
           )}
           
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <div className="md:col-span-2">
               <div className="space-y-1.5">
                 <Label htmlFor="search" className="text-sm japanese-text">案件名・会社名</Label>
@@ -268,6 +301,16 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
             </div>
             
             <div className="md:col-span-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="dateRange" className="text-sm japanese-text">参画開始日範囲</Label>
+                <DatePickerWithRange 
+                  dateRange={startDateRange}
+                  onDateRangeChange={setStartDateRange}
+                />
+              </div>
+            </div>
+            
+            <div>
               <div className="space-y-1.5">
                 <Label className="text-sm japanese-text opacity-0">フィルター</Label>
                 <div className="flex items-center space-x-2 bg-muted/15 rounded-md p-2">
