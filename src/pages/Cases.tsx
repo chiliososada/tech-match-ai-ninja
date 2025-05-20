@@ -459,7 +459,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseList 
               filteredCases={filteredCases}
               selectedCase={selectedCase}
-              setSelectedCase={handleCaseSelect}
+              setSelectedCase={(caseItem: any) => handleCaseSelect(caseItem)}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               statusFilter={statusFilter}

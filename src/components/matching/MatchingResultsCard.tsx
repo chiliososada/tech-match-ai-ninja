@@ -1,153 +1,56 @@
-
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { CaseMatchingResult } from './CaseToCandidate';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious,
-  generatePaginationRange
-} from '@/components/ui/pagination';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Pagination } from "@/components/ui/pagination"
 
 interface MatchingResultsCardProps {
-  results: CaseMatchingResult[];
-  exportButtonText: string;
-  actionButtonText: string;
+  title: string;
+  description: string;
+  matches: { id: string; name: string; skills: string[] }[];
+  currentPage: number;
+  itemsPerPage: number;
+  setCurrentPage: (page: number) => void;
 }
 
-export function MatchingResultsCard({ results, exportButtonText, actionButtonText }: MatchingResultsCardProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(results.length / itemsPerPage);
-  
-  // Get current items
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = results.slice(indexOfFirstItem, indexOfLastItem);
-  
-  // Change page
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+export const MatchingResultsCard: React.FC<MatchingResultsCardProps> = ({
+  title,
+  description,
+  matches,
+  currentPage,
+  itemsPerPage,
+  setCurrentPage,
+}) => {
+  const totalPages = Math.ceil(matches.length / itemsPerPage);
+  const paginatedMatches = matches.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // Generate pagination items
-  const paginationRange = generatePaginationRange(currentPage, totalPages);
-  
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="japanese-text">マッチング結果</CardTitle>
-        <CardDescription className="japanese-text">
-          AIによる候補者と案件のマッチング結果
-        </CardDescription>
+        <CardTitle className="text-lg font-semibold japanese-text">{title}</CardTitle>
+        <CardDescription className="japanese-text">{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="japanese-text">候補者</TableHead>
-                <TableHead className="japanese-text">候補者会社</TableHead>
-                <TableHead className="japanese-text">候補者担当者</TableHead>
-                <TableHead className="japanese-text">担当者メール</TableHead>
-                <TableHead className="japanese-text">案件</TableHead>
-                <TableHead className="japanese-text">案件会社</TableHead>
-                <TableHead className="japanese-text">案件担当者</TableHead>
-                <TableHead className="japanese-text">担当者メール</TableHead>
-                <TableHead className="japanese-text">マッチング度</TableHead>
-                <TableHead className="japanese-text">マッチング理由</TableHead>
-                <TableHead className="japanese-text">ステータス</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentItems.map(result => (
-                <TableRow key={result.id}>
-                  <TableCell className="font-medium japanese-text">{result.candidate}</TableCell>
-                  <TableCell className="japanese-text">{result.candidateCompany || "会社情報なし"}</TableCell>
-                  <TableCell className="japanese-text">{result.candidateManager || "担当者情報なし"}</TableCell>
-                  <TableCell className="japanese-text">{result.candidateEmail || "メール情報なし"}</TableCell>
-                  <TableCell className="japanese-text">{result.case}</TableCell>
-                  <TableCell className="japanese-text">{result.caseCompany || "会社情報なし"}</TableCell>
-                  <TableCell className="japanese-text">{result.caseManager || "担当者情報なし"}</TableCell>
-                  <TableCell className="japanese-text">{result.caseEmail || "メール情報なし"}</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 japanese-text">
-                      {result.matchingRate}
-                    </span>
-                  </TableCell>
-                  <TableCell className="japanese-text whitespace-normal">
-                    {result.matchingReason}
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 text-xs rounded-full ${result.statusClass} japanese-text`}>
-                      {result.status}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ul className="list-none space-y-4">
+          {paginatedMatches.map((match) => (
+            <li key={match.id} className="border rounded-md p-4">
+              <h3 className="text-md font-medium japanese-text">{match.name}</h3>
+              <div className="mt-2">
+                {match.skills.map((skill) => (
+                  <Badge key={skill} variant="secondary" className="mr-2 japanese-text">{skill}</Badge>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
         
         {totalPages > 1 && (
-          <div className="mt-4">
-            <Pagination>
-              <PaginationContent>
-                {currentPage > 1 && (
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => handlePageChange(currentPage - 1)} 
-                      className="cursor-pointer japanese-text"
-                    />
-                  </PaginationItem>
-                )}
-                
-                {paginationRange.map((pageNumber, i) => (
-                  <PaginationItem key={i}>
-                    {pageNumber === 'ellipsis' ? (
-                      <PaginationEllipsis />
-                    ) : (
-                      <PaginationLink
-                        isActive={pageNumber === currentPage}
-                        onClick={() => handlePageChange(pageNumber as number)}
-                        className="cursor-pointer"
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    )}
-                  </PaginationItem>
-                ))}
-                
-                {currentPage < totalPages && (
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => handlePageChange(currentPage + 1)} 
-                      className="cursor-pointer japanese-text"
-                    />
-                  </PaginationItem>
-                )}
-              </PaginationContent>
-            </Pagination>
-          </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(Number(page))}
+            />
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" className="japanese-text">{exportButtonText}</Button>
-        <Button className="japanese-text">{actionButtonText}</Button>
-      </CardFooter>
     </Card>
   );
-}
-
-function PaginationEllipsis() {
-  return (
-    <span className="flex h-9 w-9 items-center justify-center">
-      ...
-    </span>
-  );
-}
+};

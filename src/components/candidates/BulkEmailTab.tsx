@@ -662,46 +662,11 @@ ${!emailTemplate.includes('よろしくお願い申し上げます') ?
             {/* ページネーション */}
             {totalPages > 1 && (
               <div className="flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={goToPrevPage}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    
-                    {paginationRange.map((page, index) => {
-                      if (page === 'ellipsis') {
-                        return (
-                          <PaginationItem key={`ellipsis-${index}`}>
-                            <div className="flex h-9 w-9 items-center justify-center">
-                              ...
-                            </div>
-                          </PaginationItem>
-                        );
-                      }
-                      
-                      return (
-                        <PaginationItem key={page}>
-                          <PaginationLink 
-                            isActive={currentPage === page}
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    })}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={goToNextPage}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => setCurrentPage(Number(page))}
+                />
               </div>
             )}
           </div>

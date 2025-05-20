@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -162,7 +161,7 @@ export function EmailSender({
           {/* 案件一覧 - 他社モードの場合は会社名と登録方法も表示 */}
           <CasesList
             paginatedCases={caseData.paginatedCases}
-            selectedCases={emailState.selectedCases}
+            selectedCases={emailState.selectedCases as string[]}
             handleSelectCase={casesHandleSelectCase}
             selectAll={emailState.selectAll}
             handleSelectAll={casesHandleSelectAll}
