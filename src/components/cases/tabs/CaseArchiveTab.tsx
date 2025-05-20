@@ -14,7 +14,8 @@ import {
   CircleX,
   Trash2,
   Info,
-  Search as SearchIcon
+  Search as SearchIcon,
+  CheckCircle
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -58,7 +59,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     const currentDate = new Date();
     const firstDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     
-    // 1. Cases with a start date before this month
+    // Cases with a start date before this month
     if (item.startDate) {
       const startDate = new Date(item.startDate);
       if (startDate < firstDayOfCurrentMonth) {
@@ -85,6 +86,12 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     return false;
   }
   
+  // Get current month and year for display
+  const getCurrentMonthDisplay = () => {
+    const now = new Date();
+    return `${now.getFullYear()}年${now.getMonth() + 1}月`;
+  };
+  
   // Filter cases based on company type and user filters
   const filteredCases = cases.filter(item => {
     // Filter by company type using some mock logic
@@ -98,7 +105,17 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
       item.company?.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Status filter
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
+    let matchesStatus = true;
+    if (statusFilter === "active") {
+      // Show only active cases (not closed or expired)
+      matchesStatus = item.status !== '募集終了' && 
+                      item.status !== 'closed' && 
+                      item.status !== '期限切れ' && 
+                      item.status !== 'expired';
+    } else if (statusFilter !== "all") {
+      // Filter by specific status
+      matchesStatus = item.status === statusFilter;
+    }
     
     // Only apply deletable candidates filter if the toggle is on
     const matchesDeletable = !showOnlyDeletable || isDeletableCandidate(item);
@@ -285,10 +302,10 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                 <AlertTitle className="japanese-text font-medium">削除対象の条件</AlertTitle>
                 <AlertDescription className="japanese-text text-sm">
                   <ul className="list-disc pl-5 space-y-1 mt-2">
-                    <li>参画開始日が今月より前の案件</li>
+                    <li>参画開始日が{getCurrentMonthDisplay()}より前の案件</li>
                     <li>ステータスが「募集終了」または「期限切れ」の案件</li>
                   </ul>
-                  <p className="mt-2">これらの条件を満たす案件が削除対象として表示されます。</p>
+                  <p className="mt-2">上記の両方の条件を満たす案件が削除対象として表示されます。</p>
                 </AlertDescription>
               </Alert>
             )}
@@ -403,7 +420,8 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                           </Badge>
                         ) : (
                           <Badge variant={item.status === 'active' ? 'default' : 'outline'}
-                                className={item.status === 'active' ? 'bg-green-100 text-green-800' : ''}>
+                                className={item.status === 'active' ? 'bg-green-100 text-green-800 flex items-center' : ''}>
+                            {item.status === 'active' && <CheckCircle className="h-3 w-3 mr-1" />}
                             <span className="japanese-text">{item.status || "不明"}</span>
                           </Badge>
                         )}
