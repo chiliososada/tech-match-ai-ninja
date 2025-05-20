@@ -48,6 +48,8 @@ export interface EmailSenderComponentProps {
     setEmailBody: (body: string) => void;
     sending: boolean;
     setSending: (sending: boolean) => void;
+    setSelectedCases: (cases: MailCase[]) => void;
+    setSelectAll: (value: boolean) => void;
   };
   engineerState: {
     selectedEngineers: any[];

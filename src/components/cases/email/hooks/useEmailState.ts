@@ -4,7 +4,7 @@ import { MailCase, Engineer, EMAIL_TEMPLATES, DEFAULT_SIGNATURE } from '../types
 
 export const useEmailState = (mailCases: MailCase[]) => {
   // Core email state
-  const [selectedCases, setSelectedCases] = useState<string[]>([]);
+  const [selectedCases, setSelectedCases] = useState<MailCase[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [subject, setSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');

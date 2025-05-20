@@ -1302,8 +1302,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                     selectedCases: [],
                     companyFilter,
                     setCompanyFilter,
-                    techFilter,
-                    setTechFilter,
+                    techFilter: techKeyword, // Use techKeyword instead of undefined techFilter
+                    setTechFilter: setTechKeyword, // Use setTechKeyword instead of undefined setTechFilter
                     currentPage,
                     setCurrentPage,
                     selectedTemplate: "",
@@ -1313,7 +1313,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                     emailBody: "",
                     setEmailBody: () => {},
                     sending: false,
-                    setSending: () => {}
+                    setSending: () => {},
+                    setSelectedCases: () => {},
+                    setSelectAll: () => {}
                   }}
                   engineerState={{
                     selectedEngineers: [],
