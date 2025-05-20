@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -246,7 +245,7 @@ export function StructuredCaseForm() {
             <Calendar className="h-4 w-4 text-blue-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="startDate" className="text-sm font-medium mb-1 japanese-text">参画期間</Label>
+            <Label htmlFor="startDate" className="text-sm font-medium mb-1 japanese-text">参画開始日</Label>
             <Input 
               id="startDate" 
               type="date"
