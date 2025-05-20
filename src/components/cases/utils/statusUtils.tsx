@@ -7,10 +7,11 @@ export const getStatusBadgeColor = (status: string) => {
   switch (status) {
     case "募集中":
       return "bg-green-100 text-green-800 border-green-200";
-    case "募集完了":
+    case "募集終了":
       return "bg-amber-100 text-amber-800 border-amber-200";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      // Default to 募集中 for any other values
+      return "bg-green-100 text-green-800 border-green-200";
   }
 };
 
@@ -39,3 +40,17 @@ export const getDefaultProcesses = () => {
   ];
 };
 
+// 有効なステータス値を取得する関数
+export const getValidStatusValues = () => {
+  return ["募集中", "募集終了"];
+};
+
+// ステータス値を正規化する関数（有効でない値を有効な値に変換）
+export const normalizeStatus = (status: string) => {
+  const validStatuses = getValidStatusValues();
+  if (validStatuses.includes(status)) {
+    return status;
+  }
+  // Default to "募集中" for invalid statuses
+  return "募集中";
+};

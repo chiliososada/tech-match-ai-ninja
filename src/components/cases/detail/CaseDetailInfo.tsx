@@ -17,12 +17,16 @@ import {
   FileText
 } from 'lucide-react';
 import { MailCase } from '../email/types';
+import { normalizeStatus } from '../utils/statusUtils';
 
 interface CaseDetailInfoProps {
   selectedCase: MailCase;
 }
 
 export const CaseDetailInfo: React.FC<CaseDetailInfoProps> = ({ selectedCase }) => {
+  // Ensure the case status is one of the valid values
+  const normalizedStatus = normalizeStatus(selectedCase.status);
+  
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-6">

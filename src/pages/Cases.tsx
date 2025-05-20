@@ -24,6 +24,7 @@ import { useCaseFilters } from '@/components/cases/hooks/useCaseFilters';
 import { usePagination } from '@/components/cases/hooks/usePagination';
 import { useCaseSelection } from '@/components/cases/hooks/useCaseSelection';
 import { caseData, getCompanyList } from '@/components/cases/data/caseData';
+import { normalizeStatus } from '@/components/cases/utils/statusUtils';
 
 interface CasesProps {
   companyType?: 'own' | 'other';
@@ -66,6 +67,14 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     itemsPerPage
   } = usePagination();
 
+  // Normalize case statuses in the data
+  const normalizedCaseData = React.useMemo(() => {
+    return caseData.map(item => ({
+      ...item,
+      status: normalizeStatus(item.status)
+    }));
+  }, [caseData]);
+
   const {
     selectedCase,
     setSelectedCase,
@@ -76,7 +85,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     toggleEditMode,
     handleEditChange,
     handleSaveEdit
-  } = useCaseSelection(caseData);
+  } = useCaseSelection(normalizedCaseData);
 
   const location = useLocation();
   
@@ -97,7 +106,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   
   // Filtered cases for the list view
   const filteredCases = filterCases(
-    caseData,
+    normalizedCaseData,
     effectiveCompanyType,
     statusFilter,
     searchTerm,
@@ -109,7 +118,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   // Filtered mail cases for the email-related tabs
   const filteredMailCases = filterMailCases(
-    caseData,
+    normalizedCaseData,
     effectiveCompanyType,
     companyFilter,
     techKeyword,
@@ -180,7 +189,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
           {/* New Archive Tab */}
           <TabsContent contextId={effectiveCompanyType} value="archive" className="space-y-6">
-            <CaseArchiveTab cases={caseData} companyType={effectiveCompanyType} />
+            <CaseArchiveTab cases={normalizedCaseData} companyType={effectiveCompanyType} />
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}
