@@ -25,5 +25,17 @@ export const getSourceIcon = (source: string) => {
 
 // 工程データの初期値を設定する関数
 export const getDefaultProcesses = () => {
-  return [];
+  return [
+    "要件定義", 
+    "基本設計", 
+    "詳細設計", 
+    "製造／開発", 
+    "単体テスト", 
+    "結合テスト", 
+    "総合テスト／システムテスト", 
+    "UAT／受け入れテスト", 
+    "運用・保守",
+    "アジャイル開発"
+  ];
 };
+

@@ -1,4 +1,3 @@
-
 export interface MailCase {
   id: string;
   title: string;
@@ -25,8 +24,10 @@ export interface MailCase {
   foreignerAccepted?: boolean;
   freelancerAccepted?: boolean;
   desiredBudget?: string;
-  registrationType?: string; // Added for CasesList.tsx
-  registeredAt?: string;     // Added for CasesList.tsx
+  registrationType?: string;
+  registeredAt?: string;
+  processes?: string[];
+  interviewCount?: string;
 }
 
 export interface EmailTemplate {
