@@ -1281,7 +1281,53 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
-                <EmailSenderContainer mailCases={filteredMailCases} />
+                <EmailSender 
+                  mailCases={filteredMailCases}
+                  isOtherCompanyMode={effectiveCompanyType === 'other'}
+                  caseData={{
+                    paginatedCases: filteredMailCases.slice(
+                      (currentPage - 1) * itemsPerPage,
+                      currentPage * itemsPerPage
+                    ),
+                    totalPages,
+                    companyList
+                  }}
+                  engineerData={{
+                    paginatedEngineers: [],
+                    totalEngineerPages: 0,
+                    filteredEngineers: []
+                  }}
+                  emailState={{
+                    selectAll: false,
+                    selectedCases: [],
+                    companyFilter,
+                    setCompanyFilter,
+                    techFilter,
+                    setTechFilter,
+                    currentPage,
+                    setCurrentPage,
+                    selectedTemplate: "",
+                    setSelectedTemplate: () => {},
+                    subject: "",
+                    setSubject: () => {},
+                    emailBody: "",
+                    setEmailBody: () => {},
+                    sending: false,
+                    setSending: () => {}
+                  }}
+                  engineerState={{
+                    selectedEngineers: [],
+                    setSelectedEngineers: () => {},
+                    isEngineerDialogOpen: false,
+                    setIsEngineerDialogOpen: () => {},
+                    engineerFilter: "",
+                    setEngineerFilter: () => {},
+                    engineerCompanyFilter: "all",
+                    setEngineerCompanyFilter: () => {},
+                    engineerCurrentPage: 1,
+                    setEngineerCurrentPage: () => {}
+                  }}
+                />
               </TabsContent>
             </>
           )}

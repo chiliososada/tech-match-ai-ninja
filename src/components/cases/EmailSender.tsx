@@ -18,13 +18,49 @@ import { MailCase } from './email/types';
 import { handleSelectAll, handleSelectCase, handleTemplateChange, handleEnhanceEmail, handleSendEmail } from './email/utils/emailHandlers';
 import { openEngineerDialog, toggleEngineerSelection, removeSelectedEngineer, applyEngineerToTemplate } from './email/utils/engineerHandlers';
 
-interface EmailSenderComponentProps {
+export interface EmailSenderComponentProps {
   mailCases: MailCase[];
   isOtherCompanyMode: boolean;
-  caseData: any;
-  engineerData: any;
-  emailState: any;
-  engineerState: any;
+  caseData: {
+    paginatedCases: MailCase[];
+    totalPages: number;
+    companyList: any[];
+  };
+  engineerData: {
+    paginatedEngineers: any[];
+    totalEngineerPages: number;
+    filteredEngineers: any[];
+  };
+  emailState: {
+    selectAll: boolean;
+    selectedCases: MailCase[];
+    companyFilter: string;
+    setCompanyFilter: (value: string) => void;
+    techFilter: string;
+    setTechFilter: (value: string) => void;
+    currentPage: number;
+    setCurrentPage: (page: number) => void;
+    selectedTemplate: string;
+    setSelectedTemplate: (template: string) => void;
+    subject: string;
+    setSubject: (subject: string) => void;
+    emailBody: string;
+    setEmailBody: (body: string) => void;
+    sending: boolean;
+    setSending: (sending: boolean) => void;
+  };
+  engineerState: {
+    selectedEngineers: any[];
+    setSelectedEngineers: (engineers: any[]) => void;
+    isEngineerDialogOpen: boolean;
+    setIsEngineerDialogOpen: (isOpen: boolean) => void;
+    engineerFilter: string;
+    setEngineerFilter: (filter: string) => void;
+    engineerCompanyFilter: string;
+    setEngineerCompanyFilter: (filter: string) => void;
+    engineerCurrentPage: number;
+    setEngineerCurrentPage: (page: number) => void;
+  };
 }
 
 export function EmailSender({ 

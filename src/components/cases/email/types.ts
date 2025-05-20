@@ -1,3 +1,4 @@
+
 export interface MailCase {
   id: string;
   title: string;
@@ -24,6 +25,8 @@ export interface MailCase {
   foreignerAccepted?: boolean;
   freelancerAccepted?: boolean;
   desiredBudget?: string;
+  registrationType?: string; // Added for CasesList.tsx
+  registeredAt?: string;     // Added for CasesList.tsx
 }
 
 export interface EmailTemplate {
@@ -66,6 +69,27 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
     `
   }
 ];
+
+// Sample engineers data for the utility functions
+export const SAMPLE_ENGINEERS = [
+  {
+    id: "1",
+    name: "山田 太郎",
+    skills: ["Java", "Spring", "AWS"],
+    experience: "10年",
+    status: "対応可能",
+    company: "フリーランス",
+    companyType: "個人事業主"
+  }
+];
+
+// Default email signature for email template
+export const DEFAULT_SIGNATURE = `
+--
+株式会社ABC
+東京都渋谷区神宮前0-0-0
+TEL: 03-0000-0000
+`;
 
 export interface EmailSenderProps {
   mailCases: MailCase[];
