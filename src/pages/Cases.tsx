@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from "@/hooks/toast";
-import { Mail, FileText } from 'lucide-react'; // Add missing imports
+import { Mail as MailIcon, FileText as FileTextIcon } from 'lucide-react'; // Fix import of icons
 
 // Import components
 import { CaseList } from '@/components/cases/list/CaseList';
@@ -11,6 +11,7 @@ import { CaseUploadTab } from '@/components/cases/tabs/CaseUploadTab';
 import { EmailStatsTab } from '@/components/cases/tabs/EmailStatsTab';
 import { EmailOptimizationCard } from '@/components/cases/tabs/EmailOptimizationCard';
 import { EmailSender } from '@/components/cases/EmailSender';
+import { MailCase } from '@/components/cases/email/types'; // Import MailCase type
 
 // Import utilities
 import { 
@@ -305,9 +306,9 @@ const getStatusBadgeColor = (status: string) => {
 // 案件のソースに応じたアイコンを返す関数
 const getSourceIcon = (source: string) => {
   return source === "mail" ? (
-    <Mail className="h-4 w-4 mr-1 text-blue-600" />
+    <MailIcon className="h-4 w-4 mr-1 text-blue-600" />
   ) : (
-    <FileText className="h-4 w-4 mr-1 text-purple-600" />
+    <FileTextIcon className="h-4 w-4 mr-1 text-purple-600" />
   );
 };
 
@@ -335,11 +336,12 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const [emailDateTo, setEmailDateTo] = useState("");
   
   // 選択された案件のステート
-  const [selectedCase, setSelectedCase] = useState<typeof caseData[0] | null>(null);
+  type CaseDataType = typeof caseData[0];
+  const [selectedCase, setSelectedCase] = useState<CaseDataType | null>(null);
   // 編集モードのステート
   const [editMode, setEditMode] = useState(false);
   // 編集中の案件データ
-  const [editingCaseData, setEditingCaseData] = useState<typeof caseData[0] | null>(null);
+  const [editingCaseData, setEditingCaseData] = useState<CaseDataType | null>(null);
   
   // Company type from URL for backward compatibility
   const urlCompanyType = location.pathname.includes('/company/other') ? 'other' : 'own';
@@ -363,7 +365,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
   // ケース選択ハンドラー
-  const handleCaseSelect = (caseItem: any) => {
+  const handleCaseSelect = (caseItem: CaseDataType) => {
     setSelectedCase(caseItem);
     setEditingCaseData(null);
     setEditMode(false);

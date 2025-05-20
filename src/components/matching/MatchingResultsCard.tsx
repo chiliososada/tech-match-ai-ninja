@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -44,13 +45,17 @@ export const MatchingResultsCard: React.FC<MatchingResultsCardProps> = ({
         </ul>
         
         {totalPages > 1 && (
+          <div className="mt-4">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={(page) => setCurrentPage(Number(page))}
             />
+          </div>
         )}
       </CardContent>
     </Card>
   );
 };
+
+export default MatchingResultsCard;

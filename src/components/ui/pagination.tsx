@@ -21,13 +21,13 @@ export const Pagination: React.FC<PaginationProps> = ({
       className="mx-auto flex w-full justify-center"
     >
       <div className="flex flex-row items-center gap-1">
+        {/* Previous button */}
         <div>
           <button
             aria-label="Go to previous page"
-            className="gap-1 pl-2.5"
+            className={cn("gap-1 pl-2.5", currentPage === 1 ? "pointer-events-none opacity-50" : "")}
             onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
             disabled={currentPage <= 1}
-            className={cn("gap-1 pl-2.5", currentPage === 1 ? "pointer-events-none opacity-50" : "")}
           >
             <span className="sr-only">Previous</span>
             <svg
@@ -48,6 +48,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           </button>
         </div>
         
+        {/* Page numbers and ellipsis */}
         {generatePaginationRange(currentPage, totalPages).map((item, index) => {
           if (item === 'ellipsis') {
             return (
@@ -92,13 +93,13 @@ export const Pagination: React.FC<PaginationProps> = ({
           );
         })}
         
+        {/* Next button */}
         <div>
           <button
             aria-label="Go to next page"
-            className="gap-1 pr-2.5"
+            className={cn("gap-1 pr-2.5", currentPage === totalPages ? "pointer-events-none opacity-50" : "")}
             onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
             disabled={currentPage >= totalPages}
-            className={cn("gap-1 pr-2.5", currentPage === totalPages ? "pointer-events-none opacity-50" : "")}
           >
             <span>次へ</span>
             <span className="sr-only">Next</span>

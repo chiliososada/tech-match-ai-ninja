@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card, 
@@ -82,9 +83,9 @@ export function EmailSender({
 
   const casesHandleSelectCase = (id: string) => handleSelectCase(
     id,
-    emailState.selectedCases as any[],
+    emailState.selectedCases,
     caseData.paginatedCases,
-    emailState.setSelectedCases as any,
+    emailState.setSelectedCases,
     emailState.setSelectAll
   );
 
@@ -102,12 +103,12 @@ export function EmailSender({
   );
 
   const emailHandleSend = () => handleSendEmail(
-    emailState.selectedCases as any[],
+    emailState.selectedCases,
     mailCases,
     emailState.subject,
     emailState.emailBody,
     emailState.setSending,
-    emailState.setSelectedCases as any,
+    emailState.setSelectedCases,
     emailState.setSelectAll,
     emailState.setSubject,
     emailState.setEmailBody,
@@ -161,7 +162,7 @@ export function EmailSender({
           {/* 案件一覧 - 他社モードの場合は会社名と登録方法も表示 */}
           <CasesList
             paginatedCases={caseData.paginatedCases}
-            selectedCases={emailState.selectedCases as string[]}
+            selectedCases={emailState.selectedCases}
             handleSelectCase={casesHandleSelectCase}
             selectAll={emailState.selectAll}
             handleSelectAll={casesHandleSelectAll}
