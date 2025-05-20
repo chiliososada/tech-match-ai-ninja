@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Briefcase, Calendar, Filter } from 'lucide-react';
+import { Search, Briefcase, Calendar, Filter, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,8 @@ interface CaseListProps {
   setSearchTerm: (term: string) => void;
   statusFilter: string;
   setStatusFilter: (status: string) => void;
+  foreignerFilter: string;
+  setForeignerFilter: (filter: string) => void;
   dateRange: string;
   setDateRange: (date: string) => void;
   resetDateFilters: () => void;
@@ -46,6 +48,8 @@ export const CaseList: React.FC<CaseListProps> = ({
   setSearchTerm,
   statusFilter,
   setStatusFilter,
+  foreignerFilter,
+  setForeignerFilter,
   dateRange,
   setDateRange,
   resetDateFilters,
@@ -217,6 +221,23 @@ export const CaseList: React.FC<CaseListProps> = ({
                   <SelectItem value="all" className="japanese-text">すべて</SelectItem>
                   <SelectItem value="募集中" className="japanese-text">募集中</SelectItem>
                   <SelectItem value="募集完了" className="japanese-text">募集完了</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="w-full sm:w-48 space-y-1.5">
+              <Label htmlFor="foreigner-filter" className="text-sm font-medium japanese-text flex items-center">
+                <Users className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+                外国人
+              </Label>
+              <Select value={foreignerFilter} onValueChange={setForeignerFilter}>
+                <SelectTrigger id="foreigner-filter" className="japanese-text border-muted focus:border-primary transition-colors">
+                  <SelectValue placeholder="外国人" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="japanese-text">すべて</SelectItem>
+                  <SelectItem value="accepted" className="japanese-text">可</SelectItem>
+                  <SelectItem value="notAccepted" className="japanese-text">不可</SelectItem>
                 </SelectContent>
               </Select>
             </div>

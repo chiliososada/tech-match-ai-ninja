@@ -54,6 +54,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     resetDateFilters
   } = useCaseFilters();
 
+  // Add state for foreigner filter
+  const [foreignerFilter, setForeignerFilter] = React.useState("all");
+
   const {
     currentPage,
     setCurrentPage,
@@ -97,7 +100,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     effectiveCompanyType,
     statusFilter,
     searchTerm,
-    dateRange
+    dateRange,
+    foreignerFilter
   );
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
@@ -150,6 +154,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               setSearchTerm={setSearchTerm}
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
+              foreignerFilter={foreignerFilter}
+              setForeignerFilter={setForeignerFilter}
               dateRange={dateRange}
               setDateRange={setDateRange}
               resetDateFilters={resetDateFilters}

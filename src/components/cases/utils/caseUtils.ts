@@ -8,7 +8,8 @@ export const filterCases = (
   companyType: string,
   statusFilter: string,
   searchTerm: string,
-  dateRange: string
+  dateRange: string,
+  foreignerFilter: string
 ) => {
   return cases.filter(item => {
     // Filter by company type using some mock logic
@@ -47,7 +48,12 @@ export const filterCases = (
       }
     }
 
-    return matchesCompanyType && matchesStatus && matchesSearch && matchesDate;
+    // Filter by foreigner acceptance
+    const matchesForeigner = foreignerFilter === "all" || 
+      (foreignerFilter === "accepted" && item.foreignerAccepted) ||
+      (foreignerFilter === "notAccepted" && !item.foreignerAccepted);
+
+    return matchesCompanyType && matchesStatus && matchesSearch && matchesDate && matchesForeigner;
   });
 };
 
