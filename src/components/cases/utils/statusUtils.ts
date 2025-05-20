@@ -16,9 +16,9 @@ export const getStatusBadgeColor = (status: string) => {
 
 // 案件のソースに応じたアイコンを返す関数
 export const getSourceIcon = (source: string) => {
-  return source === "mail" ? (
-    <MailIcon className="h-4 w-4 mr-1 text-blue-600" />
-  ) : (
-    <FileTextIcon className="h-4 w-4 mr-1 text-purple-600" />
-  );
+  if (source === "mail") {
+    return <MailIcon className="h-4 w-4 mr-1 text-blue-600" />;
+  } else {
+    return <FileTextIcon className="h-4 w-4 mr-1 text-purple-600" />;
+  }
 };
