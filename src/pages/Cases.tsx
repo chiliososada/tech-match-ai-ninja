@@ -365,17 +365,30 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
-  // Create a proper handler function that can accept MailCase and convert to CaseDataType
+  // Fixed: Create a proper handler function that accepts MailCase parameter
   const handleCaseSelect = (caseItem: MailCase) => {
     // Find the matching case with full data structure from our original caseData
     const fullCaseData = caseData.find(item => item.id === caseItem.id);
     
-    // If found in our original data, use it; otherwise use the passed item with type assertion
+    // If found in our original data, use it; otherwise use the passed item as is
     if (fullCaseData) {
       setSelectedCase(fullCaseData);
     } else {
-      // Make a safe type assertion with all required properties
-      setSelectedCase(caseItem as unknown as CaseDataType);
+      // Create a compatible object with the correct type
+      const compatibleCase: CaseDataType = {
+        ...caseItem as any, // Cast as any first to avoid compiler errors
+        // Provide defaults for any required properties that might be missing in MailCase
+        startDate: caseItem.startDate || null,
+        foreignerAccepted: caseItem.foreignerAccepted || false,
+        freelancerAccepted: caseItem.freelancerAccepted || false,
+        company: caseItem.company || null,
+        receivedDate: caseItem.receivedDate || null,
+        sender: caseItem.sender || null,
+        senderName: caseItem.senderName || null,
+        manager: caseItem.manager || null,
+        managerEmail: caseItem.managerEmail || null
+      };
+      setSelectedCase(compatibleCase);
     }
     
     setEditingCaseData(null);

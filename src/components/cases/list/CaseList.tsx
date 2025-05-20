@@ -12,11 +12,11 @@ import { Pagination } from '@/components/ui/pagination';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
 
-// Updated interface to fix the type error
+// Fixed interface to match the function signature we're passing from Cases.tsx
 interface CaseListProps {
   filteredCases: MailCase[];
   selectedCase: MailCase | null;
-  setSelectedCase: (caseItem: MailCase) => void; // Changed to match the expected function type
+  setSelectedCase: (caseItem: MailCase) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   statusFilter: string;
