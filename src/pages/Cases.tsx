@@ -364,7 +364,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
-  // ケース選択ハンドラー
+  // 案件選択ハンドラー
   const handleCaseSelect = (caseItem: any) => {
     setSelectedCase(caseItem);
     setEditingCaseData(null);
