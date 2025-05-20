@@ -1,5 +1,6 @@
 
 import { MailCase } from "../email/types";
+import { parse, isValid } from 'date-fns';
 
 // Filter cases based on various criteria
 export const filterCases = (
@@ -20,7 +21,31 @@ export const filterCases = (
     const matchesSearch = searchTerm === "" || 
       item.title.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesDate = dateRange === "" || item.createdAt === dateRange;
+    // Improved date matching
+    let matchesDate = true;
+    if (dateRange) {
+      // If dateRange is specified, check if the startDate exists
+      if (!item.startDate) {
+        matchesDate = false;
+      } else {
+        // Parse both dates to compare them
+        try {
+          const filterDate = parse(dateRange, 'yyyy-MM-dd', new Date());
+          const itemDate = parse(item.startDate, 'yyyy-MM-dd', new Date());
+          
+          if (isValid(filterDate) && isValid(itemDate)) {
+            // For "immediate" and "thisMonth", cases on or after the specified date should match
+            matchesDate = itemDate >= filterDate;
+          } else {
+            // If date parsing fails, fall back to string comparison
+            matchesDate = item.startDate >= dateRange;
+          }
+        } catch (e) {
+          // If parsing fails, use string comparison as fallback
+          matchesDate = item.startDate >= dateRange;
+        }
+      }
+    }
 
     return matchesCompanyType && matchesStatus && matchesSearch && matchesDate;
   });

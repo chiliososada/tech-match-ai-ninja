@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Home, Calendar, Briefcase, Code, CircleDollarSign, FileCode, MessageSquare } from 'lucide-react';
+import { Home, Calendar, Briefcase, Code, CircleDollarSign, FileCode, MessageSquare, ArrowUp, ArrowDown } from 'lucide-react';
 import { MailCase } from '../email/types';
 import { getStatusBadgeColor } from '../utils/statusUtils';
 import { useLocation } from 'react-router-dom';
@@ -12,12 +12,18 @@ interface CaseListTableProps {
   paginatedCases: MailCase[];
   selectedCase: MailCase | null;
   onSelectCase: (caseItem: MailCase) => void;
+  onSort?: (field: string, direction: 'asc' | 'desc') => void;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export const CaseListTable: React.FC<CaseListTableProps> = ({ 
   paginatedCases, 
   selectedCase, 
-  onSelectCase
+  onSelectCase,
+  onSort,
+  sortField,
+  sortDirection
 }) => {
   const location = useLocation();
   // Make sure we correctly detect the other company view
@@ -25,6 +31,28 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
   
   console.log('Current path:', location.pathname);
   console.log('Is other company view:', isOtherCompany);
+
+  // Handler for clicking on a sortable column header
+  const handleSortClick = (field: string) => {
+    if (!onSort) return;
+    
+    // If clicking the same field, toggle direction
+    if (field === sortField) {
+      onSort(field, sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default to ascending for a new field
+      onSort(field, 'asc');
+    }
+  };
+
+  // Helper to render sort indicator
+  const renderSortIndicator = (field: string) => {
+    if (field !== sortField) return null;
+    
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="ml-1 h-4 w-4 inline" /> 
+      : <ArrowDown className="ml-1 h-4 w-4 inline" />;
+  };
 
   return (
     <div className="rounded-md border shadow-sm overflow-hidden">
@@ -35,7 +63,15 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
             {isOtherCompany && (
               <TableHead className="japanese-text font-medium">会社名</TableHead>
             )}
-            <TableHead className="japanese-text font-medium">参画開始日</TableHead>
+            <TableHead 
+              className="japanese-text font-medium cursor-pointer hover:bg-muted/40 transition-colors"
+              onClick={() => handleSortClick('startDate')}
+            >
+              <div className="flex items-center">
+                参画開始日
+                {renderSortIndicator('startDate')}
+              </div>
+            </TableHead>
             <TableHead className="japanese-text font-medium">勤務地</TableHead>
             <TableHead className="japanese-text font-medium">スキル要件</TableHead>
             <TableHead className="japanese-text font-medium">工程</TableHead>
