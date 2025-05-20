@@ -364,9 +364,10 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
-  // 案件選択ハンドラー - Fixed to properly handle MailCase type
+  // 案件選択ハンドラー - Fixed type issue
   const handleCaseSelect = (caseItem: MailCase) => {
-    setSelectedCase(caseItem as CaseDataType);
+    // Use a type assertion to match the expected type
+    setSelectedCase(caseItem as unknown as CaseDataType);
     setEditingCaseData(null);
     setEditMode(false);
   };
