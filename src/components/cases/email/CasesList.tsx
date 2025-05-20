@@ -50,6 +50,10 @@ export const CasesList: React.FC<CasesListProps> = ({
     }
   };
 
+  // Add logging to help debug
+  console.log('CasesList rendering with showCompanyInfo:', showCompanyInfo);
+  console.log('Number of cases to display:', paginatedCases.length);
+
   return (
     <div className="space-y-4">
       <Table>

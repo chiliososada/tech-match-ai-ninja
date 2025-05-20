@@ -20,7 +20,11 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
   onSelectCase
 }) => {
   const location = useLocation();
+  // Make sure we correctly detect the other company view
   const isOtherCompany = location.pathname.includes('/company/other');
+  
+  console.log('Current path:', location.pathname);
+  console.log('Is other company view:', isOtherCompany);
 
   return (
     <div className="rounded-md border shadow-sm overflow-hidden">

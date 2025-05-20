@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -81,6 +82,11 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   
   // Page title based on company type
   const pageTitle = effectiveCompanyType === 'own' ? '自社案件管理' : '他社案件管理';
+  
+  // Add logging to help debug
+  console.log('Cases component rendering with path:', location.pathname);
+  console.log('Company type from URL:', urlCompanyType);
+  console.log('Effective company type:', effectiveCompanyType);
   
   // Get company list
   const companyList = getCompanyList();
