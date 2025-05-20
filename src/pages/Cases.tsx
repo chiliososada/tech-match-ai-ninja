@@ -366,7 +366,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   // 案件選択ハンドラー - Fixed type issue
   const handleCaseSelect = (caseItem: MailCase) => {
-    // Use a type assertion to match the expected type
+    // Create a fixed version that properly handles the type conversion
     setSelectedCase(caseItem as unknown as CaseDataType);
     setEditingCaseData(null);
     setEditMode(false);

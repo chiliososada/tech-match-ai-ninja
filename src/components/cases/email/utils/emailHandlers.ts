@@ -1,4 +1,3 @@
-
 import { MailCase } from "../types";
 import { toast } from "@/hooks/toast";
 
