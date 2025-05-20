@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Cases from "./pages/Cases";
 import Candidates from "./pages/Candidates";
@@ -50,8 +50,8 @@ const App = () => (
               <Route path="/candidates/company/other" element={<ProtectedRoute><Candidates companyType="other" /></ProtectedRoute>} />
               
               {/* Legacy route - redirect handling */}
-              <Route path="/cases" element={<ProtectedRoute><Cases companyType="own" /></ProtectedRoute>} />
-              <Route path="/candidates" element={<ProtectedRoute><Candidates companyType="own" /></ProtectedRoute>} />
+              <Route path="/cases" element={<ProtectedRoute><Navigate to="/cases/company/own" replace /></ProtectedRoute>} />
+              <Route path="/candidates" element={<ProtectedRoute><Navigate to="/candidates/company/own" replace /></ProtectedRoute>} />
               
               {/* Other routes */}
               <Route path="/matching" element={<ProtectedRoute><Matching /></ProtectedRoute>} />

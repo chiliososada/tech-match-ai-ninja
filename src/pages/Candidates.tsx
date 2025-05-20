@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger, TabsWithContext } from '@/components/ui/tabs';
 import { CandidateList } from '@/components/candidates/CandidateList';
 import { CandidateForm } from '@/components/candidates/CandidateForm';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
@@ -121,6 +120,9 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   // Page title based on company type
   const pageTitle = effectiveCompanyType === 'own' ? '自社人材管理' : '他社人材管理';
 
+  // Generate a unique contextId based on company type to keep tabs independent
+  const tabContextId = `candidates-${effectiveCompanyType}`;
+
   const [recommendationTemplate, setRecommendationTemplate] = useState<string>('');
   const [recommendationText, setRecommendationText] = useState<string>('');
 
@@ -207,14 +209,14 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
       <div className="flex-1 space-y-8 p-8 pt-6">
         <h1 className="text-3xl font-bold mb-6 japanese-text">{pageTitle}</h1>
         
-        <Tabs defaultValue="list" className="w-full">
+        <TabsWithContext defaultValue="list" className="w-full" contextId={tabContextId}>
           <TabsList className="mb-4">
-            <TabsTrigger value="list" className="japanese-text">人材一覧</TabsTrigger>
-            <TabsTrigger value="add" className="japanese-text">新規登録</TabsTrigger>
-            <TabsTrigger value="resume" className="japanese-text">履歴書アップロード</TabsTrigger>
+            <TabsTrigger value="list" contextId={tabContextId} className="japanese-text">人材一覧</TabsTrigger>
+            <TabsTrigger value="add" contextId={tabContextId} className="japanese-text">新規登録</TabsTrigger>
+            <TabsTrigger value="resume" contextId={tabContextId} className="japanese-text">履歴書アップロード</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="list" className="w-full">
+          <TabsContent value="list" contextId={tabContextId} className="w-full">
             <CandidateList 
               engineers={mockEngineers}
               onViewDetails={handleViewDetails}
@@ -226,7 +228,7 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
             />
           </TabsContent>
           
-          <TabsContent value="add">
+          <TabsContent value="add" contextId={tabContextId}>
             <CandidateForm 
               initialData={initialCandidateData}
               onSubmit={handleSubmit}
@@ -240,10 +242,10 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
             />
           </TabsContent>
           
-          <TabsContent value="resume">
+          <TabsContent value="resume" contextId={tabContextId}>
             <ResumeUpload />
           </TabsContent>
-        </Tabs>
+        </TabsWithContext>
 
         {/* 候補者詳細モーダル */}
         <CandidateDetails 
