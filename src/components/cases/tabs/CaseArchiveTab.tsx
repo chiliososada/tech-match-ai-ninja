@@ -12,7 +12,9 @@ import {
   Filter, 
   Clock, 
   CircleX,
-  Trash2
+  Trash2,
+  Info,
+  Search as SearchIcon
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -30,6 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface CaseArchiveTabProps {
   cases: MailCase[];
@@ -44,6 +47,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showOnlyDeletable, setShowOnlyDeletable] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [showFilterInfo, setShowFilterInfo] = useState(false);
   const itemsPerPage = 10;
   
   // Check if we're in the own company view
@@ -188,6 +192,11 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     setConfirmDeleteOpen(false);
   };
   
+  // Toggle filter info display
+  const toggleFilterInfo = () => {
+    setShowFilterInfo(!showFilterInfo);
+  };
+  
   // Determine if all cases on current page are selected
   const allSelected = paginatedCases.length > 0 && 
     paginatedCases.every(item => selectedCases.includes(item.id));
@@ -203,52 +212,91 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-6">
-            {/* Filter controls */}
-            <div className="flex flex-col sm:flex-row gap-4 flex-wrap bg-gray-50 p-4 rounded-lg border border-gray-100">
-              <div className="w-full sm:w-64 space-y-1.5">
-                <Label htmlFor="archive-search" className="text-sm font-medium japanese-text text-gray-700">検索</Label>
-                <Input
-                  id="archive-search"
-                  placeholder="案件名、会社名で検索"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="japanese-text shadow-sm"
-                />
+            {/* Filter controls - Enhanced visual design */}
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <div className="bg-gradient-to-r from-purple-50 to-slate-50 p-4 border border-b-0 rounded-t-lg">
+                <h3 className="text-lg font-medium japanese-text flex items-center text-purple-800">
+                  <SearchIcon className="h-5 w-5 mr-2 text-purple-600" />
+                  検索と絞り込み
+                </h3>
               </div>
               
-              <div className="w-full sm:w-48 space-y-1.5">
-                <Label htmlFor="status-filter" className="text-sm font-medium japanese-text text-gray-700">ステータス</Label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger id="status-filter" className="japanese-text shadow-sm">
-                    <SelectValue placeholder="ステータス" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="japanese-text">すべて</SelectItem>
-                    <SelectItem value="active" className="japanese-text">進行中</SelectItem>
-                    <SelectItem value="募集終了" className="japanese-text">募集終了</SelectItem>
-                    <SelectItem value="期限切れ" className="japanese-text">期限切れ</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="flex flex-col sm:flex-row gap-4 flex-wrap bg-white p-6 rounded-b-lg border border-t-0">
+                <div className="w-full sm:w-64 space-y-2">
+                  <Label htmlFor="archive-search" className="text-sm font-medium japanese-text text-gray-700">検索</Label>
+                  <div className="relative">
+                    <SearchIcon className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                    <Input
+                      id="archive-search"
+                      placeholder="案件名、会社名で検索"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="japanese-text shadow-sm pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="w-full sm:w-48 space-y-2">
+                  <Label htmlFor="status-filter" className="text-sm font-medium japanese-text text-gray-700">ステータス</Label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger id="status-filter" className="japanese-text shadow-sm">
+                      <SelectValue placeholder="ステータス" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all" className="japanese-text">すべて</SelectItem>
+                      <SelectItem value="active" className="japanese-text">進行中</SelectItem>
+                      <SelectItem value="募集終了" className="japanese-text">募集終了</SelectItem>
+                      <SelectItem value="期限切れ" className="japanese-text">期限切れ</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="w-full sm:w-auto flex items-end">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="show-deletable" 
-                    checked={showOnlyDeletable}
-                    onCheckedChange={(checked) => setShowOnlyDeletable(!!checked)}
-                  />
-                  <Label htmlFor="show-deletable" className="japanese-text text-gray-700">
-                    削除対象のみ表示
-                  </Label>
+                <div className="w-full sm:w-auto flex flex-col justify-end space-y-2">
+                  <div className="flex items-start gap-2">
+                    <div>
+                      <div className="flex items-center h-9 space-x-2 mb-1">
+                        <Checkbox 
+                          id="show-deletable" 
+                          checked={showOnlyDeletable}
+                          onCheckedChange={(checked) => setShowOnlyDeletable(!!checked)}
+                        />
+                        <Label htmlFor="show-deletable" className="japanese-text text-gray-700 font-medium">
+                          削除対象のみ表示
+                        </Label>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6" 
+                          onClick={toggleFilterInfo}
+                        >
+                          <Info className="h-4 w-4 text-purple-600" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             
+            {/* Filter information box */}
+            {showFilterInfo && (
+              <Alert className="bg-purple-50 border-purple-100 text-purple-800">
+                <Info className="h-4 w-4" />
+                <AlertTitle className="japanese-text font-medium">削除対象の条件</AlertTitle>
+                <AlertDescription className="japanese-text text-sm">
+                  <ul className="list-disc pl-5 space-y-1 mt-2">
+                    <li>参画開始日が今月より前の案件</li>
+                    <li>ステータスが「募集終了」または「期限切れ」の案件</li>
+                  </ul>
+                  <p className="mt-2">これらの条件を満たす案件が削除対象として表示されます。</p>
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <Separator className="bg-gray-200" />
             
             {/* Action controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-purple-50 p-4 rounded-lg">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-purple-50 p-4 rounded-lg border border-purple-100">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium japanese-text text-gray-700">
                   {selectedCases.length}件選択中 / 全{filteredCases.length}件
