@@ -6,13 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { MailCase } from '@/components/cases/email/types';
-import { Archive, ArchiveX, Filter } from 'lucide-react';
+import { 
+  Archive, 
+  ArchiveX, 
+  Filter, 
+  Clock, 
+  CircleX,
+  Trash2
+} from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/toast';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import Pagination from '@/components/ui/pagination';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface CaseArchiveTabProps {
   cases: MailCase[];
@@ -25,11 +42,44 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [showOnlyArchivable, setShowOnlyArchivable] = useState(false);
+  const [showOnlyDeletable, setShowOnlyDeletable] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const itemsPerPage = 10;
   
   // Check if we're in the own company view
   const isOwnCompany = companyType === 'own';
+  
+  // Helper function to determine if a case is a candidate for deletion
+  function isDeletableCandidate(item: MailCase): boolean {
+    const currentDate = new Date();
+    const firstDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    
+    // 1. Cases with a start date before this month
+    if (item.startDate) {
+      const startDate = new Date(item.startDate);
+      if (startDate < firstDayOfCurrentMonth) {
+        // Also check if status is "募集終了" or "期限切れ"
+        if (item.status === '募集終了' || item.status === '期限切れ' || 
+            item.status === 'closed' || item.status === 'expired') {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+
+  // Check if a case is expired based on start date
+  function isExpired(item: MailCase): boolean {
+    if (item.startDate) {
+      const startDate = new Date(item.startDate);
+      const currentDate = new Date();
+      const firstDayOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      
+      return startDate < firstDayOfCurrentMonth;
+    }
+    return false;
+  }
   
   // Filter cases based on company type and user filters
   const filteredCases = cases.filter(item => {
@@ -46,37 +96,11 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     // Status filter
     const matchesStatus = statusFilter === "all" || item.status === statusFilter;
     
-    // Only apply archive candidate filter if the toggle is on
-    const matchesArchivable = !showOnlyArchivable || isArchiveCandidate(item);
+    // Only apply deletable candidates filter if the toggle is on
+    const matchesDeletable = !showOnlyDeletable || isDeletableCandidate(item);
     
-    return matchesCompanyType && matchesSearch && matchesStatus && matchesArchivable;
+    return matchesCompanyType && matchesSearch && matchesStatus && matchesDeletable;
   });
-  
-  // Helper function to determine if a case is a candidate for archiving
-  function isArchiveCandidate(item: MailCase): boolean {
-    // Example logic - customize according to your business rules:
-    
-    // 1. Cases with a start date that is older than 3 months
-    if (item.startDate) {
-      const startDate = new Date(item.startDate);
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      if (startDate < threeMonthsAgo) return true;
-    }
-    
-    // 2. Cases marked as closed
-    if (item.status === 'closed' || item.status === '終了') return true;
-    
-    // 3. Cases that haven't been updated in a long time (e.g., 3 months)
-    if (item.createdAt) {
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      const createdDate = new Date(item.createdAt);
-      if (createdDate < threeMonthsAgo) return true;
-    }
-    
-    return false;
-  }
   
   // Paginated cases
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -134,6 +158,35 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     // Reset selection after archiving
     setSelectedCases([]);
   };
+
+  // Handle batch delete
+  const handleDeleteClick = () => {
+    if (selectedCases.length === 0) {
+      toast({
+        title: "選択エラー",
+        description: "削除する案件を選択してください。",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Open the confirmation dialog
+    setConfirmDeleteOpen(true);
+  };
+
+  // Handle confirmed delete
+  const handleConfirmDelete = () => {
+    // In a real application, you would make an API call here
+    // For now, we'll just show a success toast
+    toast({
+      title: "削除成功",
+      description: `${selectedCases.length}件の案件が削除されました。`,
+    });
+    
+    // Reset selection after deleting
+    setSelectedCases([]);
+    setConfirmDeleteOpen(false);
+  };
   
   // Determine if all cases on current page are selected
   const allSelected = paginatedCases.length > 0 && 
@@ -172,8 +225,8 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                   <SelectContent>
                     <SelectItem value="all" className="japanese-text">すべて</SelectItem>
                     <SelectItem value="active" className="japanese-text">進行中</SelectItem>
-                    <SelectItem value="closed" className="japanese-text">終了</SelectItem>
-                    <SelectItem value="pending" className="japanese-text">保留</SelectItem>
+                    <SelectItem value="募集終了" className="japanese-text">募集終了</SelectItem>
+                    <SelectItem value="期限切れ" className="japanese-text">期限切れ</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -181,12 +234,12 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
               <div className="w-full sm:w-auto flex items-end">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
-                    id="show-archivable" 
-                    checked={showOnlyArchivable}
-                    onCheckedChange={(checked) => setShowOnlyArchivable(!!checked)}
+                    id="show-deletable" 
+                    checked={showOnlyDeletable}
+                    onCheckedChange={(checked) => setShowOnlyDeletable(!!checked)}
                   />
-                  <Label htmlFor="show-archivable" className="japanese-text text-gray-700">
-                    アーカイブ対象のみ表示
+                  <Label htmlFor="show-deletable" className="japanese-text text-gray-700">
+                    削除対象のみ表示
                   </Label>
                 </div>
               </div>
@@ -194,14 +247,14 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
             
             <Separator className="bg-gray-200" />
             
-            {/* Archive controls */}
+            {/* Action controls */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-purple-50 p-4 rounded-lg">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium japanese-text text-gray-700">
                   {selectedCases.length}件選択中 / 全{filteredCases.length}件
                 </span>
                 <Badge variant="outline" className="bg-purple-100 text-purple-800 text-xs">
-                  {showOnlyArchivable ? "アーカイブ対象のみ" : "全案件"}
+                  {showOnlyDeletable ? "削除対象のみ" : "全案件"}
                 </Badge>
               </div>
               
@@ -225,6 +278,16 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                 >
                   <ArchiveX className="h-4 w-4 mr-2" />
                   アーカイブ
+                </Button>
+
+                <Button 
+                  variant="destructive" 
+                  className="japanese-text transition-all shadow-sm"
+                  onClick={handleDeleteClick}
+                  disabled={selectedCases.length === 0}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  削除
                 </Button>
               </div>
             </div>
@@ -269,17 +332,33 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                       )}
                       <TableCell className="japanese-text">
                         {item.startDate || "設定なし"}
+                        {isExpired(item) && (
+                          <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-800 border-amber-200">
+                            <Clock className="h-3 w-3 mr-1" />
+                            期限切れ
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="japanese-text">
                         {item.createdAt || "設定なし"}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={item.status === 'active' ? 'default' : 
-                               item.status === 'closed' ? 'secondary' : 'outline'}
-                               className={item.status === 'closed' ? 'bg-gray-200 text-gray-700' : 
-                                          item.status === 'active' ? 'bg-green-100 text-green-800' : ''}>
-                          {item.status || "不明"}
-                        </Badge>
+                        {item.status === '募集終了' || item.status === 'closed' ? (
+                          <Badge variant="secondary" className="bg-gray-200 text-gray-700 flex items-center">
+                            <CircleX className="h-3 w-3 mr-1" />
+                            <span className="japanese-text">募集終了</span>
+                          </Badge>
+                        ) : item.status === '期限切れ' || item.status === 'expired' ? (
+                          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200 flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            <span className="japanese-text">期限切れ</span>
+                          </Badge>
+                        ) : (
+                          <Badge variant={item.status === 'active' ? 'default' : 'outline'}
+                                className={item.status === 'active' ? 'bg-green-100 text-green-800' : ''}>
+                            <span className="japanese-text">{item.status || "不明"}</span>
+                          </Badge>
+                        )}
                       </TableCell>
                     </TableRow>
                   )) : (
@@ -306,6 +385,29 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="japanese-text text-xl">削除の確認</AlertDialogTitle>
+            <AlertDialogDescription className="japanese-text">
+              選択した{selectedCases.length}件の案件を削除します。<br />
+              <span className="font-semibold text-red-600">この操作は元に戻せません。</span><br />
+              削除を続行しますか？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="japanese-text">キャンセル</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="japanese-text bg-red-600 hover:bg-red-700"
+            >
+              削除する
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
