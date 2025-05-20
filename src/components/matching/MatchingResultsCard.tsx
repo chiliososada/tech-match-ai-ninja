@@ -49,7 +49,7 @@ export const MatchingResultsCard: React.FC<MatchingResultsCardProps> = ({
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(Number(page))}
+              onPageChange={(page) => setCurrentPage(page)}
             />
           </div>
         )}

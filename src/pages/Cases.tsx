@@ -365,7 +365,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
   // ケース選択ハンドラー
-  const handleCaseSelect = (caseItem: CaseDataType) => {
+  const handleCaseSelect = (caseItem: any) => {
     setSelectedCase(caseItem);
     setEditingCaseData(null);
     setEditMode(false);
@@ -461,7 +461,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseList 
               filteredCases={filteredCases}
               selectedCase={selectedCase}
-              setSelectedCase={(caseItem: any) => handleCaseSelect(caseItem)}
+              setSelectedCase={handleCaseSelect}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               statusFilter={statusFilter}
