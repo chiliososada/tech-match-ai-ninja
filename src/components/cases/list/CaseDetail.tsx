@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CaseDetailEmpty } from '../detail/CaseDetailEmpty';
 import { CaseDetailHeader } from '../detail/CaseDetailHeader';
@@ -29,6 +29,15 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
     setEditMode(!editMode);
   };
 
+  // When entering edit mode, ensure we have editing data
+  useEffect(() => {
+    if (editMode && selectedCase && !editingCaseData) {
+      console.log("Edit mode activated but no editingCaseData, setting from selectedCase");
+      // This is needed to copy the selected case for editing if it was not set
+      handleEditChange('title', selectedCase.title);
+    }
+  }, [editMode, selectedCase, editingCaseData, handleEditChange]);
+
   if (!selectedCase) {
     return (
       <Card className="flex items-center justify-center h-[300px] text-center bg-muted/10 border-dashed">
@@ -55,7 +64,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
             {(editingCaseData || selectedCase) && (
               <CaseDetailForm
                 selectedCase={selectedCase}
-                editingCaseData={editingCaseData}
+                editingCaseData={editingCaseData || selectedCase}
                 toggleEditMode={toggleEditMode}
                 handleEditChange={handleEditChange}
                 handleSaveEdit={handleSaveEdit}

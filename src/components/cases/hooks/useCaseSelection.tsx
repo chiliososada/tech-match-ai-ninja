@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
 
@@ -37,6 +37,21 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     setEditMode(false);
   };
 
+  // Track edit mode changes and ensure editingCaseData is populated
+  useEffect(() => {
+    if (editMode && selectedCase && !editingCaseData) {
+      console.log("Setting initial editing data from selected case");
+      setEditingCaseData({
+        ...selectedCase,
+        processes: selectedCase.processes || [],
+        interviewCount: selectedCase.interviewCount || '1'
+      });
+    } else if (!editMode) {
+      // When exiting edit mode without saving, clear the editing data
+      setEditingCaseData(null);
+    }
+  }, [editMode, selectedCase, editingCaseData]);
+
   // Toggle edit mode handler
   const toggleEditMode = () => {
     const newEditMode = !editMode;
@@ -44,14 +59,12 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     
     // When entering edit mode, copy the selected case data for editing
     if (newEditMode && selectedCase) {
+      console.log("Entering edit mode, initializing editing data");
       setEditingCaseData({
         ...selectedCase,
         processes: selectedCase.processes || [],
         interviewCount: selectedCase.interviewCount || '1'
       });
-    } else {
-      // When exiting edit mode, clear the editing data
-      setEditingCaseData(null);
     }
   };
 
@@ -61,7 +74,19 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       console.log(`Editing field: ${field}, new value:`, value);
       
       setEditingCaseData(prev => {
-        if (!prev) return null;
+        if (!prev) {
+          // If somehow prev is null but editingCaseData was truthy, copy from selectedCase
+          if (selectedCase) {
+            console.log("Creating initial editing data from selectedCase");
+            return {
+              ...selectedCase,
+              [field]: value,
+              processes: selectedCase.processes || [],
+              interviewCount: selectedCase.interviewCount || '1'
+            };
+          }
+          return null;
+        }
         
         // Create a new object to ensure React detects the state change
         const updated = {
@@ -71,6 +96,15 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         
         console.log("Updated editing data:", updated);
         return updated;
+      });
+    } else if (selectedCase) {
+      // If editingCaseData is null but we have a selectedCase, initialize it
+      console.log("Initializing editingCaseData from selectedCase");
+      setEditingCaseData({
+        ...selectedCase,
+        [field]: value,
+        processes: selectedCase.processes || [],
+        interviewCount: selectedCase.interviewCount || '1'
       });
     }
   };
