@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -988,7 +989,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </div>
             </div>
 
-            {/* Bottom section with case input form - improved styling to fix double border */}
+            {/* Bottom section with case input form - improved styling */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="p-6">
                 <CaseUploadForm />

@@ -12,8 +12,9 @@ const TabsWithContext = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> & { contextId?: string }
 >(({ contextId = "default", value, defaultValue, ...props }, ref) => {
-  const contextualValue = contextId ? `${contextId}-${value}` : value;
-  const contextualDefaultValue = contextId ? `${contextId}-${defaultValue}` : defaultValue;
+  // If value or defaultValue is provided, add the contextId as a prefix
+  const contextualValue = value && contextId ? `${contextId}-${value}` : value;
+  const contextualDefaultValue = defaultValue && contextId ? `${contextId}-${defaultValue}` : defaultValue;
   
   return (
     <TabsPrimitive.Root
@@ -45,7 +46,8 @@ const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & { contextId?: string }
 >(({ className, value, contextId = "default", ...props }, ref) => {
-  const contextualValue = contextId ? `${contextId}-${value}` : value;
+  // Only add the contextId prefix if contextId is provided and value exists
+  const contextualValue = value && contextId ? `${contextId}-${value}` : value;
   
   return (
     <TabsPrimitive.Trigger
@@ -65,7 +67,8 @@ const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> & { contextId?: string }
 >(({ className, value, contextId = "default", ...props }, ref) => {
-  const contextualValue = contextId ? `${contextId}-${value}` : value;
+  // Only add the contextId prefix if contextId is provided and value exists
+  const contextualValue = value && contextId ? `${contextId}-${value}` : value;
   
   return (
     <TabsPrimitive.Content
