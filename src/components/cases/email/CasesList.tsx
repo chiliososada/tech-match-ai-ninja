@@ -122,6 +122,7 @@ export const CasesList: React.FC<CasesListProps> = ({
         </TableBody>
       </Table>
       
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
           <Pagination>
