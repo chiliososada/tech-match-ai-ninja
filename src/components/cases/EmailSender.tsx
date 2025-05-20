@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLocation } from 'react-router-dom';
 
-import { EmailSenderProps } from './email/types';
+import { EmailSenderProps, EMAIL_TEMPLATES } from './email/types';
 import { CasesList } from './email/CasesList';
 import { EmailForm } from './email/EmailForm';
 import { EngineerSelection } from './email/EngineerSelection';
