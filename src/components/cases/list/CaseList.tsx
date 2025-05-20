@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Briefcase } from 'lucide-react';
+import { Search, Briefcase, Calendar, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Filter, Calendar } from 'lucide-react';
 import { CaseListTable } from './CaseListTable';
 import { CaseDetail } from './CaseDetail';
 import { Pagination } from '@/components/ui/pagination';
@@ -14,6 +13,8 @@ import { toast } from '@/hooks/toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { format, addMonths, startOfMonth } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface CaseListProps {
   filteredCases: MailCase[];
@@ -113,79 +114,103 @@ export const CaseList: React.FC<CaseListProps> = ({
         <CardDescription className="japanese-text">
           登録済みの案件一覧と詳細を表示します
         </CardDescription>
-        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-              <Input
-                placeholder="案件名で検索"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="japanese-text pl-9 border-muted focus:border-primary transition-colors"
-              />
-            </div>
-          </div>
-          <div className="w-full sm:w-40">
-            <Label htmlFor="status-filter" className="text-sm font-medium mb-1 japanese-text">募集状態</Label>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger id="status-filter" className="japanese-text border-muted focus:border-primary transition-colors">
-                <SelectValue placeholder="ステータス" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" className="japanese-text">すべて</SelectItem>
-                <SelectItem value="募集中" className="japanese-text">募集中</SelectItem>
-                <SelectItem value="募集完了" className="japanese-text">募集完了</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="mt-4">
-          <Label className="text-sm font-medium mb-2 japanese-text block">参画開始日</Label>
-          <div className="flex flex-col space-y-4">
-            <RadioGroup value={dateFilterOption} onValueChange={handleDateFilterOptionChange} className="flex flex-row space-x-4 items-center">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="immediate" id="immediate" />
-                <Label htmlFor="immediate" className="japanese-text">即日</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="thisMonth" id="thisMonth" />
-                <Label htmlFor="thisMonth" className="japanese-text">本月內</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="nextMonth" id="nextMonth" />
-                <Label htmlFor="nextMonth" className="japanese-text">来月開始可能</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="none" id="none" />
-                <Label htmlFor="none" className="japanese-text">指定なし</Label>
-              </div>
-            </RadioGroup>
-            
-            <div className="flex items-center space-x-2">
-              <div className="relative flex-1">
-                <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+        
+        {/* Redesigned filter section */}
+        <div className="mt-6 space-y-5 rounded-lg border p-4 bg-white shadow-sm">
+          {/* Search and status filter - first row */}
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+            <div className="flex-1 space-y-1.5">
+              <Label htmlFor="case-search" className="text-sm font-medium japanese-text flex items-center">
+                <Search className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+                検索
+              </Label>
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
                 <Input
-                  type="date"
-                  value={dateRange}
-                  onChange={(e) => {
-                    setDateRange(e.target.value);
-                    // If manually setting date, clear radio selection
-                    if (e.target.value) {
-                      setDateFilterOption("none");
-                    }
-                  }}
-                  className="pl-9 border-muted focus:border-primary transition-colors"
+                  id="case-search"
+                  placeholder="案件名で検索"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="japanese-text pl-9 border-muted focus:border-primary transition-colors"
                 />
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={resetDateFilters}
-                className="japanese-text border-muted hover:bg-muted/20 transition-colors"
+            </div>
+            
+            <div className="w-full sm:w-48 space-y-1.5">
+              <Label htmlFor="status-filter" className="text-sm font-medium japanese-text flex items-center">
+                <Badge variant="outline" className="h-3.5 mr-1.5 py-0 text-muted-foreground">募集状態</Badge>
+              </Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger id="status-filter" className="japanese-text border-muted focus:border-primary transition-colors">
+                  <SelectValue placeholder="ステータス" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="japanese-text">すべて</SelectItem>
+                  <SelectItem value="募集中" className="japanese-text">募集中</SelectItem>
+                  <SelectItem value="募集完了" className="japanese-text">募集完了</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <Separator className="my-2" />
+          
+          {/* Date filter - second row */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium japanese-text flex items-center">
+              <Calendar className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+              参画開始日
+            </Label>
+            
+            <div className="flex flex-wrap gap-4">
+              <RadioGroup 
+                value={dateFilterOption} 
+                onValueChange={handleDateFilterOptionChange} 
+                className="flex flex-wrap gap-x-5 gap-y-2"
               >
-                <Filter className="h-4 w-4 mr-1" />
-                リセット
-              </Button>
+                <div className="flex items-center space-x-2 bg-muted/10 px-3 py-1.5 rounded-md">
+                  <RadioGroupItem value="immediate" id="immediate" />
+                  <Label htmlFor="immediate" className="japanese-text text-sm cursor-pointer">即日</Label>
+                </div>
+                <div className="flex items-center space-x-2 bg-muted/10 px-3 py-1.5 rounded-md">
+                  <RadioGroupItem value="thisMonth" id="thisMonth" />
+                  <Label htmlFor="thisMonth" className="japanese-text text-sm cursor-pointer">本月内</Label>
+                </div>
+                <div className="flex items-center space-x-2 bg-muted/10 px-3 py-1.5 rounded-md">
+                  <RadioGroupItem value="nextMonth" id="nextMonth" />
+                  <Label htmlFor="nextMonth" className="japanese-text text-sm cursor-pointer">来月開始可能</Label>
+                </div>
+                <div className="flex items-center space-x-2 bg-muted/10 px-3 py-1.5 rounded-md">
+                  <RadioGroupItem value="none" id="none" />
+                  <Label htmlFor="none" className="japanese-text text-sm cursor-pointer">指定なし</Label>
+                </div>
+              </RadioGroup>
+              
+              <div className="flex flex-1 items-center gap-2 mt-1">
+                <div className="relative flex-1">
+                  <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                  <Input
+                    type="date"
+                    value={dateRange}
+                    onChange={(e) => {
+                      setDateRange(e.target.value);
+                      if (e.target.value) {
+                        setDateFilterOption("none");
+                      }
+                    }}
+                    className="pl-9 border-muted focus:border-primary transition-colors"
+                  />
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={resetDateFilters}
+                  className="japanese-text border-muted hover:bg-muted/20 transition-colors whitespace-nowrap"
+                >
+                  <Filter className="h-3.5 w-3.5 mr-1" />
+                  リセット
+                </Button>
+              </div>
             </div>
           </div>
         </div>
