@@ -102,9 +102,11 @@ export const PaginationLink = ({
   className,
   isActive,
   children,
+  onClick,
   ...props
 }: React.ComponentProps<"button"> & {
   isActive?: boolean;
+  onClick?: () => void;
 }) => {
   return (
     <button
@@ -114,6 +116,7 @@ export const PaginationLink = ({
         isActive ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground" : "bg-background",
         className
       )}
+      onClick={onClick}
       {...props}
     >
       {children}
@@ -131,7 +134,6 @@ export const PaginationPrevious = ({
   return (
     <button
       aria-label="Go to previous page"
-      size="sm"
       className={cn("gap-1 pl-2.5", className)}
       onClick={onClick}
       {...props}
@@ -166,7 +168,6 @@ export const PaginationNext = ({
   return (
     <button
       aria-label="Go to next page"
-      size="sm"
       className={cn("gap-1 pr-2.5", className)}
       onClick={onClick}
       {...props}
@@ -216,6 +217,16 @@ export const PaginationEllipsis = ({
       <span className="sr-only">More pages</span>
     </span>
   );
+};
+
+// Export all components
+export {
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
 };
 
 // Default export for convenience

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from "@/hooks/toast";
+import { Mail, FileText } from 'lucide-react'; // Add missing imports
 
 // Import components
 import { CaseList } from '@/components/cases/list/CaseList';
@@ -362,7 +363,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
   // ケース選択ハンドラー
-  const handleCaseSelect = (caseItem: typeof caseData[0]) => {
+  const handleCaseSelect = (caseItem: any) => {
     setSelectedCase(caseItem);
     setEditingCaseData(null);
     setEditMode(false);

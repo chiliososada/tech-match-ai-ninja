@@ -11,14 +11,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious,
-  PaginationEllipsis,
-  generatePaginationRange
+  Pagination
 } from '@/components/ui/pagination';
 import { MailCase } from './types';
 
@@ -125,44 +118,11 @@ export const CasesList: React.FC<CasesListProps> = ({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={goToPrevPage} 
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              
-              {generatePaginationRange(currentPage, totalPages).map((item, index) => {
-                if (item === 'ellipsis') {
-                  return (
-                    <PaginationItem key={`ellipsis-${index}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  );
-                }
-                
-                return (
-                  <PaginationItem key={item}>
-                    <PaginationLink 
-                      isActive={currentPage === item}
-                      onClick={() => setCurrentPage(item)}
-                    >
-                      {item}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={goToNextPage}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         </div>
       )}
     </div>

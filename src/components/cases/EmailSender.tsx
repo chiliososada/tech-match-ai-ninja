@@ -83,9 +83,9 @@ export function EmailSender({
 
   const casesHandleSelectCase = (id: string) => handleSelectCase(
     id,
-    emailState.selectedCases,
+    emailState.selectedCases as any[],
     caseData.paginatedCases,
-    emailState.setSelectedCases,
+    emailState.setSelectedCases as any,
     emailState.setSelectAll
   );
 
@@ -103,12 +103,12 @@ export function EmailSender({
   );
 
   const emailHandleSend = () => handleSendEmail(
-    emailState.selectedCases,
+    emailState.selectedCases as any[],
     mailCases,
     emailState.subject,
     emailState.emailBody,
     emailState.setSending,
-    emailState.setSelectedCases,
+    emailState.setSelectedCases as any,
     emailState.setSelectAll,
     emailState.setSubject,
     emailState.setEmailBody,
