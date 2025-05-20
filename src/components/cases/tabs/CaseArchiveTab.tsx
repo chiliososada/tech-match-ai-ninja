@@ -55,20 +55,23 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     // Example logic - customize according to your business rules:
     
     // 1. Cases with an end date in the past
-    if (item.endDate) {
-      const endDate = new Date(item.endDate);
-      if (endDate < new Date()) return true;
+    if (item.startDate) {
+      // Check if startDate is older than 3 months
+      const startDate = new Date(item.startDate);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      if (startDate < threeMonthsAgo) return true;
     }
     
     // 2. Cases marked as closed
     if (item.status === 'closed' || item.status === '終了') return true;
     
     // 3. Cases that haven't been updated in a long time (e.g., 3 months)
-    if (item.updatedAt) {
+    if (item.createdAt) {
       const threeMonthsAgo = new Date();
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      const updatedDate = new Date(item.updatedAt);
-      if (updatedDate < threeMonthsAgo) return true;
+      const createdDate = new Date(item.createdAt);
+      if (createdDate < threeMonthsAgo) return true;
     }
     
     return false;
@@ -224,7 +227,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                     <TableHead>案件名</TableHead>
                     <TableHead>会社名</TableHead>
                     <TableHead>開始日</TableHead>
-                    <TableHead>終了日</TableHead>
+                    <TableHead>作成日</TableHead>
                     <TableHead>ステータス</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -246,7 +249,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                         {item.startDate || "設定なし"}
                       </TableCell>
                       <TableCell>
-                        {item.endDate || "設定なし"}
+                        {item.createdAt || "設定なし"}
                       </TableCell>
                       <TableCell>
                         <Badge variant={item.status === 'active' ? 'default' : 
