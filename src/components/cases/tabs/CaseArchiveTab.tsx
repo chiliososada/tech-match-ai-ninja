@@ -27,10 +27,11 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showOnlyArchivable, setShowOnlyArchivable] = useState(false);
   const itemsPerPage = 10;
   
-  // Filter cases that are candidates for archiving
-  const archivableCases = cases.filter(item => {
+  // Filter cases based on company type and user filters
+  const filteredCases = cases.filter(item => {
     // Filter by company type using some mock logic
     const matchesCompanyType = companyType === 'own' 
       ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
@@ -44,19 +45,18 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     // Status filter
     const matchesStatus = statusFilter === "all" || item.status === statusFilter;
     
-    // Cases that are expired or close to expiry based on some criteria
-    const isCandidate = isArchiveCandidate(item);
+    // Only apply archive candidate filter if the toggle is on
+    const matchesArchivable = !showOnlyArchivable || isArchiveCandidate(item);
     
-    return matchesCompanyType && matchesSearch && matchesStatus && isCandidate;
+    return matchesCompanyType && matchesSearch && matchesStatus && matchesArchivable;
   });
   
   // Helper function to determine if a case is a candidate for archiving
   function isArchiveCandidate(item: MailCase): boolean {
     // Example logic - customize according to your business rules:
     
-    // 1. Cases with an end date in the past
+    // 1. Cases with a start date that is older than 3 months
     if (item.startDate) {
-      // Check if startDate is older than 3 months
       const startDate = new Date(item.startDate);
       const threeMonthsAgo = new Date();
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -79,8 +79,8 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
   
   // Paginated cases
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedCases = archivableCases.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil(archivableCases.length / itemsPerPage);
+  const paginatedCases = filteredCases.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
   
   // Handle select all cases on current page
   const handleSelectAll = (checked: boolean) => {
@@ -123,7 +123,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
     // In a real application, you would make an API call here
     // For now, we'll just show a success toast
     const reasonText = archiveReason === 'expired' ? '期限切れ' : 
-                      archiveReason === 'completed' ? '募集終了' : 'その他';
+                       archiveReason === 'completed' ? '募集終了' : 'その他';
     
     toast({
       title: "アーカイブ成功",
@@ -176,6 +176,19 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="w-full sm:w-auto flex items-end">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="show-archivable" 
+                    checked={showOnlyArchivable}
+                    onCheckedChange={(checked) => setShowOnlyArchivable(!!checked)}
+                  />
+                  <Label htmlFor="show-archivable" className="japanese-text">
+                    アーカイブ対象のみ表示
+                  </Label>
+                </div>
+              </div>
             </div>
             
             <Separator />
@@ -184,7 +197,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium japanese-text">
-                  {selectedCases.length}件選択中 / 全{archivableCases.length}件
+                  {selectedCases.length}件選択中 / 全{filteredCases.length}件
                 </span>
               </div>
               
@@ -222,6 +235,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                         checked={allSelected}
                         onCheckedChange={handleSelectAll}
                         aria-label="全て選択"
+                        indeterminate={selectedCases.length > 0 && !allSelected}
                       />
                     </TableHead>
                     <TableHead>案件名</TableHead>
@@ -261,7 +275,7 @@ export function CaseArchiveTab({ cases, companyType }: CaseArchiveTabProps) {
                   )) : (
                     <TableRow>
                       <TableCell colSpan={6} className="h-24 text-center">
-                        アーカイブ対象の案件がありません
+                        表示する案件がありません
                       </TableCell>
                     </TableRow>
                   )}
