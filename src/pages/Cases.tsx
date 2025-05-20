@@ -988,14 +988,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </div>
             </div>
 
-            {/* Bottom section with ONLY case input form - removed file upload part */}
+            {/* Bottom section with case input form - removed duplicate title */}
             <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">案件情報を入力</CardTitle>
-                <CardDescription className="japanese-text">
-                  口頭の案件情報を入力して、構造化されたデータに変換します
-                </CardDescription>
-              </CardHeader>
               <CardContent>
                 <CaseUploadForm />
               </CardContent>
