@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -1282,7 +1281,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
-                <EmailSender mailCases={filteredMailCases} />
+                <EmailSenderContainer mailCases={filteredMailCases} />
               </TabsContent>
             </>
           )}

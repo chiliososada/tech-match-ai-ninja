@@ -12,7 +12,7 @@ import { CasesList } from './email/CasesList';
 import { EmailSenderLayout } from './email/EmailSenderLayout';
 import { FilterBar } from './email/FilterBar';
 import { EngineerSearchDialog } from './email/search/EngineerSearchDialog';
-import { EMAIL_TEMPLATES, MailCase } from './email/types';
+import { MailCase } from './email/types';
 
 // Import utility functions
 import { handleSelectAll, handleSelectCase, handleTemplateChange, handleEnhanceEmail, handleSendEmail } from './email/utils/emailHandlers';
