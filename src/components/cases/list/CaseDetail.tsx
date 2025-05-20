@@ -37,6 +37,11 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
     );
   }
 
+  // Debug to check what data is available for editing
+  console.log("CaseDetail - editMode:", editMode);
+  console.log("CaseDetail - selectedCase:", selectedCase);
+  console.log("CaseDetail - editingCaseData:", editingCaseData);
+
   return (
     <Card className="shadow-sm">
       <CardHeader className="bg-muted/10 border-b pb-3">

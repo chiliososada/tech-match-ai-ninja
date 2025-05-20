@@ -55,7 +55,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   };
 
-  // Edit change handler - Fix: log the field and value to verify changes
+  // Edit change handler - Fix: properly update the state
   const handleEditChange = (field: string, value: any) => {
     if (editingCaseData) {
       console.log(`Editing field: ${field}, new value:`, value);
@@ -63,10 +63,14 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       setEditingCaseData(prev => {
         if (!prev) return null;
         
-        return {
+        // Create a new object to ensure React detects the state change
+        const updated = {
           ...prev,
           [field]: value
         };
+        
+        console.log("Updated editing data:", updated);
+        return updated;
       });
     }
   };
