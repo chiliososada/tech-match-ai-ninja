@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
-import { StructuredCaseForm } from '@/components/cases/StructuredCaseForm';
-import { EmailSender } from '@/components/cases/EmailSender';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Mail, FileText, BarChart2, Clock, Calendar, Search, Filter, Edit, Home, PencilIcon } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { toast } from "@/hooks/toast";
 import { useLocation } from 'react-router-dom';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Textarea } from '@/components/ui/textarea';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from "@/hooks/toast";
+
+// Import components
+import { CaseList } from '@/components/cases/list/CaseList';
+import { CaseUploadTab } from '@/components/cases/tabs/CaseUploadTab';
+import { EmailStatsTab } from '@/components/cases/tabs/EmailStatsTab';
+import { EmailOptimizationCard } from '@/components/cases/tabs/EmailOptimizationCard';
+import { EmailSender } from '@/components/cases/EmailSender';
+
+// Import utilities
+import { 
+  filterCases, 
+  filterMailCases, 
+  getPaginatedData, 
+  calculateTotalPages,
+  processEmailStats 
+} from '@/components/cases/utils/caseUtils';
 
 // 案件のサンプルデータ（案件詳細を追加）
 const caseData = [
@@ -319,6 +315,7 @@ interface CasesProps {
 }
 
 export function Cases({ companyType = 'own' }: CasesProps) {
+  // State for filtering and pagination
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [techKeyword, setTechKeyword] = useState("");
@@ -337,11 +334,11 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const [emailDateTo, setEmailDateTo] = useState("");
   
   // 選択された案件のステート
-  const [selectedCase, setSelectedCase] = useState<(typeof caseData)[0] | null>(null);
+  const [selectedCase, setSelectedCase] = useState<typeof caseData[0] | null>(null);
   // 編集モードのステート
   const [editMode, setEditMode] = useState(false);
   // 編集中の案件データ
-  const [editingCaseData, setEditingCaseData] = useState<(typeof caseData)[0] | null>(null);
+  const [editingCaseData, setEditingCaseData] = useState<typeof caseData[0] | null>(null);
   
   // Company type from URL for backward compatibility
   const urlCompanyType = location.pathname.includes('/company/other') ? 'other' : 'own';
@@ -354,31 +351,18 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const companyList = Array.from(new Set(caseData.filter(item => item.company).map(item => item.company)));
   
   // フィルタリングされた案件を取得
-  const filteredCases = caseData.filter(item => {
-    // Filter by company type using some mock logic
-    const matchesCompanyType = effectiveCompanyType === 'own' 
-      ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
-      : parseInt(item.id) % 2 === 0;  // even IDs for 他社
-    
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
-    
-    const matchesSearch = searchTerm === "" || 
-      item.title.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesDate = dateRange === "" || item.createdAt === dateRange;
-
-    return matchesCompanyType && matchesStatus && matchesSearch && matchesDate;
-  });
-
-  // 案件一覧のページネーション
-  const paginatedCases = filteredCases.slice(
-    (casesCurrentPage - 1) * itemsPerPage,
-    casesCurrentPage * itemsPerPage
+  const filteredCases = filterCases(
+    caseData,
+    effectiveCompanyType,
+    statusFilter,
+    searchTerm,
+    dateRange
   );
-  const totalCasesPages = Math.ceil(filteredCases.length / itemsPerPage);
+
+  const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
   // ケース選択ハンドラー
-  const handleCaseSelect = (caseItem: (typeof caseData)[0]) => {
+  const handleCaseSelect = (caseItem: typeof caseData[0]) => {
     setSelectedCase(caseItem);
     setEditingCaseData(null);
     setEditMode(false);
@@ -416,85 +400,22 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     }
   };
 
-  // メール案件のフィルタリング（日付フィルターを追加）
-  const filteredMailCases = caseData.filter(item => {
-    if (item.source !== "mail") return false;
-    
-    // Filter by company type
-    const matchesCompanyType = effectiveCompanyType === 'own' 
-      ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
-      : parseInt(item.id) % 2 === 0;  // even IDs for 他社
-    
-    // 会社フィルター
-    const matchesCompany = companyFilter === "all" || item.company === companyFilter;
-    
-    // 技術キーワードフィルター
-    const matchesTech = techKeyword === "" ||
-      (item.keyTechnologies && item.keyTechnologies.toLowerCase().includes(techKeyword.toLowerCase()));
-    
-    // 日付範囲フィルター
-    let matchesDateRange = true;
-    if (emailDateFrom || emailDateTo) {
-      if (item.receivedDate) {
-        const itemDate = new Date(item.receivedDate).toISOString().split('T')[0];
-        if (emailDateFrom && itemDate < emailDateFrom) {
-          matchesDateRange = false;
-        }
-        if (emailDateTo && itemDate > emailDateTo) {
-          matchesDateRange = false;
-        }
-      } else {
-        // 日付がない項目は日付フィルターを使用時に除外
-        if (emailDateFrom || emailDateTo) {
-          matchesDateRange = false;
-        }
-      }
-    }
-    
-    return matchesCompanyType && matchesCompany && matchesTech && matchesDateRange;
-  });
+  // メール案件のフィルタリング
+  const filteredMailCases = filterMailCases(
+    caseData,
+    effectiveCompanyType,
+    companyFilter,
+    techKeyword,
+    emailDateFrom,
+    emailDateTo
+  );
   
   // ページネーション用のメール案件取得
-  const paginatedMailCases = filteredMailCases.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  const totalPages = Math.ceil(filteredMailCases.length / itemsPerPage);
+  const paginatedMailCases = getPaginatedData(filteredMailCases, currentPage, itemsPerPage);
+  const totalPages = calculateTotalPages(filteredMailCases.length, itemsPerPage);
   
-  // メール案件の統計関数
-  const getEmailStats = () => {
-    // 会社ごとの案件数
-    const companyCounts = filteredMailCases.reduce((acc, cur) => {
-      const company = cur.company || "不明";
-      acc[company] = (acc[company] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    // 送信者ごとの案件数
-    const senderCounts = filteredMailCases.reduce((acc, cur) => {
-      const sender = cur.sender || "不明";
-      acc[sender] = (acc[sender] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    // 日付ごとの案件数
-    const dateCounts = filteredMailCases.reduce((acc, cur) => {
-      if (cur.receivedDate) {
-        const date = new Date(cur.receivedDate).toLocaleDateString();
-        acc[date] = (acc[date] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-    
-    return {
-      total: filteredMailCases.length,
-      companies: companyCounts,
-      senders: senderCounts,
-      dates: dateCounts
-    };
-  };
-
-  const emailStats = getEmailStats();
+  // メール案件の統計情報を取得
+  const emailStats = processEmailStats(filteredMailCases);
   
   // 日付フィルターをリセットする関数
   const resetDateFilters = () => {
@@ -534,750 +455,56 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           )}
           
           <TabsContent contextId={effectiveCompanyType} value="list" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">案件一覧</CardTitle>
-                <CardDescription className="japanese-text">
-                  登録済みの案件一覧と詳細を表示します
-                </CardDescription>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                      <Input
-                        placeholder="案件名で検索"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="japanese-text pl-9"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-40">
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="japanese-text">
-                        <SelectValue placeholder="ステータス" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all" className="japanese-text">すべて</SelectItem>
-                        <SelectItem value="募集中" className="japanese-text">募集中</SelectItem>
-                        <SelectItem value="募集完了" className="japanese-text">募集完了</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <div className="relative flex-1">
-                        <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                        <Input
-                          type="date"
-                          placeholder="作成日（入力日）"
-                          value={dateRange}
-                          onChange={(e) => setDateRange(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={resetDateFilters}
-                        className="japanese-text"
-                      >
-                        <Filter className="h-4 w-4 mr-1" />
-                        リセット
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* 案件一覧テーブル（左側 - 1/2幅） - 列を変更 */}
-                  <div className="lg:w-1/2">
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="japanese-text">案件名</TableHead>
-                            <TableHead className="japanese-text">開始日</TableHead>
-                            <TableHead className="japanese-text">勤務地</TableHead>
-                            <TableHead className="japanese-text">スキル</TableHead>
-                            <TableHead className="japanese-text">予算</TableHead>
-                            <TableHead className="japanese-text">外国人</TableHead>
-                            <TableHead className="japanese-text">ステータス</TableHead>
-                            <TableHead className="japanese-text">希望単価</TableHead>
-                            <TableHead className="japanese-text">個人事業者</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {paginatedCases.map((item) => (
-                            <TableRow 
-                              key={item.id} 
-                              className={selectedCase?.id === item.id ? "bg-muted" : ""}
-                              onClick={() => handleCaseSelect(item)}
-                              style={{ cursor: 'pointer' }}
-                            >
-                              <TableCell className="font-medium japanese-text">{item.title}</TableCell>
-                              <TableCell className="japanese-text text-sm">
-                                {item.startDate || '-'}
-                              </TableCell>
-                              <TableCell className="japanese-text text-sm">
-                                <div className="flex items-center">
-                                  {item.location.includes('リモート') ? <Home className="h-3 w-3 mr-1" /> : null}
-                                  {item.location}
-                                </div>
-                              </TableCell>
-                              <TableCell className="japanese-text text-sm">
-                                {item.skills.join(", ")}
-                              </TableCell>
-                              <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
-                              <TableCell className="japanese-text text-sm text-center">
-                                {item.foreignerAccepted ? '◯' : '✕'}
-                              </TableCell>
-                              <TableCell>
-                                <Badge className={getStatusBadgeColor(item.status)}>
-                                  <span className="japanese-text">{item.status}</span>
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="japanese-text text-sm">{item.desiredBudget || '-'}</TableCell>
-                              <TableCell className="japanese-text text-sm text-center">
-                                {item.freelancerAccepted ? '◯' : '✕'}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  
-                    {/* 案件一覧のページネーション */}
-                    <div className="mt-4 flex justify-center">
-                      <Pagination>
-                        <PaginationContent>
-                          <PaginationItem>
-                            <PaginationPrevious 
-                              onClick={() => setCasesCurrentPage(prev => Math.max(prev - 1, 1))}
-                              className={casesCurrentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                            />
-                          </PaginationItem>
-                          
-                          {Array.from({ length: totalCasesPages }).map((_, index) => {
-                            const pageNumber = index + 1;
-                            // Show first page, current page, and last page, with ellipsis in between
-                            if (
-                              pageNumber === 1 || 
-                              pageNumber === totalCasesPages || 
-                              (pageNumber >= casesCurrentPage - 1 && pageNumber <= casesCurrentPage + 1)
-                            ) {
-                              return (
-                                <PaginationItem key={pageNumber}>
-                                  <PaginationLink 
-                                    isActive={casesCurrentPage === pageNumber}
-                                    onClick={() => setCasesCurrentPage(pageNumber)}
-                                  >
-                                    {pageNumber}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              );
-                            } else if (
-                              pageNumber === casesCurrentPage - 2 || 
-                              pageNumber === casesCurrentPage + 2
-                            ) {
-                              return (
-                                <PaginationItem key={pageNumber}>
-                                  <PaginationEllipsis />
-                                </PaginationItem>
-                              );
-                            }
-                            return null;
-                          })}
-                          
-                          <PaginationItem>
-                            <PaginationNext 
-                              onClick={() => setCasesCurrentPage(prev => Math.min(prev + 1, totalCasesPages))}
-                              className={casesCurrentPage === totalCasesPages ? "pointer-events-none opacity-50" : ""}
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    </div>
-                  </div>
-                  
-                  {/* 案件詳細表示部分（右側 - 1/2幅）- 編集機能を追加 */}
-                  <div className="lg:w-1/2">
-                    {selectedCase ? (
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-center">
-                            <CardTitle className="text-xl japanese-text">{selectedCase.title}</CardTitle>
-                            <Button onClick={toggleEditMode} variant="ghost" size="sm">
-                              <PencilIcon className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <Badge className={getStatusBadgeColor(selectedCase.status)}>
-                              <span className="japanese-text">{selectedCase.status}</span>
-                            </Badge>
-                            <span className="text-sm text-muted-foreground japanese-text">作成日: {selectedCase.createdAt}</span>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {!editMode ? (
-                            <>
-                              {/* 表示モード */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">会社名</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.company || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">担当者</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.manager || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">連絡先</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.managerEmail || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">必要経験</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.experience || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">勤務形態</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.workType || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">期間</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.duration || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">日本語レベル</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.japanese || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">優先度</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.priority || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">勤務地</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.location}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">単価</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.budget}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">外国人採用</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.foreignerAccepted ? '可能' : '不可'}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">個人事業者</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.freelancerAccepted ? '可能' : '不可'}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">希望単価</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.desiredBudget || "未設定"}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">開始日</h4>
-                                  <p className="text-sm japanese-text">{selectedCase.startDate || "未設定"}</p>
-                                </div>
-                                <div className="col-span-2">
-                                  <h4 className="text-sm font-medium mb-1 japanese-text">スキル</h4>
-                                  <div className="flex flex-wrap gap-1">
-                                    {selectedCase.skills.map((skill, index) => (
-                                      <Badge key={index} variant="outline" className="japanese-text">
-                                        {skill}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <div className="mt-4">
-                                <h4 className="text-sm font-medium mb-2 japanese-text">案件詳細</h4>
-                                <div className="bg-muted/50 rounded-md p-3 text-sm whitespace-pre-wrap japanese-text max-h-[300px] overflow-y-auto">
-                                  {selectedCase.detailDescription || "詳細情報はありません"}
-                                </div>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              {/* 編集モード */}
-                              {editingCaseData && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">案件名</label>
-                                    <Input 
-                                      value={editingCaseData.title} 
-                                      onChange={(e) => handleEditChange('title', e.target.value)} 
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">開始日</label>
-                                    <Input 
-                                      type="date"
-                                      value={editingCaseData.startDate || ''} 
-                                      onChange={(e) => handleEditChange('startDate', e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">勤務地</label>
-                                    <Input 
-                                      value={editingCaseData.location} 
-                                      onChange={(e) => handleEditChange('location', e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">単価</label>
-                                    <Input 
-                                      value={editingCaseData.budget} 
-                                      onChange={(e) => handleEditChange('budget', e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">希望単価</label>
-                                    <Input 
-                                      value={editingCaseData.desiredBudget || ''} 
-                                      onChange={(e) => handleEditChange('desiredBudget', e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">ステータス</label>
-                                    <Select 
-                                      value={editingCaseData.status}
-                                      onValueChange={(value) => handleEditChange('status', value)}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="ステータスを選択" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="募集中">募集中</SelectItem>
-                                        <SelectItem value="募集完了">募集完了</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">外国人採用</label>
-                                    <Select 
-                                      value={editingCaseData.foreignerAccepted ? "true" : "false"}
-                                      onValueChange={(value) => handleEditChange('foreignerAccepted', value === "true")}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="true">可能</SelectItem>
-                                        <SelectItem value="false">不可</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium japanese-text">個人事業者</label>
-                                    <Select 
-                                      value={editingCaseData.freelancerAccepted ? "true" : "false"}
-                                      onValueChange={(value) => handleEditChange('freelancerAccepted', value === "true")}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="true">可能</SelectItem>
-                                        <SelectItem value="false">不可</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  
-                                  <div className="col-span-2 space-y-2">
-                                    <label className="text-sm font-medium japanese-text">スキル（カンマ区切り）</label>
-                                    <Input 
-                                      value={editingCaseData.skills.join(', ')} 
-                                      onChange={(e) => handleEditChange('skills', e.target.value.split(',').map(s => s.trim()))}
-                                    />
-                                  </div>
-                                  
-                                  <div className="col-span-2 space-y-2">
-                                    <label className="text-sm font-medium japanese-text">案件詳細</label>
-                                    <Textarea 
-                                      value={editingCaseData.detailDescription || ''} 
-                                      onChange={(e) => handleEditChange('detailDescription', e.target.value)}
-                                      rows={8}
-                                    />
-                                  </div>
-                                  
-                                  <div className="col-span-2 flex justify-end space-x-2">
-                                    <Button variant="outline" onClick={toggleEditMode}>
-                                      キャンセル
-                                    </Button>
-                                    <Button onClick={handleSaveEdit}>
-                                      保存
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <Card className="flex items-center justify-center h-[300px] text-center">
-                        <CardContent>
-                          <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-2" />
-                          <p className="text-muted-foreground japanese-text">案件を選択して詳細を表示</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <CaseList 
+              filteredCases={filteredCases}
+              selectedCase={selectedCase}
+              setSelectedCase={handleCaseSelect}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              resetDateFilters={resetDateFilters}
+              casesCurrentPage={casesCurrentPage}
+              setCasesCurrentPage={setCasesCurrentPage}
+              totalCasesPages={totalCasesPages}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              editingCaseData={editingCaseData}
+              setEditingCaseData={setEditingCaseData}
+              handleEditChange={handleEditChange}
+              handleSaveEdit={handleSaveEdit}
+            />
           </TabsContent>
           
           <TabsContent contextId={effectiveCompanyType} value="upload" className="space-y-6">
-            {/* Top section with file upload (1/3) and structured case form (2/3) */}
-            <div className="grid grid-cols-3 gap-6">
-              {/* File Upload Card (1/3 width) */}
-              <div className="col-span-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="japanese-text">ファイルをアップロード</CardTitle>
-                    <CardDescription className="japanese-text">
-                      案件情報のファイル（Excel、PDF、Word）をアップロードしてください
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="dropzone-file"
-                        className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 border-border"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <FileText className="w-8 h-8 mb-3 text-muted-foreground" />
-                          <p className="mb-2 text-sm text-muted-foreground">
-                            <span className="font-semibold japanese-text">クリックしてファイルをアップロード</span>
-                          </p>
-                          <p className="text-xs text-muted-foreground japanese-text">
-                            Excel、PDF、またはWord形式
-                          </p>
-                        </div>
-                        <Input
-                          id="dropzone-file"
-                          type="file"
-                          accept=".xlsx,.xls,.pdf,.doc,.docx"
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Structured Case Form Card (2/3 width) */}
-              <div className="col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="japanese-text">案件情報の構造化</CardTitle>
-                    <CardDescription className="japanese-text">
-                      AIにより案件情報が自動的に構造化されます
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <StructuredCaseForm />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* Bottom section with case input form - improved styling */}
-            <div className="bg-white rounded-xl shadow-sm">
-              <div className="p-6">
-                <CaseUploadForm />
-              </div>
-            </div>
+            <CaseUploadTab />
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}
           {effectiveCompanyType === 'other' && (
             <>
               <TabsContent contextId={effectiveCompanyType} value="stats" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="japanese-text">メール案件の統計情報</CardTitle>
-                    <CardDescription className="japanese-text">
-                      メールから取得された案件情報の分析と統計データ
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                      <Card>
-                        <CardHeader className="py-4">
-                          <CardTitle className="text-sm font-medium japanese-text">
-                            <div className="flex items-center">
-                              <Mail className="h-4 w-4 mr-2 text-blue-600" />
-                              メール案件総数
-                            </div>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl font-bold">{emailStats.total}</div>
-                          <p className="text-xs text-muted-foreground mt-2 japanese-text">
-                            全案件の {Math.round((emailStats.total / caseData.length) * 100)}%
-                          </p>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardHeader className="py-4">
-                          <CardTitle className="text-sm font-medium japanese-text">
-                            <div className="flex items-center">
-                              <BarChart2 className="h-4 w-4 mr-2 text-indigo-600" />
-                              会社別案件数
-                            </div>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="h-[150px] overflow-auto">
-                          <div className="mb-2">
-                            <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                              <SelectTrigger className="japanese-text text-sm">
-                                <SelectValue placeholder="会社でフィルター" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-                                {companyList.map((company) => (
-                                  <SelectItem key={company as string} value={company as string} className="japanese-text">
-                                    {company as string}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <ul className="space-y-2">
-                            {Object.entries(emailStats.companies).map(([company, count]) => (
-                              <li key={company} className="flex justify-between items-center">
-                                <span className="text-sm truncate japanese-text">{company}</span>
-                                <Badge variant="outline">{count}</Badge>
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardHeader className="py-4">
-                          <CardTitle className="text-sm font-medium japanese-text">
-                            <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-2 text-amber-600" />
-                              日付別案件数
-                            </div>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="h-[150px] overflow-auto">
-                          <ul className="space-y-2">
-                            {Object.entries(emailStats.dates).map(([date, count]) => (
-                              <li key={date} className="flex justify-between items-center">
-                                <span className="text-sm japanese-text">{date}</span>
-                                <Badge variant="outline">{count}</Badge>
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    <div className="mt-6">
-                      <h3 className="text-lg font-medium mb-4 japanese-text">メール送信者分析</h3>
-                      <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
-                        <div className="flex-1">
-                          <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                            <SelectTrigger className="japanese-text">
-                              <SelectValue placeholder="会社でフィルター" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-                              {companyList.map((company) => (
-                                <SelectItem key={company as string} value={company as string} className="japanese-text">
-                                  {company as string}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="w-full sm:w-40">
-                          <Input
-                            placeholder="技術キーワード"
-                            value={techKeyword}
-                            onChange={(e) => setTechKeyword(e.target.value)}
-                            className="japanese-text"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <div className="relative flex-1">
-                              <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                              <Input
-                                type="date"
-                                placeholder="開始日"
-                                value={emailDateFrom}
-                                onChange={(e) => setEmailDateFrom(e.target.value)}
-                                className="pl-9"
-                              />
-                            </div>
-                            <span className="text-center">〜</span>
-                            <div className="relative flex-1">
-                              <Calendar className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                              <Input
-                                type="date"
-                                placeholder="終了日"
-                                value={emailDateTo}
-                                onChange={(e) => setEmailDateTo(e.target.value)}
-                                className="pl-9"
-                              />
-                            </div>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={resetDateFilters}
-                              className="japanese-text"
-                            >
-                              <Filter className="h-4 w-4 mr-1" />
-                              リセット
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="japanese-text">送信者</TableHead>
-                              <TableHead className="japanese-text">担当者名</TableHead>
-                              <TableHead className="japanese-text">会社</TableHead>
-                              <TableHead className="japanese-text">技術キーワード</TableHead>
-                              <TableHead className="japanese-text">受信日時</TableHead>
-                              <TableHead className="japanese-text text-right">案件数</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {paginatedMailCases.map((item) => {
-                              const senderCount = filteredMailCases.filter(c => c.sender === item.sender).length;
-                              
-                              return (
-                                <TableRow key={item.id}>
-                                  <TableCell className="font-medium">{item.sender}</TableCell>
-                                  <TableCell className="japanese-text">{item.senderName || "-"}</TableCell>
-                                  <TableCell className="japanese-text">{item.company || "-"}</TableCell>
-                                  <TableCell className="japanese-text">{item.keyTechnologies || "-"}</TableCell>
-                                  <TableCell className="japanese-text">
-                                    {item.receivedDate ? new Date(item.receivedDate).toLocaleString() : "-"}
-                                  </TableCell>
-                                  <TableCell className="text-right">{senderCount}</TableCell>
-                                </TableRow>
-                              );
-                            })}
-                            {filteredMailCases.length === 0 && (
-                              <TableRow>
-                                <TableCell colSpan={6} className="text-center py-4 japanese-text">
-                                  該当する案件がありません
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                      
-                      <div className="mt-4 flex justify-center">
-                        <Pagination>
-                          <PaginationContent>
-                            <PaginationItem>
-                              <PaginationPrevious 
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                              />
-                            </PaginationItem>
-                            
-                            {Array.from({ length: totalPages }).map((_, index) => {
-                              const pageNumber = index + 1;
-                              // Show first page, current page, and last page, with ellipsis in between
-                              if (
-                                pageNumber === 1 || 
-                                pageNumber === totalPages || 
-                                (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
-                              ) {
-                                return (
-                                  <PaginationItem key={pageNumber}>
-                                    <PaginationLink 
-                                      isActive={currentPage === pageNumber}
-                                      onClick={() => setCurrentPage(pageNumber)}
-                                    >
-                                      {pageNumber}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                );
-                              } else if (
-                                pageNumber === currentPage - 2 || 
-                                pageNumber === currentPage + 2
-                              ) {
-                                return (
-                                  <PaginationItem key={pageNumber}>
-                                    <PaginationEllipsis />
-                                  </PaginationItem>
-                                );
-                              }
-                              return null;
-                            })}
-                            
-                            <PaginationItem>
-                              <PaginationNext 
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                              />
-                            </PaginationItem>
-                          </PaginationContent>
-                        </Pagination>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="japanese-text">メール取得の最適化</CardTitle>
-                    <CardDescription className="japanese-text">
-                      メール案件の取得精度と効率を向上させるための設定
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2 japanese-text">優先キーワード設定</h4>
-                        <Input 
-                          placeholder="Java, エンジニア, 募集, 案件など（カンマ区切り）" 
-                          className="japanese-text"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1 japanese-text">
-                          これらのキーワードを含むメールを優先的に処理します
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2 japanese-text">優先送信者設定</h4>
-                        <Input 
-                          placeholder="tanaka@example.com, @techcompany.co.jp" 
-                          className="japanese-text"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1 japanese-text">
-                          特定の送信者やドメインからのメールを優先的に処理します
-                        </p>
-                      </div>
-                      
-                      <Button className="mt-2 japanese-text">設定を保存</Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <EmailStatsTab 
+                  filteredMailCases={filteredMailCases}
+                  paginatedMailCases={paginatedMailCases}
+                  companyFilter={companyFilter}
+                  setCompanyFilter={setCompanyFilter}
+                  techKeyword={techKeyword}
+                  setTechKeyword={setTechKeyword}
+                  emailDateFrom={emailDateFrom}
+                  setEmailDateFrom={setEmailDateFrom}
+                  emailDateTo={emailDateTo}
+                  setEmailDateTo={setEmailDateTo}
+                  resetDateFilters={resetDateFilters}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  totalPages={totalPages}
+                  emailStats={emailStats}
+                  companyList={companyList}
+                />
+                <EmailOptimizationCard />
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
@@ -1285,10 +512,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                   mailCases={filteredMailCases}
                   isOtherCompanyMode={effectiveCompanyType === 'other'}
                   caseData={{
-                    paginatedCases: filteredMailCases.slice(
-                      (currentPage - 1) * itemsPerPage,
-                      currentPage * itemsPerPage
-                    ),
+                    paginatedCases: paginatedMailCases,
                     totalPages,
                     companyList
                   }}
@@ -1302,8 +526,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                     selectedCases: [],
                     companyFilter,
                     setCompanyFilter,
-                    techFilter: techKeyword, // Use techKeyword instead of undefined techFilter
-                    setTechFilter: setTechKeyword, // Use setTechKeyword instead of undefined setTechFilter
+                    techFilter: techKeyword,
+                    setTechFilter: setTechKeyword,
                     currentPage,
                     setCurrentPage,
                     selectedTemplate: "",
