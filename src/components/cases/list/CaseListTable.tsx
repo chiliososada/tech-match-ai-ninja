@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Home, Calendar, Briefcase, Code, CircleDollarSign } from 'lucide-react';
 import { MailCase } from '../email/types';
 import { getStatusBadgeColor } from '../utils/statusUtils';
+import { useLocation } from 'react-router-dom';
+import { format } from 'date-fns';
 
 interface CaseListTableProps {
   paginatedCases: MailCase[];
@@ -17,12 +19,18 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
   selectedCase, 
   onSelectCase
 }) => {
+  const location = useLocation();
+  const isOtherCompany = location.pathname.includes('/company/other');
+
   return (
     <div className="rounded-md border shadow-sm overflow-hidden">
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow>
             <TableHead className="japanese-text font-medium">案件名</TableHead>
+            {isOtherCompany && (
+              <TableHead className="japanese-text font-medium">会社名</TableHead>
+            )}
             <TableHead className="japanese-text font-medium">開始日</TableHead>
             <TableHead className="japanese-text font-medium">勤務地</TableHead>
             <TableHead className="japanese-text font-medium">スキル</TableHead>
@@ -31,6 +39,12 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
             <TableHead className="japanese-text font-medium">ステータス</TableHead>
             <TableHead className="japanese-text font-medium">希望単価</TableHead>
             <TableHead className="japanese-text font-medium">個人事業者</TableHead>
+            {isOtherCompany && (
+              <TableHead className="japanese-text font-medium">
+                <div>登録方式</div>
+                <div className="text-xs text-muted-foreground">登録時間</div>
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -42,6 +56,9 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
               style={{ cursor: 'pointer' }}
             >
               <TableCell className="font-medium japanese-text">{item.title}</TableCell>
+              {isOtherCompany && (
+                <TableCell className="japanese-text">{item.company || "-"}</TableCell>
+              )}
               <TableCell className="japanese-text text-sm">
                 {item.startDate ? (
                   <div className="flex items-center space-x-1">
@@ -99,6 +116,17 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
                   {item.freelancerAccepted ? '◯' : '✕'}
                 </Badge>
               </TableCell>
+              {isOtherCompany && (
+                <TableCell className="japanese-text">
+                  <div className={`px-2 py-0.5 rounded text-xs inline-flex 
+                    ${item.registrationType === "自動（メール）" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"}`}>
+                    {item.registrationType || "手動"}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {item.registeredAt ? format(new Date(item.registeredAt), 'yyyy-MM-dd HH:mm') : '-'}
+                  </div>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

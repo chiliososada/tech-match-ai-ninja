@@ -74,4 +74,3 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     handleSaveEdit
   };
 };
-
