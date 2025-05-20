@@ -78,7 +78,7 @@ export function EmailSender({
         handlers={handlers}
       />
 
-      {/* 技術者検索ダイアログ */}
+      {/* 技术者検索ダイアログ */}
       <EngineerSearchDialog 
         isOpen={engineerState.isEngineerDialogOpen}
         setIsOpen={engineerState.setIsEngineerDialogOpen}

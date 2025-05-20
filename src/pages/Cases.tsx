@@ -9,7 +9,7 @@ import { CaseList } from '@/components/cases/list/CaseList';
 import { CaseUploadTab } from '@/components/cases/tabs/CaseUploadTab';
 import { EmailStatsTab } from '@/components/cases/tabs/EmailStatsTab';
 import { EmailOptimizationCard } from '@/components/cases/tabs/EmailOptimizationCard';
-import { EmailSender } from '@/components/cases/EmailSender';
+import { EmailSenderContainer } from '@/components/cases/EmailSenderContainer';
 import { CasesHeader } from '@/components/cases/CasesHeader';
 
 // Import utilities and hooks
@@ -191,52 +191,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
-                <EmailSender 
-                  mailCases={filteredMailCases}
-                  isOtherCompanyMode={effectiveCompanyType === 'other'}
-                  caseData={{
-                    paginatedCases: paginatedMailCases,
-                    totalPages,
-                    companyList
-                  }}
-                  engineerData={{
-                    paginatedEngineers: [],
-                    totalEngineerPages: 0,
-                    filteredEngineers: []
-                  }}
-                  emailState={{
-                    selectAll: false,
-                    selectedCases: [],
-                    companyFilter,
-                    setCompanyFilter,
-                    techFilter: techKeyword,
-                    setTechFilter: setTechKeyword,
-                    currentPage,
-                    setCurrentPage,
-                    selectedTemplate: "",
-                    setSelectedTemplate: () => {},
-                    subject: "",
-                    setSubject: () => {},
-                    emailBody: "",
-                    setEmailBody: () => {},
-                    sending: false,
-                    setSending: () => {},
-                    setSelectedCases: () => {},
-                    setSelectAll: () => {}
-                  }}
-                  engineerState={{
-                    selectedEngineers: [],
-                    setSelectedEngineers: () => {},
-                    isEngineerDialogOpen: false,
-                    setIsEngineerDialogOpen: () => {},
-                    engineerFilter: "",
-                    setEngineerFilter: () => {},
-                    engineerCompanyFilter: "all",
-                    setEngineerCompanyFilter: () => {},
-                    engineerCurrentPage: 1,
-                    setEngineerCurrentPage: () => {}
-                  }}
-                />
+                <EmailSenderContainer mailCases={filteredMailCases} />
               </TabsContent>
             </>
           )}

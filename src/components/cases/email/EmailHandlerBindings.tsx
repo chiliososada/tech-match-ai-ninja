@@ -92,12 +92,15 @@ export const useEmailHandlerBindings = ({
     engineerState.setSelectedEngineers
   );
 
-  const engineerHandleOpen = () => openEngineerDialog(
-    engineerState.setIsEngineerDialogOpen,
-    engineerState.setEngineerCurrentPage,
-    engineerState.setEngineerFilter,
-    engineerState.setEngineerCompanyFilter
-  );
+  const engineerHandleOpen = () => {
+    // 确保此函数正确执行
+    openEngineerDialog(
+      engineerState.setIsEngineerDialogOpen,
+      engineerState.setEngineerCurrentPage,
+      engineerState.setEngineerFilter,
+      engineerState.setEngineerCompanyFilter
+    );
+  };
 
   const engineerHandleToggle = (engineer: any) => toggleEngineerSelection(
     engineer,
