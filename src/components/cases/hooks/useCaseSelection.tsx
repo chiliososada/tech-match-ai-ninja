@@ -20,16 +20,21 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       setSelectedCase(caseItem);
     }
     
+    // Reset edit mode and data when selecting a new case
     setEditingCaseData(null);
     setEditMode(false);
   };
 
   // Toggle edit mode handler
   const toggleEditMode = () => {
-    setEditMode(!editMode);
-    if (!editMode && selectedCase) {
+    const newEditMode = !editMode;
+    setEditMode(newEditMode);
+    
+    // When entering edit mode, copy the selected case data for editing
+    if (newEditMode && selectedCase) {
       setEditingCaseData({...selectedCase});
     } else {
+      // When exiting edit mode, clear the editing data
       setEditingCaseData(null);
     }
   };
@@ -53,6 +58,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       });
       setSelectedCase(editingCaseData);
       setEditMode(false);
+      setEditingCaseData(null);
     }
   };
 
@@ -68,3 +74,4 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     handleSaveEdit
   };
 };
+

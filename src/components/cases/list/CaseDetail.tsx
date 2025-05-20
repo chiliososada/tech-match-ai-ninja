@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -64,8 +63,8 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
       </CardHeader>
       <CardContent className="pt-5">
         {!editMode ? (
+          // ... keep existing code (display mode section with all the case details)
           <>
-            {/* 表示モード */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-6">
               <div className="flex space-x-2">
                 <div className="bg-primary/10 p-2 rounded-md">
@@ -237,9 +236,10 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
             </div>
           </>
         ) : (
+          // Edit mode - Fix the issue where the form disappears
           <>
-            {/* 編集モード */}
-            {editingCaseData && (
+            {/* Fix: Use the selectedCase as a fallback if editingCaseData is not available */}
+            {(editingCaseData || selectedCase) && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text flex items-center">
@@ -247,7 +247,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     案件名
                   </label>
                   <Input 
-                    value={editingCaseData.title} 
+                    value={editingCaseData?.title || selectedCase.title} 
                     onChange={(e) => handleEditChange('title', e.target.value)} 
                     className="border-primary/30 focus:border-primary"
                   />
@@ -259,7 +259,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                   </label>
                   <Input 
                     type="date"
-                    value={editingCaseData.startDate || ''} 
+                    value={editingCaseData?.startDate || selectedCase.startDate || ''} 
                     onChange={(e) => handleEditChange('startDate', e.target.value)}
                     className="border-primary/30 focus:border-primary"
                   />
@@ -270,7 +270,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     勤務地
                   </label>
                   <Input 
-                    value={editingCaseData.location} 
+                    value={editingCaseData?.location || selectedCase.location} 
                     onChange={(e) => handleEditChange('location', e.target.value)}
                     className="border-primary/30 focus:border-primary"
                   />
@@ -281,7 +281,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     単価
                   </label>
                   <Input 
-                    value={editingCaseData.budget} 
+                    value={editingCaseData?.budget || selectedCase.budget} 
                     onChange={(e) => handleEditChange('budget', e.target.value)}
                     className="border-primary/30 focus:border-primary"
                   />
@@ -292,7 +292,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     希望単価
                   </label>
                   <Input 
-                    value={editingCaseData.desiredBudget || ''} 
+                    value={editingCaseData?.desiredBudget || selectedCase.desiredBudget || ''} 
                     onChange={(e) => handleEditChange('desiredBudget', e.target.value)}
                     className="border-primary/30 focus:border-primary"
                   />
@@ -303,7 +303,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     ステータス
                   </label>
                   <Select 
-                    value={editingCaseData.status}
+                    value={editingCaseData?.status || selectedCase.status}
                     onValueChange={(value) => handleEditChange('status', value)}
                   >
                     <SelectTrigger className="border-primary/30 focus:border-primary">
@@ -321,7 +321,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     外国人採用
                   </label>
                   <Select 
-                    value={editingCaseData.foreignerAccepted ? "true" : "false"}
+                    value={(editingCaseData?.foreignerAccepted || selectedCase.foreignerAccepted) ? "true" : "false"}
                     onValueChange={(value) => handleEditChange('foreignerAccepted', value === "true")}
                   >
                     <SelectTrigger className="border-primary/30 focus:border-primary">
@@ -339,7 +339,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     個人事業者
                   </label>
                   <Select 
-                    value={editingCaseData.freelancerAccepted ? "true" : "false"}
+                    value={(editingCaseData?.freelancerAccepted || selectedCase.freelancerAccepted) ? "true" : "false"}
                     onValueChange={(value) => handleEditChange('freelancerAccepted', value === "true")}
                   >
                     <SelectTrigger className="border-primary/30 focus:border-primary">
@@ -358,7 +358,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     スキル（カンマ区切り）
                   </label>
                   <Input 
-                    value={editingCaseData.skills.join(', ')} 
+                    value={(editingCaseData?.skills || selectedCase.skills).join(', ')} 
                     onChange={(e) => handleEditChange('skills', e.target.value.split(',').map(s => s.trim()))}
                     className="border-primary/30 focus:border-primary"
                   />
@@ -370,7 +370,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({
                     案件詳細
                   </label>
                   <Textarea 
-                    value={editingCaseData.detailDescription || ''} 
+                    value={editingCaseData?.detailDescription || selectedCase.detailDescription || ''} 
                     onChange={(e) => handleEditChange('detailDescription', e.target.value)}
                     rows={8}
                     className="border-primary/30 focus:border-primary"
