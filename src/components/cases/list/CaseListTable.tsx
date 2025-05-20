@@ -2,20 +2,9 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Home } from 'lucide-react';
+import { Home, Calendar, Briefcase, Code, Yen } from 'lucide-react';
 import { MailCase } from '../email/types';
-
-// 案件のステータスに応じた色を返す関数
-const getStatusBadgeColor = (status: string) => {
-  switch (status) {
-    case "募集中":
-      return "bg-green-100 text-green-800";
-    case "募集完了":
-      return "bg-amber-100 text-amber-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+import { getStatusBadgeColor } from '../utils/statusUtils';
 
 interface CaseListTableProps {
   paginatedCases: MailCase[];
@@ -29,54 +18,86 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
   onSelectCase
 }) => {
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border shadow-sm overflow-hidden">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-muted/30">
           <TableRow>
-            <TableHead className="japanese-text">案件名</TableHead>
-            <TableHead className="japanese-text">開始日</TableHead>
-            <TableHead className="japanese-text">勤務地</TableHead>
-            <TableHead className="japanese-text">スキル</TableHead>
-            <TableHead className="japanese-text">予算</TableHead>
-            <TableHead className="japanese-text">外国人</TableHead>
-            <TableHead className="japanese-text">ステータス</TableHead>
-            <TableHead className="japanese-text">希望単価</TableHead>
-            <TableHead className="japanese-text">個人事業者</TableHead>
+            <TableHead className="japanese-text font-medium">案件名</TableHead>
+            <TableHead className="japanese-text font-medium">開始日</TableHead>
+            <TableHead className="japanese-text font-medium">勤務地</TableHead>
+            <TableHead className="japanese-text font-medium">スキル</TableHead>
+            <TableHead className="japanese-text font-medium">予算</TableHead>
+            <TableHead className="japanese-text font-medium">外国人</TableHead>
+            <TableHead className="japanese-text font-medium">ステータス</TableHead>
+            <TableHead className="japanese-text font-medium">希望単価</TableHead>
+            <TableHead className="japanese-text font-medium">個人事業者</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedCases.map((item) => (
             <TableRow 
               key={item.id} 
-              className={selectedCase?.id === item.id ? "bg-muted" : ""}
+              className={`${selectedCase?.id === item.id ? "bg-primary/5 border-l-4 border-l-primary" : ""} hover:bg-muted/20 transition-colors`}
               onClick={() => onSelectCase(item)}
               style={{ cursor: 'pointer' }}
             >
               <TableCell className="font-medium japanese-text">{item.title}</TableCell>
               <TableCell className="japanese-text text-sm">
-                {item.startDate || '-'}
+                {item.startDate ? (
+                  <div className="flex items-center space-x-1">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span>{item.startDate}</span>
+                  </div>
+                ) : '-'}
               </TableCell>
               <TableCell className="japanese-text text-sm">
-                <div className="flex items-center">
-                  {item.location.includes('リモート') ? <Home className="h-3 w-3 mr-1" /> : null}
-                  {item.location}
+                <div className="flex items-center space-x-1">
+                  {item.location.includes('リモート') ? <Home className="h-3.5 w-3.5 text-blue-500" /> : <Briefcase className="h-3.5 w-3.5 text-gray-500" />}
+                  <span>{item.location}</span>
                 </div>
               </TableCell>
               <TableCell className="japanese-text text-sm">
-                {item.skills.join(", ")}
+                <div className="flex flex-wrap gap-1 max-w-[150px]">
+                  {item.skills.slice(0, 2).map((skill, idx) => (
+                    <Badge key={idx} variant="outline" className="bg-blue-50 text-xs">
+                      {skill}
+                    </Badge>
+                  ))}
+                  {item.skills.length > 2 && (
+                    <Badge variant="outline" className="bg-gray-100 text-xs">
+                      +{item.skills.length - 2}
+                    </Badge>
+                  )}
+                </div>
               </TableCell>
-              <TableCell className="japanese-text text-sm">{item.budget}</TableCell>
+              <TableCell className="japanese-text text-sm">
+                <div className="flex items-center space-x-1">
+                  <Yen className="h-3.5 w-3.5 text-green-600" />
+                  <span>{item.budget}</span>
+                </div>
+              </TableCell>
               <TableCell className="japanese-text text-sm text-center">
-                {item.foreignerAccepted ? '◯' : '✕'}
+                <Badge variant={item.foreignerAccepted ? "success" : "destructive"} className="px-1.5 min-w-[24px]">
+                  {item.foreignerAccepted ? '◯' : '✕'}
+                </Badge>
               </TableCell>
               <TableCell>
                 <Badge className={getStatusBadgeColor(item.status)}>
                   <span className="japanese-text">{item.status}</span>
                 </Badge>
               </TableCell>
-              <TableCell className="japanese-text text-sm">{item.desiredBudget || '-'}</TableCell>
+              <TableCell className="japanese-text text-sm">
+                {item.desiredBudget ? (
+                  <div className="flex items-center space-x-1">
+                    <Yen className="h-3.5 w-3.5 text-purple-600" />
+                    <span>{item.desiredBudget}</span>
+                  </div>
+                ) : '-'}
+              </TableCell>
               <TableCell className="japanese-text text-sm text-center">
-                {item.freelancerAccepted ? '◯' : '✕'}
+                <Badge variant={item.freelancerAccepted ? "success" : "destructive"} className="px-1.5 min-w-[24px]">
+                  {item.freelancerAccepted ? '◯' : '✕'}
+                </Badge>
               </TableCell>
             </TableRow>
           ))}

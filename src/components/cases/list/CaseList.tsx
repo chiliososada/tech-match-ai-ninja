@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search } from 'lucide-react';
+import { Search, Briefcase } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ import { Pagination } from '@/components/ui/pagination';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
 
-// Fixed interface to match the function signature we're passing from Cases.tsx
 interface CaseListProps {
   filteredCases: MailCase[];
   selectedCase: MailCase | null;
@@ -65,9 +64,12 @@ export const CaseList: React.FC<CaseListProps> = ({
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="japanese-text">案件一覧</CardTitle>
+    <Card className="shadow-sm">
+      <CardHeader className="pb-4 bg-muted/5 border-b">
+        <CardTitle className="japanese-text flex items-center">
+          <Briefcase className="h-5 w-5 mr-2 text-primary" />
+          案件一覧
+        </CardTitle>
         <CardDescription className="japanese-text">
           登録済みの案件一覧と詳細を表示します
         </CardDescription>
@@ -79,13 +81,13 @@ export const CaseList: React.FC<CaseListProps> = ({
                 placeholder="案件名で検索"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="japanese-text pl-9"
+                className="japanese-text pl-9 border-muted focus:border-primary transition-colors"
               />
             </div>
           </div>
           <div className="w-full sm:w-40">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="japanese-text">
+              <SelectTrigger className="japanese-text border-muted focus:border-primary transition-colors">
                 <SelectValue placeholder="ステータス" />
               </SelectTrigger>
               <SelectContent>
@@ -106,14 +108,14 @@ export const CaseList: React.FC<CaseListProps> = ({
                   placeholder="作成日（入力日）"
                   value={dateRange}
                   onChange={(e) => setDateRange(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 border-muted focus:border-primary transition-colors"
                 />
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={resetDateFilters}
-                className="japanese-text"
+                className="japanese-text border-muted hover:bg-muted/20 transition-colors"
               >
                 <Filter className="h-4 w-4 mr-1" />
                 リセット
@@ -122,23 +124,25 @@ export const CaseList: React.FC<CaseListProps> = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 案件一覧テーブル（左側 - 1/2幅） */}
           <div className="lg:w-1/2">
-            <CaseListTable 
-              paginatedCases={paginatedCases} 
-              selectedCase={selectedCase} 
-              onSelectCase={setSelectedCase} 
-            />
-            
-            {/* 案件一覧のページネーション */}
-            <div className="mt-4 flex justify-center">
-              <Pagination 
-                currentPage={casesCurrentPage} 
-                totalPages={totalCasesPages} 
-                onPageChange={setCasesCurrentPage} 
+            <div className="bg-white rounded-md h-full flex flex-col">
+              <CaseListTable 
+                paginatedCases={paginatedCases} 
+                selectedCase={selectedCase} 
+                onSelectCase={setSelectedCase} 
               />
+              
+              {/* 案件一覧のページネーション */}
+              <div className="mt-4 flex justify-center">
+                <Pagination 
+                  currentPage={casesCurrentPage} 
+                  totalPages={totalCasesPages} 
+                  onPageChange={setCasesCurrentPage} 
+                />
+              </div>
             </div>
           </div>
           

@@ -6,11 +6,11 @@ import { Mail as MailIcon, FileText as FileTextIcon } from 'lucide-react';
 export const getStatusBadgeColor = (status: string) => {
   switch (status) {
     case "募集中":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 text-green-800 border-green-200";
     case "募集完了":
-      return "bg-amber-100 text-amber-800";
+      return "bg-amber-100 text-amber-800 border-amber-200";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
