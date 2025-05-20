@@ -55,12 +55,18 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   };
 
-  // Edit change handler
+  // Edit change handler - Fix: log the field and value to verify changes
   const handleEditChange = (field: string, value: any) => {
     if (editingCaseData) {
-      setEditingCaseData({
-        ...editingCaseData,
-        [field]: value
+      console.log(`Editing field: ${field}, new value:`, value);
+      
+      setEditingCaseData(prev => {
+        if (!prev) return null;
+        
+        return {
+          ...prev,
+          [field]: value
+        };
       });
     }
   };
@@ -68,6 +74,8 @@ export const useCaseSelection = (caseData: MailCase[]) => {
   // Save edit handler
   const handleSaveEdit = () => {
     if (editingCaseData) {
+      console.log("Saving edited data:", editingCaseData);
+      
       toast({
         title: "案件情報が更新されました",
         description: "変更が保存されました"
