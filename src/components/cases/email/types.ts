@@ -1,6 +1,16 @@
 
 export interface EmailSenderProps {
-  mailCases: any[];
+  mailCases: MailCase[];
+}
+
+export interface MailCase {
+  id: string;
+  title: string;
+  company?: string;
+  keyTechnologies?: string;
+  sender: string;
+  registrationType?: string;
+  registeredAt?: string;
 }
 
 export interface Engineer {
@@ -9,6 +19,7 @@ export interface Engineer {
   skills: string[];
   experience: string;
   status: string;
+  companyType?: string;
 }
 
 export interface EmailTemplate {
@@ -96,83 +107,95 @@ export const SAMPLE_ENGINEERS: Engineer[] = [
     name: "鈴木 一郎",
     skills: ["Java", "Spring Boot", "AWS"],
     experience: "7年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "自社"
   },
   {
     id: "e2",
     name: "佐藤 次郎",
     skills: ["React", "TypeScript", "Node.js"],
     experience: "5年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "自社"
   },
   {
     id: "e3",
     name: "田中 三郎",
     skills: ["Python", "Django", "AWS"],
     experience: "3年",
-    status: "稼働中"
+    status: "稼働中",
+    companyType: "他社"
   },
   {
     id: "e4",
     name: "高橋 四郎",
     skills: ["PHP", "Laravel", "MySQL"],
     experience: "6年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "自社"
   },
   {
     id: "e5",
     name: "渡辺 五郎",
     skills: ["C#", ".NET", "Azure"],
     experience: "8年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "他社"
   },
   {
     id: "e6",
     name: "伊藤 六郎",
     skills: ["Golang", "Docker", "Kubernetes"],
     experience: "4年",
-    status: "稼働中"
+    status: "稼働中",
+    companyType: "自社"
   },
   {
     id: "e7",
     name: "山本 七郎",
     skills: ["JavaScript", "Vue.js", "Firebase"],
     experience: "3年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "他社"
   },
   {
     id: "e8",
     name: "中村 八郎",
     skills: ["Swift", "iOS", "React Native"],
     experience: "5年",
-    status: "稼働中"
+    status: "稼働中",
+    companyType: "自社"
   },
   {
     id: "e9",
     name: "小林 九郎",
     skills: ["Angular", "TypeScript", "MongoDB"],
     experience: "4年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "他社"
   },
   {
     id: "e10",
     name: "加藤 十郎",
     skills: ["Ruby", "Rails", "PostgreSQL"],
     experience: "6年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "自社"
   },
   {
     id: "e11",
     name: "吉田 十一郎",
     skills: ["Java", "Android", "Kotlin"],
     experience: "7年",
-    status: "稼働中"
+    status: "稼働中",
+    companyType: "他社"
   },
   {
     id: "e12",
     name: "山田 十二郎",
     skills: ["React", "Redux", "GraphQL"],
     experience: "4年",
-    status: "稼働可能"
+    status: "稼働可能",
+    companyType: "自社"
   }
 ];
