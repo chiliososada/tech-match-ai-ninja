@@ -988,12 +988,12 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </div>
             </div>
 
-            {/* Bottom section with case input form - removed duplicate title */}
-            <Card>
-              <CardContent>
+            {/* Bottom section with case input form - improved styling to fix double border */}
+            <div className="bg-white rounded-xl shadow-sm">
+              <div className="p-6">
                 <CaseUploadForm />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}
