@@ -10,6 +10,7 @@ import { CaseUploadTab } from '@/components/cases/tabs/CaseUploadTab';
 import { EmailStatsTab } from '@/components/cases/tabs/EmailStatsTab';
 import { EmailSenderContainer } from '@/components/cases/EmailSenderContainer';
 import { CasesHeader } from '@/components/cases/CasesHeader';
+import { CaseArchiveTab } from '@/components/cases/tabs/CaseArchiveTab';
 
 // Import utilities and hooks
 import { 
@@ -129,17 +130,19 @@ export function Cases({ companyType = 'own' }: CasesProps) {
         <CasesHeader pageTitle={pageTitle} />
 
         <TabsWithContext defaultValue="list" contextId={effectiveCompanyType} className="space-y-6">
-          {/* For own company, show only two tabs */}
+          {/* For own company, show all tabs including the new archive tab */}
           {effectiveCompanyType === 'own' ? (
             <TabsList>
               <TabsTrigger contextId={effectiveCompanyType} value="list" className="japanese-text">案件一覧</TabsTrigger>
               <TabsTrigger contextId={effectiveCompanyType} value="upload" className="japanese-text">案件アップロード</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="archive" className="japanese-text">案件アーカイブ</TabsTrigger>
             </TabsList>
           ) : (
-            /* For other company, show all tabs */
+            /* For other company, show all tabs including the new archive tab */
             <TabsList>
               <TabsTrigger contextId={effectiveCompanyType} value="list" className="japanese-text">案件一覧</TabsTrigger>
               <TabsTrigger contextId={effectiveCompanyType} value="upload" className="japanese-text">案件アップロード</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="archive" className="japanese-text">案件アーカイブ</TabsTrigger>
               <TabsTrigger contextId={effectiveCompanyType} value="stats" className="japanese-text">メール案件統計</TabsTrigger>
               <TabsTrigger contextId={effectiveCompanyType} value="send" className="japanese-text">一括送信</TabsTrigger>
             </TabsList>
@@ -173,6 +176,11 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           
           <TabsContent contextId={effectiveCompanyType} value="upload" className="space-y-6">
             <CaseUploadTab />
+          </TabsContent>
+
+          {/* New Archive Tab */}
+          <TabsContent contextId={effectiveCompanyType} value="archive" className="space-y-6">
+            <CaseArchiveTab cases={caseData} companyType={effectiveCompanyType} />
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}
