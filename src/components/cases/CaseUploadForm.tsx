@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -18,7 +17,7 @@ export function CaseUploadForm() {
     '経験年数: [年数]\n' +
     '勤務地: [場所]\n' +
     '単価: [単価]\n' +
-    '期間: [期間]\n' +
+    '参画開始日: [開始日]\n' +
     '備考: [備考]'
   );
 
@@ -66,7 +65,7 @@ export function CaseUploadForm() {
       .replace('[年数]', '3年以上')
       .replace('[場所]', hasLocation)
       .replace('[単価]', hasBudget)
-      .replace('[期間]', '即日～長期')
+      .replace('[開始日]', '即日')
       .replace('[備考]', text);
   };
 

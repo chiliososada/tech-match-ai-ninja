@@ -69,7 +69,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
       <div className="space-y-2">
         <label className="text-sm font-medium japanese-text flex items-center">
           <Calendar className="h-4 w-4 mr-1 text-gray-600" />
-          参画期間
+          参画開始日
         </label>
         <Input 
           type="date"

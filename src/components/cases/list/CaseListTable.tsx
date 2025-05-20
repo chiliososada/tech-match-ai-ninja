@@ -35,7 +35,7 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
             {isOtherCompany && (
               <TableHead className="japanese-text font-medium">会社名</TableHead>
             )}
-            <TableHead className="japanese-text font-medium">参画期間</TableHead>
+            <TableHead className="japanese-text font-medium">参画開始日</TableHead>
             <TableHead className="japanese-text font-medium">勤務地</TableHead>
             <TableHead className="japanese-text font-medium">スキル要件</TableHead>
             <TableHead className="japanese-text font-medium">工程</TableHead>
