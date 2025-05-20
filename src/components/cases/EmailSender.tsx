@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card, 
@@ -103,7 +104,7 @@ export function EmailSender({
 
   const emailHandleSend = () => handleSendEmail(
     emailState.selectedCases,
-    mailCases as any[], // Type assertion to resolve the error
+    mailCases, // Removed the type assertion since we'll fix the function signature instead
     emailState.subject,
     emailState.emailBody,
     emailState.setSending,

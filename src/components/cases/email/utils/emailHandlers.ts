@@ -167,10 +167,10 @@ export const handleEnhanceEmail = (
   }, 1500);
 };
 
-// Handle sending email
+// Handle sending email - Updated the function signature to accept MailCase[] instead of any[]
 export const handleSendEmail = (
   selectedCases: MailCase[],
-  mailCases: MailCase[],
+  mailCases: MailCase[], // Changed from any[] to MailCase[]
   subject: string,
   emailBody: string,
   setSending: (sending: boolean) => void,

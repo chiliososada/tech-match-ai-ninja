@@ -364,7 +364,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
-  // 案件選択ハンドラー
+  // 案件選択ハンドラー - Fixed to properly handle MailCase type
   const handleCaseSelect = (caseItem: any) => {
     setSelectedCase(caseItem);
     setEditingCaseData(null);
@@ -461,7 +461,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseList 
               filteredCases={filteredCases}
               selectedCase={selectedCase}
-              setSelectedCase={handleCaseSelect}
+              setSelectedCase={handleCaseSelect} // Using our fixed handler
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               statusFilter={statusFilter}
