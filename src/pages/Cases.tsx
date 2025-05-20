@@ -4,7 +4,7 @@ import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
 import { StructuredCaseForm } from '@/components/cases/StructuredCaseForm';
 import { EmailSender } from '@/components/cases/EmailSender';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Table, 
   TableBody, 
@@ -516,24 +516,24 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           <h2 className="text-3xl font-bold tracking-tight japanese-text">{pageTitle}</h2>
         </div>
 
-        <Tabs defaultValue="list" className="space-y-6">
+        <TabsWithContext defaultValue="list" contextId={effectiveCompanyType} className="space-y-6">
           {/* For own company, show only two tabs */}
           {effectiveCompanyType === 'own' ? (
             <TabsList>
-              <TabsTrigger value="list" className="japanese-text">案件一覧</TabsTrigger>
-              <TabsTrigger value="upload" className="japanese-text">案件アップロード</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="list" className="japanese-text">案件一覧</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="upload" className="japanese-text">案件アップロード</TabsTrigger>
             </TabsList>
           ) : (
             /* For other company, show all tabs */
             <TabsList>
-              <TabsTrigger value="list" className="japanese-text">案件一覧</TabsTrigger>
-              <TabsTrigger value="upload" className="japanese-text">案件アップロード</TabsTrigger>
-              <TabsTrigger value="stats" className="japanese-text">メール案件統計</TabsTrigger>
-              <TabsTrigger value="send" className="japanese-text">一括送信</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="list" className="japanese-text">案件一覧</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="upload" className="japanese-text">案件アップロード</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="stats" className="japanese-text">メール案件統計</TabsTrigger>
+              <TabsTrigger contextId={effectiveCompanyType} value="send" className="japanese-text">一括送信</TabsTrigger>
             </TabsList>
           )}
           
-          <TabsContent value="list" className="space-y-6">
+          <TabsContent contextId={effectiveCompanyType} value="list" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="japanese-text">案件一覧</CardTitle>
@@ -933,7 +933,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             </Card>
           </TabsContent>
           
-          <TabsContent value="upload" className="space-y-6">
+          <TabsContent contextId={effectiveCompanyType} value="upload" className="space-y-6">
             {/* Top section with file upload (1/3) and structured case form (2/3) */}
             <div className="grid grid-cols-3 gap-6">
               {/* File Upload Card (1/3 width) */}
@@ -999,7 +999,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           {/* Only show the stats and send tabs for other company */}
           {effectiveCompanyType === 'other' && (
             <>
-              <TabsContent value="stats" className="space-y-6">
+              <TabsContent contextId={effectiveCompanyType} value="stats" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="japanese-text">メール案件の統計情報</CardTitle>
@@ -1280,12 +1280,12 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="send" className="space-y-6">
+              <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
                 <EmailSender mailCases={filteredMailCases} />
               </TabsContent>
             </>
           )}
-        </Tabs>
+        </TabsWithContext>
       </div>
     </MainLayout>
   );
