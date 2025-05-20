@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from "@/hooks/toast";
-import { Mail as MailIcon, FileText as FileTextIcon } from 'lucide-react'; // Fix import of icons
+import { Mail as MailIcon, FileText as FileTextIcon } from 'lucide-react';
 
 // Import components
 import { CaseList } from '@/components/cases/list/CaseList';
@@ -11,7 +12,7 @@ import { CaseUploadTab } from '@/components/cases/tabs/CaseUploadTab';
 import { EmailStatsTab } from '@/components/cases/tabs/EmailStatsTab';
 import { EmailOptimizationCard } from '@/components/cases/tabs/EmailOptimizationCard';
 import { EmailSender } from '@/components/cases/EmailSender';
-import { MailCase } from '@/components/cases/email/types'; // Import MailCase type
+import { MailCase } from '@/components/cases/email/types';
 
 // Import utilities
 import { 
@@ -335,7 +336,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const [emailDateFrom, setEmailDateFrom] = useState("");
   const [emailDateTo, setEmailDateTo] = useState("");
   
-  // 選択された案件のステート
+  // Define CaseDataType explicitly to match exactly with the case data structure
   type CaseDataType = typeof caseData[0];
   const [selectedCase, setSelectedCase] = useState<CaseDataType | null>(null);
   // 編集モードのステート
@@ -364,11 +365,19 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
-  // 案件選択ハンドラー - Fixed type issues
+  // Create a proper handler function that can accept MailCase and convert to CaseDataType
   const handleCaseSelect = (caseItem: MailCase) => {
-    // Create a type-safe function that handles the conversion properly
-    const typedCaseItem = caseItem as unknown as CaseDataType;
-    setSelectedCase(typedCaseItem);
+    // Find the matching case with full data structure from our original caseData
+    const fullCaseData = caseData.find(item => item.id === caseItem.id);
+    
+    // If found in our original data, use it; otherwise use the passed item with type assertion
+    if (fullCaseData) {
+      setSelectedCase(fullCaseData);
+    } else {
+      // Make a safe type assertion with all required properties
+      setSelectedCase(caseItem as unknown as CaseDataType);
+    }
+    
     setEditingCaseData(null);
     setEditMode(false);
   };
@@ -463,7 +472,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseList 
               filteredCases={filteredCases}
               selectedCase={selectedCase}
-              setSelectedCase={handleCaseSelect} // Using our fixed handler function
+              setSelectedCase={handleCaseSelect}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               statusFilter={statusFilter}
