@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -934,24 +935,67 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           </TabsContent>
           
           <TabsContent value="upload" className="space-y-6">
-            {/* Form positions swapped */}
+            {/* New layout for the upload tab in 自社案件管理 */}
+            {/* Top section with file upload (1/3) and structured case form (2/3) */}
+            <div className="grid grid-cols-3 gap-6">
+              {/* File Upload Card (1/3 width) */}
+              <div className="col-span-1">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="japanese-text">ファイルをアップロード</CardTitle>
+                    <CardDescription className="japanese-text">
+                      案件情報のファイル（Excel、PDF、Word）をアップロードしてください
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-center w-full">
+                      <label
+                        htmlFor="dropzone-file"
+                        className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 border-border"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <FileText className="w-8 h-8 mb-3 text-muted-foreground" />
+                          <p className="mb-2 text-sm text-muted-foreground">
+                            <span className="font-semibold japanese-text">クリックしてファイルをアップロード</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground japanese-text">
+                            Excel、PDF、またはWord形式
+                          </p>
+                        </div>
+                        <Input
+                          id="dropzone-file"
+                          type="file"
+                          accept=".xlsx,.xls,.pdf,.doc,.docx"
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Structured Case Form Card (2/3 width) */}
+              <div className="col-span-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="japanese-text">案件情報の構造化</CardTitle>
+                    <CardDescription className="japanese-text">
+                      AIにより案件情報が自動的に構造化されます
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <StructuredCaseForm />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Bottom section with case input form */}
             <Card>
               <CardHeader>
-                <CardTitle className="japanese-text">案件情報の構造化</CardTitle>
+                <CardTitle className="japanese-text">案件情報を入力</CardTitle>
                 <CardDescription className="japanese-text">
-                  AIにより案件情報が自動的に構造化されます
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <StructuredCaseForm />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="japanese-text">新規案件の追加</CardTitle>
-                <CardDescription className="japanese-text">
-                  案件情報をアップロードまたは手動で入力して、システムに追加します
+                  口頭の案件情報を入力して、構造化されたデータに変換します
                 </CardDescription>
               </CardHeader>
               <CardContent>
