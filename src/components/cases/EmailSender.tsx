@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -358,7 +357,7 @@ ${emailBody.includes('よろしくお願いいたします') ? '' : '\nご検討
         filteredEngineersLength={filteredEngineers.length}
         engineerCompanyFilter={engineerCompanyFilter}
         setEngineerCompanyFilter={setEngineerCompanyFilter}
-        showCompanyType={isOtherCompanyMode} // 他社モードの場合のみ会社区分を表示
+        showCompanyType={isOtherCompanyMode} // 他社モードの場合のみ会社區分を表示
       />
     </div>
   );
