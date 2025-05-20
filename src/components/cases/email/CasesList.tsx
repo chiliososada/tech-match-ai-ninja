@@ -17,7 +17,7 @@ import { MailCase } from './types';
 
 interface CasesListProps {
   paginatedCases: MailCase[];
-  selectedCases: string[];
+  selectedCases: MailCase[]; // Changed from string[] to MailCase[]
   handleSelectCase: (id: string) => void;
   selectAll: boolean;
   handleSelectAll: () => void;
@@ -88,7 +88,7 @@ export const CasesList: React.FC<CasesListProps> = ({
               <TableRow key={item.id}>
                 <TableCell>
                   <Checkbox 
-                    checked={selectedCases.includes(item.id)} 
+                    checked={selectedCases.some(caseItem => caseItem.id === item.id)} // Updated to check using object comparison
                     onCheckedChange={() => handleSelectCase(item.id)}
                   />
                 </TableCell>

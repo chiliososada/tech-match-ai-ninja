@@ -364,10 +364,11 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
-  // 案件選択ハンドラー - Fixed type issue
+  // 案件選択ハンドラー - Fixed type issues
   const handleCaseSelect = (caseItem: MailCase) => {
-    // Create a fixed version that properly handles the type conversion
-    setSelectedCase(caseItem as unknown as CaseDataType);
+    // Create a type-safe function that handles the conversion properly
+    const typedCaseItem = caseItem as unknown as CaseDataType;
+    setSelectedCase(typedCaseItem);
     setEditingCaseData(null);
     setEditMode(false);
   };
@@ -462,7 +463,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseList 
               filteredCases={filteredCases}
               selectedCase={selectedCase}
-              setSelectedCase={handleCaseSelect} // Using our fixed handler
+              setSelectedCase={handleCaseSelect} // Using our fixed handler function
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               statusFilter={statusFilter}

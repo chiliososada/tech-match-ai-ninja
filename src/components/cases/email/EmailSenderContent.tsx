@@ -39,7 +39,7 @@ interface EmailSenderContentProps {
   caseData: {
     paginatedCases: MailCase[];
     totalPages: number;
-    companyList: any[];  // Changed from string[] to any[] to match the actual type
+    companyList: any[];
   };
   handlers: {
     casesHandleSelectAll: () => void;
