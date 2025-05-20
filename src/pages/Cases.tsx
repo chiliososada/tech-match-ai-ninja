@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -8,7 +7,6 @@ import { TabsWithContext, TabsContent, TabsList, TabsTrigger } from '@/component
 import { CaseList } from '@/components/cases/list/CaseList';
 import { CaseUploadTab } from '@/components/cases/tabs/CaseUploadTab';
 import { EmailStatsTab } from '@/components/cases/tabs/EmailStatsTab';
-import { EmailOptimizationCard } from '@/components/cases/tabs/EmailOptimizationCard';
 import { EmailSenderContainer } from '@/components/cases/EmailSenderContainer';
 import { CasesHeader } from '@/components/cases/CasesHeader';
 
@@ -187,7 +185,6 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                   emailStats={emailStats}
                   companyList={companyList}
                 />
-                <EmailOptimizationCard />
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
