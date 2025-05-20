@@ -5,11 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileUp, Upload, Wand2 } from 'lucide-react';
+import { Upload, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function CaseUploadForm() {
-  const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [description, setDescription] = useState('');
   const [beautifiedText, setBeautifiedText] = useState('');
@@ -22,20 +21,6 @@ export function CaseUploadForm() {
     '期間: [期間]\n' +
     '備考: [備考]'
   );
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setIsUploading(true);
-      // Simulate file upload
-      setTimeout(() => {
-        setIsUploading(false);
-        toast.success('ファイルがアップロードされました', {
-          description: `${file.name} がアップロードされました。処理中...`
-        });
-      }, 1500);
-    }
-  };
 
   const handleDescriptionSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,119 +86,82 @@ export function CaseUploadForm() {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
-      <Card>
+    <Card className="w-full">
+      <form onSubmit={handleDescriptionSubmit}>
         <CardHeader>
-          <CardTitle className="japanese-text">ファイルをアップロード</CardTitle>
+          <CardTitle className="japanese-text">案件情報を入力</CardTitle>
           <CardDescription className="japanese-text">
-            案件情報のファイル（Excel、PDF、Word）をアップロードしてください
+            口頭の案件情報を入力して、構造化されたデータに変換します
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center w-full">
-            <label
-              htmlFor="dropzone-file"
-              className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 border-border"
-            >
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <FileUp className="w-8 h-8 mb-3 text-muted-foreground" />
-                <p className="mb-2 text-sm text-muted-foreground">
-                  <span className="font-semibold japanese-text">クリックしてファイルをアップロード</span>
-                </p>
-                <p className="text-xs text-muted-foreground japanese-text">
-                  Excel、PDF、またはWord形式
-                </p>
-              </div>
-              <Input
-                id="dropzone-file"
-                type="file"
-                accept=".xlsx,.xls,.pdf,.doc,.docx"
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={isUploading}
+          <div className="grid w-full gap-4">
+            <div className="grid w-full gap-1.5">
+              <Label htmlFor="case-description" className="japanese-text">案件の説明</Label>
+              <Textarea
+                id="case-description"
+                placeholder="例：「Java、SpringBootの経験者を募集しています。勤務地は東京、期間は6ヶ月～、単価は60〜80万円です。」"
+                className="min-h-[120px] japanese-text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                disabled={isProcessing}
               />
-            </label>
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              <Label htmlFor="format-template" className="japanese-text">出力フォーマット</Label>
+              <Textarea
+                id="format-template"
+                placeholder="出力フォーマットのテンプレート"
+                className="h-20 japanese-text"
+                value={formatTemplate}
+                onChange={(e) => setFormatTemplate(e.target.value)}
+                disabled={isProcessing}
+              />
+              <p className="text-xs text-muted-foreground japanese-text">
+                フォーマットに[案件名]、[スキル]、[年数]などのプレースホルダーを使用してください
+              </p>
+            </div>
+            
+            {beautifiedText && (
+              <div className="space-y-2 mt-2">
+                <Label htmlFor="beautified-text" className="japanese-text">AI生成された案件情報</Label>
+                <div className="bg-muted p-4 rounded-md">
+                  <pre className="text-sm whitespace-pre-wrap japanese-text">{beautifiedText}</pre>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
-      </Card>
-      
-      <Card>
-        <form onSubmit={handleDescriptionSubmit}>
-          <CardHeader>
-            <CardTitle className="japanese-text">案件情報を入力</CardTitle>
-            <CardDescription className="japanese-text">
-              口頭の案件情報を入力して、構造化されたデータに変換します
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid w-full gap-4">
-              <div className="grid w-full gap-1.5">
-                <Label htmlFor="case-description" className="japanese-text">案件の説明</Label>
-                <Textarea
-                  id="case-description"
-                  placeholder="例：「Java、SpringBootの経験者を募集しています。勤務地は東京、期間は6ヶ月～、単価は60〜80万円です。」"
-                  className="min-h-[120px] japanese-text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  disabled={isProcessing}
-                />
-              </div>
-              
-              <div className="flex flex-col space-y-2">
-                <Label htmlFor="format-template" className="japanese-text">出力フォーマット</Label>
-                <Textarea
-                  id="format-template"
-                  placeholder="出力フォーマットのテンプレート"
-                  className="h-20 japanese-text"
-                  value={formatTemplate}
-                  onChange={(e) => setFormatTemplate(e.target.value)}
-                  disabled={isProcessing}
-                />
-                <p className="text-xs text-muted-foreground japanese-text">
-                  フォーマットに[案件名]、[スキル]、[年数]などのプレースホルダーを使用してください
-                </p>
-              </div>
-              
-              {beautifiedText && (
-                <div className="space-y-2 mt-2">
-                  <Label htmlFor="beautified-text" className="japanese-text">AI生成された案件情報</Label>
-                  <div className="bg-muted p-4 rounded-md">
-                    <pre className="text-sm whitespace-pre-wrap japanese-text">{beautifiedText}</pre>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
-            <Button 
-              type="button" 
-              variant="outline"
-              className="japanese-text w-full sm:w-auto" 
-              onClick={handleAIBeautify}
-              disabled={isProcessing || !description.trim()}
-            >
-              <Wand2 className="mr-2 h-4 w-4" />
-              AIで美化
-            </Button>
-            
-            <Button 
-              type="submit" 
-              className="japanese-text w-full sm:w-auto" 
-              disabled={!description.trim() || isProcessing}
-            >
-              {isProcessing ? (
-                <>処理中...</>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  分析して構造化
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+        <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
+          <Button 
+            type="button" 
+            variant="outline"
+            className="japanese-text w-full sm:w-auto" 
+            onClick={handleAIBeautify}
+            disabled={isProcessing || !description.trim()}
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            AIで美化
+          </Button>
+          
+          <Button 
+            type="submit" 
+            className="japanese-text w-full sm:w-auto" 
+            disabled={!description.trim() || isProcessing}
+          >
+            {isProcessing ? (
+              <>処理中...</>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                分析して構造化
+              </>
+            )}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
 
