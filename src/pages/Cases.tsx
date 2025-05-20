@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CaseUploadForm } from '@/components/cases/CaseUploadForm';
@@ -935,7 +934,6 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           </TabsContent>
           
           <TabsContent value="upload" className="space-y-6">
-            {/* New layout for the upload tab in 自社案件管理 */}
             {/* Top section with file upload (1/3) and structured case form (2/3) */}
             <div className="grid grid-cols-3 gap-6">
               {/* File Upload Card (1/3 width) */}
@@ -990,7 +988,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </div>
             </div>
 
-            {/* Bottom section with case input form */}
+            {/* Bottom section with ONLY case input form - removed file upload part */}
             <Card>
               <CardHeader>
                 <CardTitle className="japanese-text">案件情報を入力</CardTitle>
