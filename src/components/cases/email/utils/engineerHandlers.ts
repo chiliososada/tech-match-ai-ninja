@@ -1,4 +1,7 @@
 
+// Import toast from the appropriate location
+import { toast } from "@/hooks/use-toast";
+
 import { MailCase } from "../types";
 
 // Open engineer search dialog
@@ -109,3 +112,4 @@ Email: tanaka@techmatch.co.jp`;
   console.log("Applied engineers to template, email body updated");
   toast.success("技術者情報をメール本文に反映しました");
 };
+
