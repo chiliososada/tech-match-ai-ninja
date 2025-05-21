@@ -3,12 +3,13 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
 export const StatusLegend: React.FC = () => {
-  // Define status types with their Japanese names and badge variants
+  // Updated status types with their Japanese names and badge variants to match talent management
   const statusTypes = [
-    { name: '稼働可能', variant: 'success', description: '稼働可能なエンジニア' },
-    { name: '条件付き', variant: 'warning', description: '条件付きで稼働可能' },
-    { name: '稼働中', variant: 'info', description: '現在稼働中' },
-    { name: '予約済み', variant: 'secondary', description: '予約済みのエンジニア' },
+    { name: '提案中', variant: 'proposed', description: '企業に提案中のエンジニア' },
+    { name: '事前面談', variant: 'preliminary', description: '事前面談予定のエンジニア' },
+    { name: '面談', variant: 'interview', description: '面談中のエンジニア' },
+    { name: '結果待ち', variant: 'waiting', description: '面談結果待ちのエンジニア' },
+    { name: '営業終了', variant: 'completed', description: '営業活動が終了したエンジニア' },
   ];
 
   return (

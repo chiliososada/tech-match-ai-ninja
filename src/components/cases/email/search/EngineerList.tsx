@@ -17,12 +17,13 @@ export const EngineerList: React.FC<EngineerListProps> = ({
   toggleEngineerSelection,
   filteredEngineersLength
 }) => {
-  // Function to determine badge color based on status
+  // Updated function to determine badge variant based on status
   const getBadgeVariant = (status: string) => {
-    if (status === "稼働可能") return "success";
-    if (status === "条件付き") return "warning";
-    if (status === "稼働中") return "info";
-    if (status === "予約済み") return "secondary";
+    if (status === "提案中") return "proposed";
+    if (status === "事前面談") return "preliminary";
+    if (status === "面談") return "interview";
+    if (status === "結果待ち") return "waiting";
+    if (status === "営業終了") return "completed";
     return "default"; // fallback
   };
   
