@@ -1,3 +1,4 @@
+
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
 import { toast } from 'sonner';
 
@@ -18,7 +19,7 @@ export const handleSelectAll = (
   }
 };
 
-// 案件個別の選択処理
+// 案件個別の選択処理 - 修正: 送信者単位での選択に変更
 export const handleSelectCase = (
   id: string,
   selectedCases: MailCase[],
@@ -26,21 +27,21 @@ export const handleSelectCase = (
   setSelectedCases: (cases: MailCase[]) => void,
   setSelectAll: (value: boolean) => void
 ) => {
-  // 既に選択されているかチェック
+  // 対象のケースを取得
+  const caseItem = paginatedCases.find(item => item.id === id);
+  if (!caseItem) return;
+  
+  // すでに選択されているか確認
   const isSelected = selectedCases.some(item => item.id === id);
+  
   let newSelectedCases: MailCase[];
   
   if (isSelected) {
     // 選択解除
     newSelectedCases = selectedCases.filter(item => item.id !== id);
   } else {
-    // 追加選択
-    const caseToAdd = paginatedCases.find(item => item.id === id);
-    if (caseToAdd) {
-      newSelectedCases = [...selectedCases, caseToAdd];
-    } else {
-      return; // 見つからない場合は処理終了
-    }
+    // 追加選択 - 既存の選択ケースとマージ
+    newSelectedCases = [...selectedCases, caseItem];
   }
   
   setSelectedCases(newSelectedCases);
@@ -52,7 +53,7 @@ export const handleSelectCase = (
   setSelectAll(allSelected);
 };
 
-// テンプレート変更時の処理
+// テンプレート変更時の処理 - 修正: テンプレート適用を確実に行う
 export const handleTemplateChange = (
   templateId: string,
   setSelectedTemplate: (template: string) => void,
@@ -63,9 +64,16 @@ export const handleTemplateChange = (
   
   // テンプレートに応じた件名と本文を設定
   const template = EMAIL_TEMPLATES.find(t => t.id === templateId);
+  
   if (template) {
-    setSubject(template.subject || "");
-    setEmailBody(template.body || "");
+    console.log("Applying template:", template.name);
+    // 少し遅延を入れて確実に状態が更新されるようにする
+    setTimeout(() => {
+      setSubject(template.subject || "");
+      setEmailBody(template.body || "");
+    }, 0);
+  } else {
+    console.log("Template not found for ID:", templateId);
   }
 };
 

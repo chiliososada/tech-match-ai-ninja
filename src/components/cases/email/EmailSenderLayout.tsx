@@ -97,24 +97,30 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
     return count;
   }, [selectedSendersByCompany]);
 
+  // Log template changes for debugging
+  React.useEffect(() => {
+    console.log("Current selected template:", emailState.selectedTemplate);
+    console.log("Current email body:", emailState.emailBody);
+  }, [emailState.selectedTemplate, emailState.emailBody]);
+
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* 左カラム - 選択した送信者一覧 */}
-      <div>
-        <Card className="h-full border-primary/10">
+      <div className="h-full">
+        <Card className="h-full flex flex-col border-primary/10">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-medium japanese-text flex justify-between items-center">
               <span>選択した送信者</span>
               <Badge variant="secondary" className="ml-2">{totalSelectedSenders}人</Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-2 flex-1">
             {totalSelectedSenders === 0 ? (
-              <div className="text-sm text-muted-foreground japanese-text py-4 text-center border border-dashed rounded-md">
+              <div className="text-sm text-muted-foreground japanese-text py-4 text-center border border-dashed rounded-md h-full flex items-center justify-center">
                 送信者が選択されていません
               </div>
             ) : (
-              <ScrollArea className="h-[300px] pr-4">
+              <ScrollArea className="h-[400px] pr-4">
                 {Object.entries(selectedSendersByCompany).map(([company, senders]) => (
                   <div key={company} className="mb-4">
                     <h4 className="font-semibold text-sm bg-muted px-2 py-1 rounded mb-2 japanese-text">

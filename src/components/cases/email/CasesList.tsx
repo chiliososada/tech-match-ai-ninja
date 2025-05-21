@@ -52,6 +52,7 @@ export const CasesList: React.FC<CasesListProps> = ({
   console.log('CasesList rendering with showCompanyInfo:', showCompanyInfo);
   console.log('Number of cases to display:', paginatedCases.length);
   console.log('Current page:', currentPage, 'Total pages:', totalPages);
+  console.log('Selected cases:', selectedCases.map(c => c.id));
 
   // Flatten cases to show senders as the primary entity
   const flattenedSenders = React.useMemo(() => {
@@ -62,6 +63,7 @@ export const CasesList: React.FC<CasesListProps> = ({
       keyTechnologies: string;
       sender: string;
       email: string;
+      position?: string;
       registrationType?: string;
       registeredAt?: string;
       originalCase: MailCase;
@@ -78,6 +80,7 @@ export const CasesList: React.FC<CasesListProps> = ({
             keyTechnologies: caseItem.keyTechnologies || '',
             sender: sender.name,
             email: sender.email,
+            position: sender.position,
             registrationType: caseItem.registrationType,
             registeredAt: caseItem.registeredAt,
             originalCase: caseItem
@@ -117,18 +120,9 @@ export const CasesList: React.FC<CasesListProps> = ({
     return flattened;
   }, [paginatedCases]);
 
-  // Check if a sender is selected
-  const isSenderSelected = (caseId: string, sender: string, email: string) => {
-    const caseSelected = selectedCases.find(c => c.id === caseId);
-    if (!caseSelected) return false;
-    
-    // If the case has senders array, check if this specific sender is in it
-    if (caseSelected.senders) {
-      return caseSelected.senders.some(s => s.name === sender && s.email === email);
-    }
-    
-    // If the case has a single sender, check if it matches
-    return caseSelected.sender === sender && caseSelected.senderEmail === email;
+  // Check if a case is selected (not just the sender)
+  const isCaseSelected = (caseId: string) => {
+    return selectedCases.some(c => c.id === caseId);
   };
 
   return (
@@ -171,11 +165,16 @@ export const CasesList: React.FC<CasesListProps> = ({
               <TableRow key={`${item.caseId}-${item.sender}-${index}`}>
                 <TableCell>
                   <Checkbox 
-                    checked={isSenderSelected(item.caseId, item.sender, item.email)}
+                    checked={isCaseSelected(item.caseId)}
                     onCheckedChange={() => handleSelectCase(item.caseId)}
                   />
                 </TableCell>
-                <TableCell className="font-medium japanese-text">{item.sender || '送信者なし'}</TableCell>
+                <TableCell className="font-medium japanese-text">
+                  {item.sender || '送信者なし'}
+                  {item.position && (
+                    <span className="ml-1 text-xs text-muted-foreground">({item.position})</span>
+                  )}
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {item.email || '-'}
                 </TableCell>
