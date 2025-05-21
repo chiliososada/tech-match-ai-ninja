@@ -71,10 +71,16 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
   const [selectedCase, setSelectedCase] = React.useState<MailCase | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = React.useState(false);
   
-  // Filter company list based on search term
+  // Filter company list based on search term and ensure no null or empty string values
   const filteredCompanyList = React.useMemo(() => {
-    if (!companySearchTerm) return caseData.companyList;
-    return caseData.companyList.filter((company) => 
+    // First filter out null or empty strings
+    const validCompanies = caseData.companyList.filter(company => 
+      company !== null && company !== ""
+    );
+    
+    // Then filter based on search term
+    if (!companySearchTerm) return validCompanies;
+    return validCompanies.filter((company) => 
       company && company.toLowerCase().includes(companySearchTerm.toLowerCase())
     );
   }, [caseData.companyList, companySearchTerm]);
@@ -170,4 +176,3 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
     </div>
   );
 };
-

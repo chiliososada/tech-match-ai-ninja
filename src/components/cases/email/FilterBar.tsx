@@ -18,6 +18,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setTechFilter,
   companyList
 }) => {
+  // Filter out null or empty string values from companyList
+  const validCompanyList = companyList.filter(company => company !== null && company !== "");
+
   return (
     <div className="mt-4 flex flex-col sm:flex-row gap-4">
       <Select value={companyFilter} onValueChange={setCompanyFilter}>
@@ -26,7 +29,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </SelectTrigger>
         <SelectContent className="max-h-[300px] overflow-y-auto">
           <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-          {companyList.map((company, index) => (
+          {validCompanyList.map((company, index) => (
             <SelectItem key={`${company}-${index}`} value={company as string} className="japanese-text">
               {company as string}
             </SelectItem>
