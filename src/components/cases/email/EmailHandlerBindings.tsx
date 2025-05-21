@@ -13,7 +13,7 @@ import {
   handleSendEmail,
   handleTestEmail
 } from './utils/sending/emailSendingHandlers';
-import { Engineer } from '@/components/candidates/types';
+import { Engineer } from '@/components/cases/email/types';  // Use our local Engineer type
 import { createEngineerHandlers } from './utils/engineerHandlers';
 
 interface EmailHandlerBindingsProps {
@@ -142,7 +142,9 @@ export const useEmailHandlerBindings = ({
       // Append engineer info to email body
       const engineerInfo = `\n\n【ご提案する技術者】\n${engineerNames}\n\n【技術者のスキル】\n- ${engineerSkills}`;
       
-      emailState.setEmailBody(prev => prev + engineerInfo);
+      // Fix: Properly handle the callback for setEmailBody to accept a string
+      const currentBody = emailState.emailBody;
+      emailState.setEmailBody(currentBody + engineerInfo);
     }
   );
 

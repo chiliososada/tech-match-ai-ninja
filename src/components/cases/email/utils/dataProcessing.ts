@@ -1,6 +1,5 @@
 
-import { MailCase } from '../types';
-import { Engineer } from '@/components/candidates/types';
+import { MailCase, Engineer } from '../types';
 
 /**
  * Processes case data for display

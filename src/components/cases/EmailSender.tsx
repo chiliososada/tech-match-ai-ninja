@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { EngineerSearchDialog } from './email/search/EngineerSearchDialog';
-import { MailCase } from './email/types';
+import { MailCase, Engineer } from './email/types'; // Import our local Engineer type
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailHandlerBindings } from './email/EmailHandlerBindings';
 
@@ -14,9 +14,9 @@ export interface EmailSenderComponentProps {
     companyList: any[];
   };
   engineerData: {
-    paginatedEngineers: any[];
+    paginatedEngineers: Engineer[];
     totalEngineerPages: number;
-    filteredEngineers: any[];
+    filteredEngineers: Engineer[];
   };
   emailState: {
     selectAll: boolean;
@@ -41,8 +41,8 @@ export interface EmailSenderComponentProps {
     setSignature: (signature: string) => void;
   };
   engineerState: {
-    selectedEngineers: any[];
-    setSelectedEngineers: (engineers: any[]) => void;
+    selectedEngineers: Engineer[];
+    setSelectedEngineers: (engineers: Engineer[]) => void;
     isEngineerDialogOpen: boolean;
     setIsEngineerDialogOpen: (isOpen: boolean) => void;
     engineerFilter: string;

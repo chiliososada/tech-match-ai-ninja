@@ -1,5 +1,5 @@
 
-import { Engineer } from '@/components/candidates/types';
+import { Engineer } from '@/components/cases/email/types'; // Use our local Engineer type
 import { toast } from 'sonner';
 
 export interface EngineerHandlersProps {
@@ -77,9 +77,8 @@ export const removeSelectedEngineer = (
 export const applyEngineerToTemplate = (
   selectedEngineers: Engineer[],
   selectedCases: any[],
-  setSelectedTemplate: (template: string) => void,
-  setSubject: (subject: string) => void,
-  setEmailBody: (body: string) => void
+  setEmailBody: (body: string) => void,
+  currentEmailBody: string
 ) => {
   if (selectedEngineers.length === 0) {
     toast.error('技術者が選択されていません');
@@ -112,6 +111,7 @@ export const applyEngineerToTemplate = (
   // Append engineer info to email body
   const engineerInfo = `\n\n【ご提案する技術者】\n${engineerNames}\n\n【技術者のスキル】\n- ${engineerSkills}`;
   
-  setEmailBody(prev => prev + engineerInfo);
+  // Fix: Use the current email body directly instead of a function
+  setEmailBody(currentEmailBody + engineerInfo);
   toast.success('技術者情報をメール本文に反映しました');
 };

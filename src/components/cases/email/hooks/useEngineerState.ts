@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Engineer } from '@/components/candidates/types';
+import { Engineer } from '@/components/cases/email/types';  // Import Engineer type from our local types
 
 export const useEngineerState = () => {
   const [isEngineerDialogOpen, setIsEngineerDialogOpen] = useState(false);
@@ -28,6 +28,7 @@ export const useEngineerState = () => {
   return {
     isEngineerDialogOpen,
     selectedEngineers,
+    setSelectedEngineers, // Added this method to fix the error
     openEngineerDialog,
     closeEngineerDialog,
     addEngineer,

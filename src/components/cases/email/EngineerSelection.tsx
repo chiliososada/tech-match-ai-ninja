@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Search, UserPlus, User } from 'lucide-react';
-import { Engineer } from '@/components/candidates/types'; // Import the Engineer type
+import { Engineer } from '../types'; // Use our local Engineer type
 
 interface EngineerSelectionProps {
-  selectedEngineers: Engineer[]; // Updated to use Engineer type
+  selectedEngineers: Engineer[];
   openEngineerDialog: () => void;
   removeSelectedEngineer: (engineerId: string) => void;
   applyEngineerToTemplate: () => void;
@@ -62,11 +62,11 @@ export const EngineerSelection: React.FC<EngineerSelectionProps> = ({
                       {Array.isArray(engineer.skills) ? engineer.skills.join(", ") : engineer.skills} | {engineer.experience}
                     </p>
                     {Array.isArray(engineer.status) && engineer.status.length > 0 ? (
-                      <Badge variant={getBadgeVariant(engineer.status[0])} className="text-xs">
+                      <Badge variant={getBadgeVariant(engineer.status[0]) as any} className="text-xs">
                         {engineer.status[0]}
                       </Badge>
                     ) : engineer.status ? (
-                      <Badge variant={getBadgeVariant(engineer.status.toString())} className="text-xs">
+                      <Badge variant={getBadgeVariant(engineer.status.toString()) as any} className="text-xs">
                         {engineer.status.toString()}
                       </Badge>
                     ) : null}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
@@ -169,6 +168,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
       emailState.setSelectAll(false);
       emailState.setSubject('');
       emailState.setEmailBody('');
+      // Use setSelectedEngineers from engineerState
       engineerState.setSelectedEngineers([]);
       emailState.setSending(false);
     }, 2000);

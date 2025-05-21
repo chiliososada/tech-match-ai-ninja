@@ -1,3 +1,4 @@
+
 export interface MailCase {
   id: string;
   title: string;
@@ -54,15 +55,16 @@ export interface EmailSenderProps {
   mailCases: MailCase[];
 }
 
-// Update Engineer type to include status
+// Update Engineer type to make it compatible with candidates/types.ts
+// Making all fields optional that are required in candidates/types.ts
 export interface Engineer {
   id: string;
   name: string;
-  skills?: string[];
+  skills?: string[] | string;
   japaneseLevel?: string;
   experience?: string;
   availability?: string;
-  status?: string; // Add status property
+  status?: string[] | string; 
   remarks?: string;
   companyType?: string;
   companyName?: string;

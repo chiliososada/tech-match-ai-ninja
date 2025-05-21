@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Engineer } from '@/components/candidates/types';
+import { Engineer } from '@/components/cases/email/types'; // Use our local Engineer type
 
 interface EngineerSelectionDialogProps {
   isOpen: boolean;
