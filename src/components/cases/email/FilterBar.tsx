@@ -2,6 +2,7 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Calendar } from 'lucide-react';
 
 interface FilterBarProps {
   companyFilter: string;
@@ -9,6 +10,8 @@ interface FilterBarProps {
   techFilter: string;
   setTechFilter: (value: string) => void;
   companyList: (string | null)[];
+  startDateFilter?: string;
+  setStartDateFilter?: (value: string) => void;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -16,7 +19,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setCompanyFilter,
   techFilter,
   setTechFilter,
-  companyList
+  companyList,
+  startDateFilter = "",
+  setStartDateFilter
 }) => {
   // Filter out null, undefined, empty strings and ensure they're unique
   const validCompanyList = React.useMemo(() => {
@@ -59,6 +64,21 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         onChange={(e) => setTechFilter(e.target.value)}
         className="japanese-text bg-white"
       />
+      
+      {setStartDateFilter && (
+        <div className="relative">
+          <div className="absolute left-3 top-3 text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+          </div>
+          <Input 
+            type="date" 
+            placeholder="参画開始日" 
+            value={startDateFilter}
+            onChange={(e) => setStartDateFilter(e.target.value)}
+            className="japanese-text pl-10 bg-white"
+          />
+        </div>
+      )}
     </div>
   );
 };

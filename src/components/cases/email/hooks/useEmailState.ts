@@ -20,6 +20,7 @@ Tel: 03-1234-5678
 Email: contact@techrecruiter.ai
 `);
   const [sending, setSending] = useState(false);
+  const [startDateFilter, setStartDateFilter] = useState('');
   
   // For demonstration, we'll limit the number of cases displayed
   const [limitedMailCases, setLimitedMailCases] = useState<MailCase[] | null>(null);
@@ -34,12 +35,12 @@ Email: contact@techrecruiter.ai
   // Effect to reset current page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [companyFilter, techFilter]);
+  }, [companyFilter, techFilter, startDateFilter]);
 
   // Effect to deselect all when changing pages or filters
   useEffect(() => {
     setSelectAll(false);
-  }, [currentPage, companyFilter, techFilter]);
+  }, [currentPage, companyFilter, techFilter, startDateFilter]);
 
   // Handle unselect case with specific rowId
   const handleUnselectCase = useCallback((caseId: string, rowId: string) => {
@@ -70,6 +71,8 @@ Email: contact@techrecruiter.ai
     signature,
     setSignature,
     limitedMailCases,
-    handleUnselectCase
+    handleUnselectCase,
+    startDateFilter,
+    setStartDateFilter
   };
 };

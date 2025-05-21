@@ -3,7 +3,7 @@ import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { MailCase } from '../types';
 
@@ -18,6 +18,7 @@ interface CasesListRowProps {
     position?: string;
     registrationType?: string;
     registeredAt?: string;
+    startDate?: string; // Add startDate property
     originalCase: MailCase;
     rowId: string;
   };
@@ -79,6 +80,14 @@ export const CasesListRow: React.FC<CasesListRowProps> = ({
         <TableCell className="japanese-text">{sender.company}</TableCell>
       )}
       <TableCell className="japanese-text">{sender.keyTechnologies}</TableCell>
+      <TableCell className="japanese-text text-sm">
+        {sender.startDate ? (
+          <div className="flex items-center space-x-1">
+            <Calendar className="h-3.5 w-3.5 text-blue-500" />
+            <span>{sender.startDate}</span>
+          </div>
+        ) : '-'}
+      </TableCell>
       {showCompanyInfo && (
         <TableCell className="japanese-text">
           <div className={`px-2 py-0.5 rounded text-xs inline-flex 

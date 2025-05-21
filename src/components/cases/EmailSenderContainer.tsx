@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
 import { useEngineerState } from './email/hooks/useEngineerState';
 import { toast } from 'sonner';
 import { EngineerSelectionDialog } from './email/EngineerSelectionDialog';
 import { processCaseData } from './email/utils/dataProcessing';
+import { MailCase } from './email/types';
 
 interface EmailSenderContainerProps {
   mailCases: any[];
@@ -15,14 +16,71 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   const emailState = useEmailState(mailCases); // Pass mailCases to useEmailState
   const engineerState = useEngineerState(mailCases);
   
-  // Get paginated cases based on filters and pagination
+  // State for sorting
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  // Apply filters and sorting to cases
+  const filteredAndSortedCases = React.useMemo(() => {
+    let filtered = [...mailCases];
+    
+    // Apply company filter
+    if (emailState.companyFilter !== 'all') {
+      filtered = filtered.filter(item => item.company === emailState.companyFilter);
+    }
+    
+    // Apply tech filter
+    if (emailState.techFilter) {
+      const techKeyword = emailState.techFilter.toLowerCase();
+      filtered = filtered.filter(item => {
+        const skills = Array.isArray(item.skills) ? item.skills.join(' ').toLowerCase() : '';
+        return skills.includes(techKeyword);
+      });
+    }
+    
+    // Apply start date filter
+    if (emailState.startDateFilter) {
+      filtered = filtered.filter(item => {
+        // Ensure item.startDate exists and matches the format in filter
+        return item.startDate === emailState.startDateFilter;
+      });
+    }
+    
+    // Apply sorting if requested
+    if (sortField === 'startDate') {
+      filtered.sort((a, b) => {
+        const dateA = a.startDate || '';
+        const dateB = b.startDate || '';
+        
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;  // Empty dates go last
+        if (!dateB) return -1;
+        
+        // Compare dates
+        const comparison = dateA.localeCompare(dateB);
+        // Apply direction
+        return sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+    
+    return filtered;
+  }, [mailCases, emailState.companyFilter, emailState.techFilter, emailState.startDateFilter, sortField, sortDirection]);
+  
+  // Get paginated cases based on filters, sorting and pagination
   const { paginatedCases, totalPages, companyList } = processCaseData(
-    mailCases,
+    filteredAndSortedCases,
     emailState.companyFilter,
     emailState.techFilter,
     emailState.currentPage,
     10
   );
+  
+  // Handle sorting
+  const handleSort = (field: string, direction: 'asc' | 'desc') => {
+    setSortField(field);
+    setSortDirection(direction);
+    toast.info(`${field === 'startDate' ? '参画開始日' : field}で${direction === 'asc' ? '昇順' : '降順'}に並び替えました`);
+  };
   
   // Handle selecting all cases
   const handleSelectAll = () => {
@@ -236,7 +294,8 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     engineerHandleOpen: engineerState.openEngineerDialog,
     engineerHandleRemove: engineerState.removeEngineer,
     engineerHandleApply: engineerHandleApply,
-    handleUnselectCase: handleUnselectCase
+    handleUnselectCase: emailState.handleUnselectCase,
+    handleSort: handleSort
   };
   
   return (
@@ -250,18 +309,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
           totalPages,
           companyList
         }}
-        handlers={{
-          casesHandleSelectAll: handleSelectAll,
-          casesHandleSelectCase: handleSelectCase,
-          templateHandleChange: handleTemplateChange,
-          emailHandleEnhance: handleEnhanceEmail,
-          emailHandleSend: handleSendEmail,
-          emailHandleTest: handleTestEmail,
-          engineerHandleOpen: engineerState.openEngineerDialog,
-          engineerHandleRemove: engineerState.removeEngineer,
-          engineerHandleApply: engineerHandleApply,
-          handleUnselectCase: handleUnselectCase
-        }}
+        handlers={handlers}
       />
       
       {/* Add the EngineerSelectionDialog component */}

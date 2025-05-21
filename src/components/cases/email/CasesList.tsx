@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table } from '@/components/ui/table';
 import { MailCase } from './types';
 import { CasesListHeader } from './components/CasesListHeader';
@@ -10,7 +10,7 @@ import { useSenderMapper } from './components/SenderMapper';
 interface CasesListProps {
   paginatedCases: MailCase[];
   selectedCases: MailCase[]; 
-  handleSelectCase: (id: string, rowId: string) => void; // Updated to include rowId
+  handleSelectCase: (id: string, rowId: string) => void;
   selectAll: boolean;
   handleSelectAll: () => void;
   currentPage: number;
@@ -18,6 +18,7 @@ interface CasesListProps {
   totalPages: number;
   showCompanyInfo?: boolean;
   onViewCase?: (caseItem: MailCase) => void;
+  onSort?: (field: string, direction: 'asc' | 'desc') => void;
 }
 
 export const CasesList: React.FC<CasesListProps> = ({
@@ -30,8 +31,13 @@ export const CasesList: React.FC<CasesListProps> = ({
   setCurrentPage,
   totalPages,
   showCompanyInfo = false,
-  onViewCase
+  onViewCase,
+  onSort
 }) => {
+  // Add state for sorting
+  const [sortField, setSortField] = useState<string>('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
   // Function to handle page changes
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -41,12 +47,18 @@ export const CasesList: React.FC<CasesListProps> = ({
   // Use the custom hook to get flattened senders
   const { flattenedSenders } = useSenderMapper({ paginatedCases });
 
-  // Add logging to help debug
-  console.log('CasesList rendering with showCompanyInfo:', showCompanyInfo);
-  console.log('Number of cases to display:', paginatedCases.length);
-  console.log('Current page:', currentPage, 'Total pages:', totalPages);
-  console.log('Selected cases:', selectedCases.map(c => ({ id: c.id, rowId: c.selectedRowId })));
-  console.log('Flattened senders:', flattenedSenders);
+  // Handle sorting
+  const handleSort = (field: string) => {
+    // If clicking the same field, toggle direction
+    const newDirection = field === sortField && sortDirection === 'asc' ? 'desc' : 'asc';
+    
+    setSortField(field);
+    setSortDirection(newDirection);
+    
+    if (onSort) {
+      onSort(field, newDirection);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -56,6 +68,9 @@ export const CasesList: React.FC<CasesListProps> = ({
           handleSelectAll={handleSelectAll}
           disabled={flattenedSenders.length === 0}
           showCompanyInfo={showCompanyInfo}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={handleSort}
         />
         <CasesListBody 
           flattenedSenders={flattenedSenders}

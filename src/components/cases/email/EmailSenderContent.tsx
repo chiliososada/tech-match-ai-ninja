@@ -37,6 +37,8 @@ interface EmailSenderContentProps {
     setSending: (sending: boolean) => void;
     signature: string;
     setSignature: (signature: string) => void;
+    startDateFilter?: string;
+    setStartDateFilter?: (value: string) => void;
   };
   engineerState: {
     selectedEngineers: any[];
@@ -57,6 +59,7 @@ interface EmailSenderContentProps {
     engineerHandleRemove: (engineerId: string) => void;
     engineerHandleApply: () => void;
     handleUnselectCase: (caseId: string, rowId: string) => void;
+    handleSort?: (field: string, direction: 'asc' | 'desc') => void;
   };
 }
 
@@ -114,6 +117,13 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
     handlers.handleUnselectCase(caseId, rowId);
   };
 
+  // Handle sorting (pass through to parent handler)
+  const handleSort = (field: string, direction: 'asc' | 'desc') => {
+    if (handlers.handleSort) {
+      handlers.handleSort(field, direction);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <Card className="shadow-md border-primary/10 overflow-hidden">
@@ -151,6 +161,8 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             techFilter={emailState.techFilter}
             setTechFilter={emailState.setTechFilter}
             companyList={filteredCompanyList}
+            startDateFilter={emailState.startDateFilter}
+            setStartDateFilter={emailState.setStartDateFilter}
           />
         </CardHeader>
         <CardContent className="pt-6">
@@ -166,6 +178,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             totalPages={caseData.totalPages}
             showCompanyInfo={isOtherCompanyMode}
             onViewCase={handleViewCase}
+            onSort={handleSort}
           />
           
           <EmailSenderLayout
