@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -9,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmailTemplate } from './types';
 import { MailCheck, Send, Sparkles, MailPlus } from 'lucide-react';
+import { updateSignatureInBody } from './utils/emailHandlers';
 
 interface EmailFormProps {
   emailTemplates: EmailTemplate[];
@@ -48,28 +48,24 @@ export function EmailForm({
   // Ensure selectedTemplate is never undefined or null
   const safeSelectedTemplate = selectedTemplate || "";
   
+  // Using a ref to track if this is the first render
+  const isFirstRender = React.useRef(true);
+  
   // Effect to append signature to email body when signature changes
+  // But skip the first render to prevent automatically adding signature when component loads
   useEffect(() => {
-    // Check if signature is already in the email body
-    if (signature && !emailBody.includes(signature)) {
-      // Only update if there's a body and signature to avoid unnecessary updates
-      if (emailBody.trim() || signature.trim()) {
-        const bodyWithoutSignature = removeSignatureFromBody(emailBody, signature);
-        setEmailBody(bodyWithoutSignature + (bodyWithoutSignature ? '\n\n' : '') + signature);
-      }
-    }
-  }, [signature]);
-
-  // Helper function to remove old signature from email body
-  const removeSignatureFromBody = (body: string, sig: string) => {
-    // If signature is empty or body doesn't contain the signature, return the original body
-    if (!sig.trim() || !body.includes(sig)) {
-      return body;
+    // Skip the first render
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
     
-    // Remove signature and any extra newlines before it
-    return body.substring(0, body.indexOf(sig)).replace(/\n+$/, '');
-  };
+    // Use the utility function to update the signature
+    const updatedBody = updateSignatureInBody(emailBody, signature);
+    if (updatedBody !== emailBody) {
+      setEmailBody(updatedBody);
+    }
+  }, [signature]);
 
   // Handle signature changes
   const handleSignatureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
