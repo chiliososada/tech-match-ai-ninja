@@ -19,7 +19,7 @@ export interface MailCase {
   selectedSenderName?: string;
   selectedSenderEmail?: string;
   selectedSenderPosition?: string;
-  startDate?: string; // Ensure startDate is part of the type definition
+  startDate?: string;
 }
 
 export interface Engineer {
@@ -30,3 +30,68 @@ export interface Engineer {
   currentStatus?: string;
   company?: string;
 }
+
+// Define EmailTemplate interface
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  description?: string;
+}
+
+// Add email templates array
+export const EMAIL_TEMPLATES: EmailTemplate[] = [
+  {
+    id: 'intro',
+    name: '案件紹介テンプレート',
+    subject: '【案件紹介】{{title}} - {{company}}',
+    body: `お世話になっております。
+
+{{companyContact}}と申します。
+
+以下の案件をご紹介させていただきます。
+
+【案件名】{{title}}
+【会社名】{{company}}
+【案件概要】
+{{description}}
+
+ご検討いただけますと幸いです。
+よろしくお願いいたします。`,
+    description: '基本的な案件紹介用テンプレート'
+  },
+  {
+    id: 'engineer-intro',
+    name: 'エンジニア紹介テンプレート',
+    subject: '【エンジニア紹介】{{engineerName}} - {{title}}案件',
+    body: `お世話になっております。
+
+{{companyContact}}と申します。
+
+{{title}}案件について、以下のエンジニアを紹介させていただきます。
+
+【エンジニア名】{{engineerName}}
+【スキル】{{engineerSkills}}
+【経験年数】{{engineerYears}}
+
+ご検討いただけますと幸いです。
+よろしくお願いいたします。`,
+    description: 'エンジニア紹介用テンプレート'
+  },
+  {
+    id: 'follow-up',
+    name: 'フォローアップテンプレート',
+    subject: 'Re: 【案件紹介】{{title}} - フォローアップ',
+    body: `{{sender}}様
+
+お世話になっております。
+先日ご連絡いたしました、{{title}}案件についてフォローアップのご連絡をさせていただきます。
+
+案件についてご検討いただけましたでしょうか？
+ご質問などございましたら、お気軽にお問い合わせください。
+
+よろしくお願いいたします。`,
+    description: 'フォローアップ用テンプレート'
+  }
+];

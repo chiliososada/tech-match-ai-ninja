@@ -190,4 +190,3 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
 };
 
 export default EmailSenderLayout;
-
