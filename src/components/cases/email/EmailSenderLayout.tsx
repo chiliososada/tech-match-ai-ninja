@@ -54,6 +54,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
       email: string;
       caseId: string;
       caseTitle: string;
+      rowId?: string; // Add rowId for more precise identification
     }[] } = {};
     
     emailState.selectedCases.forEach(caseItem => {
@@ -63,18 +64,37 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
         groupedSenders[company] = [];
       }
       
-      // If case has multiple senders
-      if (caseItem.senders && caseItem.senders.length > 0) {
-        caseItem.senders.forEach(sender => {
+      // If case has multiple senders but a specific one was selected (via rowId)
+      if (caseItem.selectedRowId) {
+        // Get the sender info from the rowId
+        const rowParts = caseItem.selectedRowId.split('-');
+        const senderName = rowParts[1];
+        
+        if (caseItem.senders && caseItem.senders.length > 0) {
+          // Find the matching sender
+          const sender = caseItem.senders.find(s => s.name === senderName);
+          if (sender) {
+            groupedSenders[company].push({
+              name: sender.name,
+              email: sender.email,
+              caseId: caseItem.id,
+              caseTitle: caseItem.title,
+              rowId: caseItem.selectedRowId
+            });
+          }
+        } 
+        // If using legacy format but has selectedRowId
+        else if (caseItem.sender) {
           groupedSenders[company].push({
-            name: sender.name,
-            email: sender.email,
+            name: caseItem.sender,
+            email: caseItem.senderEmail || '',
             caseId: caseItem.id,
-            caseTitle: caseItem.title
+            caseTitle: caseItem.title,
+            rowId: caseItem.selectedRowId
           });
-        });
-      } 
-      // If case has a single sender
+        }
+      }
+      // Legacy case without rowId (backwards compatibility)
       else if (caseItem.sender) {
         groupedSenders[company].push({
           name: caseItem.sender,

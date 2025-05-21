@@ -16,9 +16,10 @@ interface CasesListBodyProps {
     registrationType?: string;
     registeredAt?: string;
     originalCase: MailCase;
+    rowId: string; // Add the rowId property
   }[];
   selectedCases: MailCase[];
-  handleSelectCase: (id: string) => void;
+  handleSelectCase: (id: string, rowId: string) => void; // Update to accept rowId
   showCompanyInfo: boolean;
   onViewCase?: (caseItem: MailCase) => void;
 }
@@ -30,9 +31,12 @@ export const CasesListBody: React.FC<CasesListBodyProps> = ({
   showCompanyInfo,
   onViewCase
 }) => {
-  // Check if a case is selected - compare by exact ID match
-  const isCaseSelected = (caseId: string) => {
-    return selectedCases.some(c => c.id === caseId);
+  // Check if a sender row is selected - compare by row ID
+  const isSenderRowSelected = (rowId: string) => {
+    // Parse the rowId to get the case id
+    const caseId = rowId.split('-')[0];
+    // Check if this specific row is selected
+    return selectedCases.some(c => c.id === caseId && c.selectedRowId === rowId);
   };
 
   return (
@@ -46,9 +50,9 @@ export const CasesListBody: React.FC<CasesListBodyProps> = ({
       ) : (
         flattenedSenders.map((item, index) => (
           <CasesListRow
-            key={`${item.caseId}-${item.sender}-${index}`}
+            key={item.rowId || `${item.caseId}-${item.sender}-${index}`}
             sender={item}
-            isSelected={isCaseSelected(item.caseId)}
+            isSelected={isSenderRowSelected(item.rowId)}
             handleSelectCase={handleSelectCase}
             showCompanyInfo={showCompanyInfo}
             onViewCase={onViewCase}

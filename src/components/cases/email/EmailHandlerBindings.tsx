@@ -60,8 +60,9 @@ export const useEmailHandlerBindings = ({
     emailState.setSelectAll
   );
 
-  const casesHandleSelectCase = (id: string) => handleSelectCase(
+  const casesHandleSelectCase = (id: string, rowId: string) => handleSelectCase(
     id,
+    rowId,
     emailState.selectedCases,
     caseData.paginatedCases,
     emailState.setSelectedCases,
@@ -123,6 +124,14 @@ export const useEmailHandlerBindings = ({
     emailState.setEmailBody
   );
 
+  // Add a function to handle unselecting a case by case ID
+  const handleUnselectCase = (caseId: string) => {
+    const updatedCases = emailState.selectedCases.filter(
+      item => !(item.id === caseId)
+    );
+    emailState.setSelectedCases(updatedCases);
+  };
+
   return {
     casesHandleSelectAll,
     casesHandleSelectCase,
@@ -132,6 +141,7 @@ export const useEmailHandlerBindings = ({
     engineerHandleOpen,
     engineerHandleToggle,
     engineerHandleRemove,
-    engineerHandleApply
+    engineerHandleApply,
+    handleUnselectCase
   };
 };

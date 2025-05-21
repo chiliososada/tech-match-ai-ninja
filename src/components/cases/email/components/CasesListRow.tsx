@@ -19,9 +19,10 @@ interface CasesListRowProps {
     registrationType?: string;
     registeredAt?: string;
     originalCase: MailCase;
+    rowId: string; // Add rowId property
   };
   isSelected: boolean;
-  handleSelectCase: (id: string) => void;
+  handleSelectCase: (id: string, rowId: string) => void; // Update to accept rowId
   showCompanyInfo: boolean;
   onViewCase?: (caseItem: MailCase) => void;
   index: number;
@@ -35,13 +36,13 @@ export const CasesListRow: React.FC<CasesListRowProps> = ({
   onViewCase,
   index
 }) => {
-  // Handle direct selection of a single case by ID
+  // Handle selection of a specific sender row using rowId
   const handleSelect = () => {
-    handleSelectCase(sender.caseId);
+    handleSelectCase(sender.caseId, sender.rowId);
   };
 
   return (
-    <TableRow key={`${sender.caseId}-${sender.sender}-${index}`}>
+    <TableRow key={sender.rowId || `${sender.caseId}-${sender.sender}-${index}`}>
       <TableCell>
         <Checkbox 
           checked={isSelected}

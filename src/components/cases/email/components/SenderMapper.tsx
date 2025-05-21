@@ -22,7 +22,9 @@ export const useSenderMapper = ({
           position: sender.position,
           registrationType: caseItem.registrationType,
           registeredAt: caseItem.registeredAt,
-          originalCase: caseItem
+          originalCase: caseItem,
+          // Add a unique row ID for each sender to ensure precise selection
+          rowId: `${caseItem.id}-${sender.name}-${index}`
         }));
       } 
       // If the case uses the legacy sender format
@@ -37,7 +39,9 @@ export const useSenderMapper = ({
           position: '',
           registrationType: caseItem.registrationType,
           registeredAt: caseItem.registeredAt,
-          originalCase: caseItem
+          originalCase: caseItem,
+          // Add a unique row ID for single sender cases too
+          rowId: `${caseItem.id}-single`
         }];
       }
     });

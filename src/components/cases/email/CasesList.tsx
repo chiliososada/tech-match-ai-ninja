@@ -10,7 +10,7 @@ import { useSenderMapper } from './components/SenderMapper';
 interface CasesListProps {
   paginatedCases: MailCase[];
   selectedCases: MailCase[]; 
-  handleSelectCase: (id: string) => void;
+  handleSelectCase: (id: string, rowId: string) => void; // Update to include rowId
   selectAll: boolean;
   handleSelectAll: () => void;
   currentPage: number;
