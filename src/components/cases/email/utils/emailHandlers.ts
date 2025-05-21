@@ -23,7 +23,9 @@ export const handleSelectAll = (
           const rowId = `${caseItem.id}-${sender.email}-${index}`;
           return {
             ...caseItem,
-            selectedRowId: rowId
+            selectedRowId: rowId,
+            selectedSenderName: sender.name,
+            selectedSenderEmail: sender.email
           };
         })];
       } 
@@ -32,14 +34,18 @@ export const handleSelectAll = (
         const rowId = `${caseItem.id}-${caseItem.senderEmail || 'default'}-0`;
         return [...acc, {
           ...caseItem,
-          selectedRowId: rowId
+          selectedRowId: rowId,
+          selectedSenderName: caseItem.sender,
+          selectedSenderEmail: caseItem.senderEmail
         }];
       }
       // For cases without any sender info
       else {
         return [...acc, {
           ...caseItem,
-          selectedRowId: `${caseItem.id}-default-0`
+          selectedRowId: `${caseItem.id}-default-0`,
+          selectedSenderName: '',
+          selectedSenderEmail: ''
         }];
       }
     }, []);
@@ -54,7 +60,7 @@ export const handleSelectAll = (
 // 案件個別の選択処理 - 個別ケースのみ選択するように修正
 export const handleSelectCase = (
   id: string,
-  rowId: string, // Add rowId parameter
+  rowId: string,
   selectedCases: MailCase[],
   paginatedCases: MailCase[],
   setSelectedCases: (cases: MailCase[]) => void,
@@ -63,6 +69,23 @@ export const handleSelectCase = (
   // 対象のケースを取得
   const caseItem = paginatedCases.find(item => item.id === id);
   if (!caseItem) return;
+  
+  // Extract sender information from the rowId
+  const rowParts = rowId.split('-');
+  let senderName = '';
+  let senderEmail = '';
+  
+  // Find the specific sender info based on rowId
+  if (caseItem.senders && caseItem.senders.length > 0) {
+    const senderIndex = parseInt(rowParts[2], 10);
+    if (!isNaN(senderIndex) && senderIndex < caseItem.senders.length) {
+      senderName = caseItem.senders[senderIndex].name;
+      senderEmail = caseItem.senders[senderIndex].email;
+    }
+  } else if (caseItem.sender) {
+    senderName = caseItem.sender;
+    senderEmail = caseItem.senderEmail || '';
+  }
   
   // すでに選択されているか確認 - by rowId
   const isSelected = selectedCases.some(item => 
@@ -80,7 +103,9 @@ export const handleSelectCase = (
     // 追加選択 - 選択した案件のみを追加、rowIdも保存
     const newCase = {
       ...caseItem,
-      selectedRowId: rowId // Store the rowId to identify exactly which row was selected
+      selectedRowId: rowId,
+      selectedSenderName: senderName,
+      selectedSenderEmail: senderEmail
     };
     newSelectedCases = [...selectedCases, newCase];
   }

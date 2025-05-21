@@ -19,10 +19,10 @@ interface CasesListRowProps {
     registrationType?: string;
     registeredAt?: string;
     originalCase: MailCase;
-    rowId: string; // Add rowId property
+    rowId: string;
   };
   isSelected: boolean;
-  handleSelectCase: (id: string, rowId: string) => void; // Update to accept rowId
+  handleSelectCase: (id: string, rowId: string) => void;
   showCompanyInfo: boolean;
   onViewCase?: (caseItem: MailCase) => void;
   index: number;
@@ -41,8 +41,24 @@ export const CasesListRow: React.FC<CasesListRowProps> = ({
     handleSelectCase(sender.caseId, sender.rowId);
   };
 
+  // Handle row click for selection
+  const handleRowClick = (e: React.MouseEvent) => {
+    // Don't trigger row selection when clicking on buttons or checkboxes
+    if (
+      e.target instanceof HTMLElement &&
+      (e.target.closest('button') || e.target.closest('[role="checkbox"]'))
+    ) {
+      return;
+    }
+    handleSelect();
+  };
+
   return (
-    <TableRow key={sender.rowId || `${sender.caseId}-${sender.sender}-${index}`}>
+    <TableRow 
+      key={sender.rowId || `${sender.caseId}-${sender.sender}-${index}`}
+      onClick={handleRowClick}
+      className={`cursor-pointer ${isSelected ? 'bg-primary/5' : ''} hover:bg-muted/20`}
+    >
       <TableCell>
         <Checkbox 
           checked={isSelected}
