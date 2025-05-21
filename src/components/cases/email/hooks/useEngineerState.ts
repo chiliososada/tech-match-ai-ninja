@@ -1,24 +1,36 @@
 
 import { useState } from 'react';
-import { Engineer } from '../types';
+import { Engineer } from '@/components/candidates/types';
 
 export const useEngineerState = () => {
   const [isEngineerDialogOpen, setIsEngineerDialogOpen] = useState(false);
-  const [engineerFilter, setEngineerFilter] = useState("");
-  const [engineerCurrentPage, setEngineerCurrentPage] = useState(1);
   const [selectedEngineers, setSelectedEngineers] = useState<Engineer[]>([]);
-  const [engineerCompanyFilter, setEngineerCompanyFilter] = useState("all");
-  
+
+  const openEngineerDialog = () => {
+    setIsEngineerDialogOpen(true);
+  };
+
+  const closeEngineerDialog = () => {
+    setIsEngineerDialogOpen(false);
+  };
+
+  const addEngineer = (engineer: Engineer) => {
+    // Check if engineer is already selected
+    if (!selectedEngineers.some(e => e.id === engineer.id)) {
+      setSelectedEngineers([...selectedEngineers, engineer]);
+    }
+  };
+
+  const removeEngineer = (engineerId: string) => {
+    setSelectedEngineers(selectedEngineers.filter(e => e.id !== engineerId));
+  };
+
   return {
     isEngineerDialogOpen,
-    setIsEngineerDialogOpen,
-    engineerFilter,
-    setEngineerFilter,
-    engineerCurrentPage,
-    setEngineerCurrentPage,
     selectedEngineers,
-    setSelectedEngineers,
-    engineerCompanyFilter,
-    setEngineerCompanyFilter
+    openEngineerDialog,
+    closeEngineerDialog,
+    addEngineer,
+    removeEngineer
   };
 };

@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Search, UserPlus, User } from 'lucide-react';
-import { Engineer } from './types';
+import { Engineer } from '@/components/candidates/types'; // Import the Engineer type
 
 interface EngineerSelectionProps {
-  selectedEngineers: Engineer[];
+  selectedEngineers: Engineer[]; // Updated to use Engineer type
   openEngineerDialog: () => void;
   removeSelectedEngineer: (engineerId: string) => void;
   applyEngineerToTemplate: () => void;
@@ -59,11 +59,21 @@ export const EngineerSelection: React.FC<EngineerSelectionProps> = ({
                   <p className="text-sm font-medium japanese-text">{engineer.name}</p>
                   <div className="flex items-center gap-2">
                     <p className="text-xs text-muted-foreground japanese-text">
-                      {engineer.skills && engineer.skills.join(", ")} | {engineer.experience}
+                      {Array.isArray(engineer.skills) ? engineer.skills.join(", ") : engineer.skills} | {engineer.experience}
                     </p>
-                    {engineer.status && (
-                      <Badge variant={getBadgeVariant(engineer.status)} className="text-xs">
-                        {engineer.status}
+                    {Array.isArray(engineer.status) && engineer.status.length > 0 ? (
+                      <Badge variant={getBadgeVariant(engineer.status[0])} className="text-xs">
+                        {engineer.status[0]}
+                      </Badge>
+                    ) : engineer.status ? (
+                      <Badge variant={getBadgeVariant(engineer.status.toString())} className="text-xs">
+                        {engineer.status.toString()}
+                      </Badge>
+                    ) : null}
+                    
+                    {engineer.companyType === '他社' && engineer.companyName && (
+                      <Badge variant="outline" className="text-xs">
+                        {engineer.companyName}
                       </Badge>
                     )}
                   </div>

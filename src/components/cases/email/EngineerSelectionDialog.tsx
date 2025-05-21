@@ -1,40 +1,25 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { supabase } from "@/integrations/supabase/client";
 import { Engineer } from '@/components/candidates/types';
 
-interface CandidateItem {
-  id: number;
-  name: string;
-  skills: string;
-  companyType?: string;
-  companyName?: string;
-  nationality?: string;
-  age?: string;
-  gender?: string;
-  experience?: string;
-  japaneseLevel?: string;
-  availability?: string;
-  status?: string[];
+interface EngineerSelectionDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (engineer: Engineer) => void;
 }
 
-interface CandidateSelectionDialogProps {
-  onSelect: (selectedCandidate: CandidateItem) => void;
-}
-
-export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogProps) {
+export function EngineerSelectionDialog({ isOpen, onClose, onSelect }: EngineerSelectionDialogProps) {
   const [companyTypeFilter, setCompanyTypeFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   
-  // Import engineers from Candidates.tsx - making sure to use the same data source
-  // as the "人材管理" page
+  // Use the same mock engineers data from Candidates.tsx
+  // In a real app, this would come from an API call or a shared data store
   const mockEngineers: Engineer[] = [
     {
       id: '1',
@@ -43,7 +28,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       japaneseLevel: 'ネイティブレベル',
       experience: '5年',
       availability: '即日',
-      status: ['提案中', '事前面談'],  // Multiple statuses
+      status: ['提案中', '事前面談'],
       remarks: '週4日勤務希望, 出張可, リモート可',
       companyType: '自社',
       companyName: 'テックイノベーション株式会社',
@@ -62,7 +47,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       japaneseLevel: 'ネイティブレベル',
       experience: '3年',
       availability: '1ヶ月後',
-      status: ['面談', '結果待ち'],  // Multiple statuses
+      status: ['面談', '結果待ち'],
       remarks: 'リモート勤務希望, 週5日可',
       companyType: '他社',
       companyName: 'フロントエンドパートナーズ株式会社',
@@ -95,64 +80,37 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
     }
   ];
 
-  // Convert Engineer objects to CandidateItem format
-  const convertEngineerToCandidateItem = (engineer: Engineer): CandidateItem => {
-    return {
-      id: parseInt(engineer.id),
-      name: engineer.name,
-      skills: Array.isArray(engineer.skills) ? engineer.skills.join(', ') : engineer.skills || '',
-      companyType: engineer.companyType || '自社',
-      companyName: engineer.companyName || '',
-      nationality: engineer.nationality || '',
-      age: engineer.age || '',
-      gender: engineer.gender || '',
-      experience: engineer.experience || '',
-      japaneseLevel: engineer.japaneseLevel || '',
-      availability: engineer.availability || '',
-      status: Array.isArray(engineer.status) ? engineer.status : (engineer.status ? [engineer.status] : [])
-    };
-  };
-
-  // Convert engineers to candidates
-  const candidates: CandidateItem[] = mockEngineers.map(convertEngineerToCandidateItem);
-  
-  // Filter candidates based on company type and search query
-  const filteredCandidates = candidates.filter(candidate => {
-    const matchesCompanyType = companyTypeFilter === "all" || candidate.companyType === companyTypeFilter;
+  // Filter engineers based on company type and search query
+  const filteredEngineers = mockEngineers.filter(engineer => {
+    const matchesCompanyType = companyTypeFilter === "all" || engineer.companyType === companyTypeFilter;
     const matchesSearch = !searchQuery || 
-      candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.skills.toLowerCase().includes(searchQuery.toLowerCase());
+      engineer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (Array.isArray(engineer.skills) 
+        ? engineer.skills.join(' ').toLowerCase().includes(searchQuery.toLowerCase())
+        : (engineer.skills || '').toLowerCase().includes(searchQuery.toLowerCase()));
     
     return matchesCompanyType && matchesSearch;
   });
 
-  const handleSelect = (candidate: CandidateItem) => {
-    onSelect(candidate);
-    // Close dialog by resetting state
-    setSearchQuery("");
-    setCompanyTypeFilter("all");
+  const handleSelect = (engineer: Engineer) => {
+    onSelect(engineer);
+    onClose();
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full japanese-text">
-          <Users className="mr-2 h-4 w-4" />
-          既存人材から選択
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
           <DialogTitle className="japanese-text">既存人材から選択</DialogTitle>
           <DialogDescription className="japanese-text">
-            マッチングに使用する人材を選択してください
+            メールに記載する技術者を選択してください
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 max-h-80 overflow-y-auto">
           <div className="flex flex-col space-y-4">
             <div>
               <Input 
-                placeholder="人材を検索" 
+                placeholder="技術者を検索" 
                 className="japanese-text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -187,17 +145,23 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCandidates.map((candidate) => (
-                <TableRow key={candidate.id}>
-                  <TableCell className="font-medium japanese-text">{candidate.name}</TableCell>
-                  <TableCell className="japanese-text">{candidate.skills}</TableCell>
-                  <TableCell className="japanese-text">{candidate.companyType}</TableCell>
-                  <TableCell className="japanese-text">{candidate.companyType === '他社' ? candidate.companyName : '-'}</TableCell>
+              {filteredEngineers.map((engineer) => (
+                <TableRow key={engineer.id}>
+                  <TableCell className="font-medium japanese-text">{engineer.name}</TableCell>
+                  <TableCell className="japanese-text">
+                    {Array.isArray(engineer.skills) 
+                      ? engineer.skills.join(', ') 
+                      : engineer.skills}
+                  </TableCell>
+                  <TableCell className="japanese-text">{engineer.companyType}</TableCell>
+                  <TableCell className="japanese-text">
+                    {engineer.companyType === '他社' ? engineer.companyName : '-'}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => handleSelect(candidate)} 
+                      onClick={() => handleSelect(engineer)} 
                       className="japanese-text"
                     >
                       選択
@@ -205,6 +169,14 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
                   </TableCell>
                 </TableRow>
               ))}
+              
+              {filteredEngineers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-4 japanese-text">
+                    検索条件に一致する技術者がいません
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
