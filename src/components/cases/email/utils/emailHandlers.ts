@@ -38,19 +38,19 @@ export const applyTemplate = (templateId: string, data: {
   }
 
   // Get the first case and engineer for placeholder replacement
-  const firstCase = data.selectedCases[0] || {};
-  const firstEngineer = data.selectedEngineers[0] || {};
+  const firstCase = data.selectedCases && data.selectedCases.length > 0 ? data.selectedCases[0] : null;
+  const firstEngineer = data.selectedEngineers && data.selectedEngineers.length > 0 ? data.selectedEngineers[0] : null;
   
-  // Create placeholder data
+  // Create placeholder data with safe defaults
   const placeholderData = {
-    title: firstCase.title || '',
-    sender: firstCase.sender || firstCase.selectedSenderName || '',
-    description: firstCase.description || firstCase.detailDescription || '',
-    company: firstCase.company || '',
+    title: firstCase?.title || '',
+    sender: firstCase?.sender || firstCase?.selectedSenderName || '',
+    description: firstCase?.description || firstCase?.detailDescription || '',
+    company: firstCase?.company || '',
     companyContact: 'AI採用担当',
-    engineerName: firstEngineer.name || '',
-    engineerYears: firstEngineer.experience || '',
-    engineerSkills: firstEngineer.skills ? firstEngineer.skills.join('、') : ''
+    engineerName: firstEngineer?.name || '',
+    engineerYears: firstEngineer?.experience || '',
+    engineerSkills: firstEngineer?.skills ? firstEngineer.skills.join('、') : ''
   };
   
   // Replace placeholders

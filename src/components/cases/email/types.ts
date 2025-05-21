@@ -54,7 +54,7 @@ export interface EmailSenderProps {
   mailCases: MailCase[];
 }
 
-// Add Engineer type that was missing
+// Update Engineer type to include status
 export interface Engineer {
   id: string;
   name: string;
@@ -64,6 +64,7 @@ export interface Engineer {
   position: string;
   availability: string;
   email: string;
+  status?: string; // Add status property
 }
 
 export const EMAIL_TEMPLATES: EmailTemplate[] = [
