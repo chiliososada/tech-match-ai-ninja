@@ -121,3 +121,161 @@ export const sendTestEmail = async (
     description: '自分宛にテストメールが送信されました'
   });
 };
+
+// Add the missing exported functions with the exact names expected in EmailHandlerBindings.tsx
+
+// Handle select all functionality
+export const handleSelectAll = (
+  paginatedCases: MailCase[],
+  isSelectAll: boolean,
+  setSelectedCases: (cases: MailCase[]) => void,
+  setSelectAll: (value: boolean) => void
+) => {
+  if (isSelectAll) {
+    // Deselect all
+    setSelectedCases([]);
+    setSelectAll(false);
+  } else {
+    // Select all with proper rowId
+    const casesWithRowId = paginatedCases.map(caseItem => {
+      // Generate a unique row ID based on available sender information
+      const rowId = `${caseItem.id}-${caseItem.senderEmail || 'default'}-0`;
+      
+      return {
+        ...caseItem,
+        selectedRowId: rowId
+      };
+    });
+    
+    setSelectedCases(casesWithRowId);
+    setSelectAll(true);
+  }
+};
+
+// Handle individual case selection
+export const handleSelectCase = (
+  id: string,
+  rowId: string,
+  selectedCases: MailCase[],
+  paginatedCases: MailCase[],
+  setSelectedCases: (cases: MailCase[]) => void,
+  setSelectAll: (value: boolean) => void
+) => {
+  // Find the case to toggle
+  const caseToToggle = paginatedCases.find(c => c.id === id);
+  if (!caseToToggle) return;
+  
+  // Check if this case is already selected
+  const isAlreadySelected = selectedCases.some(c => 
+    c.id === id && c.selectedRowId === rowId
+  );
+  
+  if (isAlreadySelected) {
+    // Remove from selected
+    const updatedCases = selectedCases.filter(c => 
+      !(c.id === id && c.selectedRowId === rowId)
+    );
+    setSelectedCases(updatedCases);
+    setSelectAll(false);
+  } else {
+    // Add to selected, with selected sender details and rowId
+    const updatedCase = { 
+      ...caseToToggle,
+      selectedRowId: rowId
+    };
+    setSelectedCases([...selectedCases, updatedCase]);
+    
+    // Check if all are now selected
+    if (selectedCases.length + 1 === paginatedCases.length) {
+      setSelectAll(true);
+    }
+  }
+};
+
+// Handle template change
+export const handleTemplateChange = (
+  templateId: string,
+  setSelectedTemplate: (template: string) => void,
+  setSubject: (subject: string) => void,
+  setEmailBody: (body: string) => void
+) => {
+  setSelectedTemplate(templateId);
+  
+  const { subject, body } = applyTemplate(templateId, {
+    selectedCases: [],
+    selectedEngineers: []
+  });
+  
+  setSubject(subject);
+  setEmailBody(body);
+};
+
+// Handle enhance email
+export const handleEnhanceEmail = (
+  emailBody: string,
+  setSending: (sending: boolean) => void,
+  setEmailBody: (body: string) => void
+) => {
+  setSending(true);
+  
+  enhanceEmail(emailBody, (enhancedBody) => {
+    setEmailBody(enhancedBody);
+    setSending(false);
+  });
+};
+
+// Handle send email
+export const handleSendEmail = (
+  selectedCases: MailCase[],
+  mailCases: MailCase[],
+  subject: string,
+  emailBody: string,
+  setSending: (sending: boolean) => void,
+  setSelectedCases: (cases: MailCase[]) => void,
+  setSelectAll: (value: boolean) => void,
+  setSubject: (subject: string) => void,
+  setEmailBody: (body: string) => void,
+  setSelectedEngineers: (engineers: any[]) => void
+) => {
+  if (selectedCases.length === 0) {
+    toast.error('送信するメールが選択されていません');
+    return;
+  }
+  
+  if (!subject || !emailBody) {
+    toast.error('件名または本文が入力されていません');
+    return;
+  }
+  
+  setSending(true);
+  
+  sendEmail(subject, emailBody, "", selectedCases, () => {
+    // Reset state after sending
+    setSelectedCases([]);
+    setSelectAll(false);
+    setSubject('');
+    setEmailBody('');
+    setSelectedEngineers([]);
+    setSending(false);
+  });
+};
+
+// Handle test email
+export const handleTestEmail = (
+  subject: string,
+  emailBody: string,
+  signature: string,
+  setSending: (sending: boolean) => void
+) => {
+  if (!subject || !emailBody) {
+    toast.error('件名または本文が入力されていません');
+    return;
+  }
+  
+  setSending(true);
+  
+  sendTestEmail(subject, emailBody, signature)
+    .then(() => {
+      setSending(false);
+    });
+};

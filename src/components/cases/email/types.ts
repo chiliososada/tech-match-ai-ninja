@@ -1,4 +1,3 @@
-
 export interface MailCase {
   id: string;
   title: string;
@@ -40,6 +39,7 @@ export interface MailCase {
   desiredBudget?: string;
   interviewCount?: string;
   processes?: string[];
+  registeredAt?: string; // Added registeredAt property
 }
 
 export interface EmailTemplate {
@@ -52,6 +52,18 @@ export interface EmailTemplate {
 // Add the EmailSenderProps interface that was missing
 export interface EmailSenderProps {
   mailCases: MailCase[];
+}
+
+// Add Engineer type that was missing
+export interface Engineer {
+  id: string;
+  name: string;
+  skills: string[];
+  experience: number | string;
+  company: string;
+  position: string;
+  availability: string;
+  email: string;
 }
 
 export const EMAIL_TEMPLATES: EmailTemplate[] = [
