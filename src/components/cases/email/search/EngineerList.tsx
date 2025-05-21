@@ -18,20 +18,29 @@ export const EngineerList: React.FC<EngineerListProps> = ({
   filteredEngineersLength
 }) => {
   // Updated function to determine badge variant based on status
-  const getBadgeVariant = (status: string) => {
-    if (status === "提案中") return "proposed";
-    if (status === "事前面談") return "preliminary";
-    if (status === "面談") return "interview";
-    if (status === "結果待ち") return "waiting";
-    if (status === "営業終了") return "completed";
+  const getBadgeVariant = (status: string | string[]) => {
+    const statusString = Array.isArray(status) ? status[0] : status;
+    
+    if (statusString === "提案中") return "proposed";
+    if (statusString === "事前面談") return "preliminary";
+    if (statusString === "面談") return "interview";
+    if (statusString === "結果待ち") return "waiting";
+    if (statusString === "営業終了") return "completed";
     return "default"; // fallback
+  };
+  
+  // Helper function to safely convert skills to a string
+  const formatSkills = (skills: string | string[] | undefined): string => {
+    if (!skills) return '';
+    if (Array.isArray(skills)) return skills.join(', ');
+    return skills;
   };
   
   return (
     <div className="space-y-2">
       {paginatedEngineers.map(engineer => {
         const isSelected = selectedEngineers.some(e => e.id === engineer.id);
-        const badgeVariant = getBadgeVariant(engineer.status);
+        const badgeVariant = getBadgeVariant(engineer.status || '');
         
         return (
           <div 
@@ -44,14 +53,14 @@ export const EngineerList: React.FC<EngineerListProps> = ({
               <p className="font-medium japanese-text">{engineer.name}</p>
               <div className="flex items-center text-sm text-muted-foreground">
                 <span className="japanese-text mr-2">スキル:</span>
-                <span className="japanese-text">{engineer.skills && engineer.skills.join(", ")}</span>
+                <span className="japanese-text">{formatSkills(engineer.skills)}</span>
               </div>
               <div className="flex items-center text-xs">
                 <span className="japanese-text mr-2">経験:</span>
                 <span className="japanese-text">{engineer.experience}</span>
                 <span className="mx-2">|</span>
                 <Badge variant={badgeVariant as any} className="japanese-text text-xs font-medium">
-                  {engineer.status}
+                  {Array.isArray(engineer.status) ? engineer.status[0] : engineer.status}
                 </Badge>
                 {engineer.companyType && (
                   <>

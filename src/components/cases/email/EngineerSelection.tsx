@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Search, UserPlus, User } from 'lucide-react';
-import { Engineer } from '../types'; // Use our local Engineer type
+import { Engineer } from './types'; // Fix the import path
 
 interface EngineerSelectionProps {
   selectedEngineers: Engineer[];

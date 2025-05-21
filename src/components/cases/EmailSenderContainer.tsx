@@ -17,7 +17,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   
   // Get paginated cases based on filters and pagination
   const { paginatedCases, totalPages, companyList } = processCaseData(
-    mailCases,
+    mailCases, // Pass mailCases as the first argument
     emailState.companyFilter,
     emailState.techFilter,
     emailState.currentPage,
