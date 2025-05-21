@@ -83,11 +83,12 @@ export function EngineerSelectionDialog({ isOpen, onClose, onSelect }: EngineerS
   // Filter engineers based on company type and search query
   const filteredEngineers = mockEngineers.filter(engineer => {
     const matchesCompanyType = companyTypeFilter === "all" || engineer.companyType === companyTypeFilter;
+    
     const matchesSearch = !searchQuery || 
       engineer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (Array.isArray(engineer.skills) 
-        ? engineer.skills.join(' ').toLowerCase().includes(searchQuery.toLowerCase())
-        : (engineer.skills || '').toLowerCase().includes(searchQuery.toLowerCase()));
+        ? engineer.skills.some(skill => typeof skill === 'string' && skill.toLowerCase().includes(searchQuery.toLowerCase()))
+        : typeof engineer.skills === 'string' && engineer.skills.toLowerCase().includes(searchQuery.toLowerCase()));
     
     return matchesCompanyType && matchesSearch;
   });

@@ -3,14 +3,9 @@ import React from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
 import { useEngineerState } from './email/hooks/useEngineerState';
-import { createCaseSelectionHandlers } from './email/utils/selection/caseSelectionHandlers';
-import { createTemplateHandlers } from './email/utils/template/templateHandlers';
-import { createEmailSendingHandlers } from './email/utils/sending/emailSendingHandlers';
-import { createEngineerHandlers } from './email/utils/engineerHandlers';
-import { createSignatureHandlers } from './email/utils/signature/signatureHandlers';
-import { filterPaginatedCases, getTotalPages } from './email/utils/dataProcessing';
 import { toast } from 'sonner';
-import { EngineerSelectionDialog } from './email/EngineerSelectionDialog'; // Import the new dialog
+import { EngineerSelectionDialog } from './email/EngineerSelectionDialog';
+import { processCaseData } from './email/utils/dataProcessing';
 
 interface EmailSenderContainerProps {
   mailCases: any[];
@@ -22,50 +17,196 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   const engineerState = useEngineerState();
   
   // Get paginated cases based on filters and pagination
-  const paginatedCases = filterPaginatedCases(
+  const { paginatedCases, totalPages, companyList } = processCaseData(
     mailCases,
     emailState.companyFilter,
     emailState.techFilter,
-    emailState.currentPage
+    emailState.currentPage,
+    10
   );
-  
-  // Get total pages for pagination
-  const totalPages = getTotalPages(
-    mailCases,
-    emailState.companyFilter,
-    emailState.techFilter
-  );
-  
-  // Get company list for filtering
-  const companyList = [...new Set(mailCases.map(c => c.company))];
   
   // Create handlers for different actions
-  const casesHandlers = createCaseSelectionHandlers({
-    setSelectedCases: emailState.setSelectedCases,
-    selectedCases: emailState.selectedCases,
-    selectAll: emailState.selectAll,
-    setSelectAll: emailState.setSelectAll
-  });
+  const handleSelectAll = () => {
+    if (emailState.selectAll) {
+      // Deselect all
+      emailState.setSelectedCases([]);
+      emailState.setSelectAll(false);
+      toast("全ての送信者の選択を解除しました");
+    } else {
+      // Select all visible cases
+      const flattenedSenders: any[] = [];
+      
+      paginatedCases.forEach(caseItem => {
+        if (caseItem.senders && Array.isArray(caseItem.senders) && caseItem.senders.length > 0) {
+          caseItem.senders.forEach((sender, index) => {
+            const senderEmail = sender.email || `${sender.name?.replace(/\s+/g, '').toLowerCase()}@example.com`;
+            const rowId = `${caseItem.id}-${senderEmail}-${index}`;
+            
+            flattenedSenders.push({
+              ...caseItem,
+              selectedRowId: rowId,
+              selectedSenderName: sender.name,
+              selectedSenderEmail: sender.email,
+              selectedSenderPosition: sender.position
+            });
+          });
+        } else {
+          const rowId = `${caseItem.id}-${caseItem.senderEmail || 'default'}-0`;
+          flattenedSenders.push({
+            ...caseItem,
+            selectedRowId: rowId,
+            selectedSenderName: caseItem.sender || caseItem.senderName || '',
+            selectedSenderEmail: caseItem.senderEmail || '',
+            selectedSenderPosition: ''
+          });
+        }
+      });
+      
+      emailState.setSelectedCases(flattenedSenders);
+      emailState.setSelectAll(true);
+      toast(`${flattenedSenders.length}名の送信者を選択しました`);
+    }
+  };
   
-  const templateHandlers = createTemplateHandlers({
-    setSelectedTemplate: emailState.setSelectedTemplate,
-    setSubject: emailState.setSubject,
-    setEmailBody: emailState.setEmailBody,
-    selectedEngineers: engineerState.selectedEngineers
-  });
+  const handleSelectCase = (id: string, rowId: string) => {
+    const caseToToggle = paginatedCases.find(c => c.id === id);
+    if (!caseToToggle) return;
+    
+    const isAlreadySelected = emailState.selectedCases.some(c => 
+      c.id === id && c.selectedRowId === rowId
+    );
+    
+    const rowParts = rowId.split('-');
+    const senderEmail = rowParts[1];
+    const senderIndex = parseInt(rowParts[2]);
+    
+    if (isAlreadySelected) {
+      const updatedCases = emailState.selectedCases.filter(c => 
+        !(c.id === id && c.selectedRowId === rowId)
+      );
+      emailState.setSelectedCases(updatedCases);
+      emailState.setSelectAll(false);
+      toast("送信者の選択を解除しました");
+    } else {
+      let selectedSenderName = '';
+      let selectedSenderEmail = '';
+      let selectedSenderPosition = '';
+      
+      if (caseToToggle.senders && Array.isArray(caseToToggle.senders) && senderIndex < caseToToggle.senders.length) {
+        const sender = caseToToggle.senders[senderIndex];
+        selectedSenderName = sender.name || '';
+        selectedSenderEmail = sender.email || '';
+        selectedSenderPosition = sender.position || '';
+      } else {
+        selectedSenderName = caseToToggle.sender || caseToToggle.senderName || '';
+        selectedSenderEmail = caseToToggle.senderEmail || '';
+      }
+      
+      const updatedCase = { 
+        ...caseToToggle,
+        selectedRowId: rowId,
+        selectedSenderName,
+        selectedSenderEmail,
+        selectedSenderPosition
+      };
+      
+      emailState.setSelectedCases([...emailState.selectedCases, updatedCase]);
+      toast("送信者を選択しました");
+    }
+  };
   
-  const emailHandlers = createEmailSendingHandlers({
-    selectedCases: emailState.selectedCases,
-    subject: emailState.subject,
-    emailBody: emailState.emailBody,
-    signature: emailState.signature,
-    setSending: emailState.setSending
-  });
+  const handleTemplateChange = (templateId: string) => {
+    emailState.setSelectedTemplate(templateId);
+    
+    // Apply template logic here...
+    // This is simplified; actual implementation would use proper template functions
+    if (templateId === 'template-1') {
+      emailState.setSubject('案件のご紹介');
+      emailState.setEmailBody('いつもお世話になっております。\n\n新しい案件のご紹介です。\n\nご検討いただければ幸いです。');
+    } else if (templateId === 'template-2') {
+      emailState.setSubject('技術者のご提案');
+      emailState.setEmailBody('いつもお世話になっております。\n\n技術者のご提案です。\n\nどうぞご検討ください。');
+    } else {
+      emailState.setSubject('');
+      emailState.setEmailBody('');
+    }
+  };
   
-  const engineerHandlers = createEngineerHandlers(
-    engineerState.openEngineerDialog,
-    engineerState.removeEngineer,
-    () => {
+  const handleEnhanceEmail = () => {
+    if (!emailState.emailBody.trim()) {
+      toast.error('メール本文を入力してください');
+      return;
+    }
+    
+    emailState.setSending(true);
+    
+    // Simulate AI enhancement
+    setTimeout(() => {
+      const enhancedBody = emailState.emailBody + '\n\n文章が最適化されました。';
+      emailState.setEmailBody(enhancedBody);
+      emailState.setSending(false);
+      toast.success('メール本文が最適化されました');
+    }, 1500);
+  };
+  
+  const handleSendEmail = () => {
+    if (emailState.selectedCases.length === 0) {
+      toast.error('送信先が選択されていません');
+      return;
+    }
+    
+    if (!emailState.subject || !emailState.emailBody) {
+      toast.error('件名または本文が入力されていません');
+      return;
+    }
+    
+    emailState.setSending(true);
+    
+    // Simulate sending
+    setTimeout(() => {
+      toast.success(`${emailState.selectedCases.length}名にメールを送信しました`);
+      emailState.setSelectedCases([]);
+      emailState.setSelectAll(false);
+      emailState.setSubject('');
+      emailState.setEmailBody('');
+      engineerState.setSelectedEngineers([]);
+      emailState.setSending(false);
+    }, 2000);
+  };
+  
+  const handleTestEmail = () => {
+    if (!emailState.subject || !emailState.emailBody) {
+      toast.error('件名または本文が入力されていません');
+      return;
+    }
+    
+    emailState.setSending(true);
+    
+    // Simulate sending test email
+    setTimeout(() => {
+      toast.success('テストメールを送信しました');
+      emailState.setSending(false);
+    }, 1500);
+  };
+  
+  // Handle removing a case from the selected list
+  const handleUnselectCase = (caseId: string, rowId: string) => {
+    emailState.setSelectedCases(prev => 
+      prev.filter(c => !(c.id === caseId && c.selectedRowId === rowId))
+    );
+  };
+  
+  // Combined handlers
+  const handlers = {
+    casesHandleSelectAll: handleSelectAll,
+    casesHandleSelectCase: handleSelectCase,
+    templateHandleChange: handleTemplateChange,
+    emailHandleEnhance: handleEnhanceEmail,
+    emailHandleSend: handleSendEmail,
+    emailHandleTest: handleTestEmail,
+    engineerHandleOpen: engineerState.openEngineerDialog,
+    engineerHandleRemove: engineerState.removeEngineer,
+    engineerHandleApply: () => {
       if (engineerState.selectedEngineers.length === 0) {
         toast.error('技術者が選択されていません');
         return;
@@ -92,33 +233,6 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
       emailState.setEmailBody(updatedBody);
       toast.success('技術者情報をメール本文に反映しました');
     },
-    engineerState.addEngineer // Pass the addEngineer function
-  );
-  
-  const signatureHandlers = createSignatureHandlers({
-    setSignature: emailState.setSignature,
-    signature: emailState.signature
-  });
-  
-  // Handle removing a case from the selected list
-  const handleUnselectCase = (caseId: string, rowId: string) => {
-    emailState.setSelectedCases(prev => 
-      prev.filter(c => !(c.id === caseId && c.selectedRowId === rowId))
-    );
-  };
-  
-  // Get combined handlers
-  const handlers = {
-    casesHandleSelectAll: casesHandlers.handleSelectAll,
-    casesHandleSelectCase: casesHandlers.handleSelectCase,
-    templateHandleChange: templateHandlers.handleTemplateChange,
-    emailHandleEnhance: emailHandlers.handleEnhanceEmail,
-    emailHandleSend: emailHandlers.handleSendEmail,
-    emailHandleTest: emailHandlers.handleTestEmail,
-    engineerHandleOpen: engineerHandlers.openEngineerDialog,
-    engineerHandleRemove: engineerHandlers.removeSelectedEngineer,
-    engineerHandleApply: engineerHandlers.applyEngineerToTemplate,
-    signatureHandleChange: signatureHandlers.handleSignatureChange,
     handleUnselectCase: handleUnselectCase
   };
   

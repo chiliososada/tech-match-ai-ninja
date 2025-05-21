@@ -1,5 +1,6 @@
 
 import { MailCase } from '../types';
+import { Engineer } from '@/components/candidates/types';
 
 /**
  * Processes case data for display
@@ -59,6 +60,53 @@ export const processCaseData = (
 };
 
 /**
+ * Filter paginated cases based on filter criteria
+ */
+export const filterPaginatedCases = (
+  cases: MailCase[],
+  companyFilter: string,
+  techFilter: string,
+  currentPage: number
+) => {
+  // Use the processCaseData function to filter and paginate cases
+  const result = processCaseData(cases, companyFilter, techFilter, currentPage, 10);
+  return result.paginatedCases;
+};
+
+/**
+ * Get total pages for pagination
+ */
+export const getTotalPages = (
+  cases: MailCase[],
+  companyFilter: string,
+  techFilter: string
+) => {
+  // Filter cases first
+  let filteredCases = [...cases];
+  
+  // Filter by company if not "all"
+  if (companyFilter && companyFilter !== "all") {
+    filteredCases = filteredCases.filter(caseItem => 
+      caseItem.company && caseItem.company.toLowerCase() === companyFilter.toLowerCase()
+    );
+  }
+  
+  // Filter by tech keywords
+  if (techFilter && techFilter.trim() !== "") {
+    const keywords = techFilter.toLowerCase().split(/\s+/);
+    filteredCases = filteredCases.filter(caseItem => 
+      keywords.some(keyword => 
+        (caseItem.skills && caseItem.skills.some(skill => skill.toLowerCase().includes(keyword))) ||
+        (caseItem.title && caseItem.title.toLowerCase().includes(keyword))
+      )
+    );
+  }
+  
+  // Calculate pagination with standard page size of 10
+  return Math.ceil(filteredCases.length / 10);
+};
+
+/**
  * Processes engineer data for display
  */
 export const processEngineerData = (
@@ -68,7 +116,7 @@ export const processEngineerData = (
   itemsPerPage: number
 ) => {
   // Mock data for engineers that matches the talent management data format
-  const mockEngineers = [
+  const mockEngineers: Engineer[] = [
     {
       id: 'eng-1',
       name: '山田太郎',
@@ -76,7 +124,7 @@ export const processEngineerData = (
       japaneseLevel: 'ネイティブレベル',
       experience: '5年',
       availability: '即日',
-      status: '提案中',
+      status: ['提案中'],
       remarks: '週4日勤務希望, 出張可, リモート可',
       companyType: '自社',
       companyName: 'テックイノベーション株式会社',
@@ -84,6 +132,8 @@ export const processEngineerData = (
       registeredAt: '2023-01-15',
       updatedAt: '2023-03-20',
       nationality: '日本',
+      age: '32歳',
+      gender: '男性',
     },
     {
       id: 'eng-2',
@@ -92,7 +142,7 @@ export const processEngineerData = (
       japaneseLevel: 'ネイティブレベル',
       experience: '3年',
       availability: '1ヶ月後',
-      status: '事前面談',
+      status: ['事前面談'],
       remarks: 'リモート勤務希望, 週5日可',
       companyType: '他社',
       companyName: 'フロントエンドパートナーズ株式会社',
@@ -100,6 +150,8 @@ export const processEngineerData = (
       registeredAt: '2023-02-20',
       updatedAt: '2023-04-15',
       nationality: '中国',
+      age: '28歳',
+      gender: '女性',
     },
     {
       id: 'eng-3',
@@ -108,7 +160,7 @@ export const processEngineerData = (
       japaneseLevel: 'ビジネスレベル',
       experience: '8年',
       availability: '応相談',
-      status: '面談',
+      status: ['面談'],
       remarks: '大手企業での勤務経験豊富, 長期案件希望',
       companyType: '自社',
       companyName: 'テックイノベーション株式会社',
@@ -116,57 +168,11 @@ export const processEngineerData = (
       registeredAt: '2023-03-05',
       updatedAt: '2023-05-10',
       nationality: 'インド',
-    },
-    {
-      id: 'eng-4',
-      name: '佐藤健太',
-      skills: ['C#', '.NET', 'Azure'],
-      japaneseLevel: 'ネイティブレベル',
-      experience: '6年',
-      availability: '2週間後',
-      status: '結果待ち',
-      remarks: '金融システム開発経験あり',
-      companyType: '他社',
-      companyName: 'テクノソリューションズ株式会社',
-      source: '転職サイト',
-      registeredAt: '2023-04-10',
-      updatedAt: '2023-06-01',
-      nationality: '日本',
-    },
-    {
-      id: 'eng-5',
-      name: '高橋裕子',
-      skills: ['Ruby', 'Rails', 'PostgreSQL'],
-      japaneseLevel: 'ビジネスレベル',
-      experience: '4年',
-      availability: '即日',
-      status: '営業終了',
-      remarks: 'スタートアップでの勤務経験あり',
-      companyType: '自社',
-      companyName: 'テックイノベーション株式会社',
-      source: '直接応募',
-      registeredAt: '2023-05-15',
-      updatedAt: '2023-07-20',
-      nationality: '韓国',
-    },
-    {
-      id: 'eng-6',
-      name: '伊藤雄太',
-      skills: ['PHP', 'Laravel', 'MySQL'],
-      japaneseLevel: 'ネイティブレベル',
-      experience: '7年',
-      availability: '即日',
-      status: '提案中',
-      remarks: 'EC開発経験豊富',
-      companyType: '他社',
-      companyName: 'ウェブデベロップ株式会社',
-      source: 'エージェント紹介',
-      registeredAt: '2023-06-05',
-      updatedAt: '2023-08-10',
-      nationality: '日本',
-    },
+      age: '35歳',
+      gender: '男性',
+    }
   ];
-  
+
   // Filter engineers based on criteria
   let filteredEngineers = [...mockEngineers];
   
@@ -176,7 +182,10 @@ export const processEngineerData = (
     filteredEngineers = filteredEngineers.filter(engineer => 
       keywords.some(keyword => 
         engineer.name.toLowerCase().includes(keyword) ||
-        (engineer.skills && engineer.skills.some(skill => skill.toLowerCase().includes(keyword)))
+        (engineer.skills && (Array.isArray(engineer.skills) 
+          ? engineer.skills.some(skill => typeof skill === 'string' && skill.toLowerCase().includes(keyword))
+          : typeof engineer.skills === 'string' && engineer.skills.toLowerCase().includes(keyword))
+        )
       )
     );
   }
@@ -184,7 +193,7 @@ export const processEngineerData = (
   // Filter by company type if not "all"
   if (engineerCompanyFilter && engineerCompanyFilter !== "all") {
     filteredEngineers = filteredEngineers.filter(engineer => 
-      engineer.companyType.toLowerCase() === engineerCompanyFilter.toLowerCase()
+      engineer.companyType === engineerCompanyFilter
     );
   }
   

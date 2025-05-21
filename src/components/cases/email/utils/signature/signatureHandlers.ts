@@ -38,3 +38,18 @@ export const formatSignaturePreview = (signature: string) => {
   // Simply return the signature for now, but we could format it differently if needed
   return signature;
 };
+
+// Create signature handlers
+export const createSignatureHandlers = ({
+  setSignature,
+  signature
+}: {
+  setSignature: (signature: string) => void;
+  signature: string;
+}) => {
+  return {
+    handleSignatureChange: (newSignature: string) => {
+      setSignature(newSignature);
+    }
+  };
+};

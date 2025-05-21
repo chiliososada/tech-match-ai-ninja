@@ -133,3 +133,42 @@ export const handleTestEmail = (
       setSending(false);
     });
 };
+
+// Create email sending handlers
+export const createEmailSendingHandlers = ({
+  selectedCases,
+  subject,
+  emailBody,
+  signature,
+  setSending
+}: {
+  selectedCases: MailCase[];
+  subject: string;
+  emailBody: string;
+  signature: string;
+  setSending: (sending: boolean) => void;
+}) => {
+  return {
+    handleEnhanceEmail: () => handleEnhanceEmail(emailBody, setSending, () => {}),
+    handleSendEmail: (
+      mailCases: MailCase[],
+      setSelectedCases: (cases: MailCase[]) => void,
+      setSelectAll: (value: boolean) => void,
+      setSubject: (subject: string) => void,
+      setEmailBody: (body: string) => void,
+      setSelectedEngineers: (engineers: any[]) => void
+    ) => handleSendEmail(
+      selectedCases,
+      mailCases,
+      subject,
+      emailBody,
+      setSending,
+      setSelectedCases,
+      setSelectAll,
+      setSubject,
+      setEmailBody,
+      setSelectedEngineers
+    ),
+    handleTestEmail: () => handleTestEmail(subject, emailBody, signature, setSending)
+  };
+};

@@ -1,19 +1,20 @@
+
 import React from 'react';
 import { MailCase } from './types';
 import { 
   handleSelectAll, 
-  handleSelectCase, 
-  handleTemplateChange, 
+  handleSelectCase
+} from './utils/selection/caseSelectionHandlers';
+import { 
+  handleTemplateChange
+} from './utils/template/templateHandlers';
+import { 
   handleEnhanceEmail, 
   handleSendEmail,
   handleTestEmail
-} from './utils/emailHandlers';
-import { 
-  openEngineerDialog, 
-  toggleEngineerSelection, 
-  removeSelectedEngineer, 
-  applyEngineerToTemplate 
-} from './utils/engineerHandlers';
+} from './utils/sending/emailSendingHandlers';
+import { Engineer } from '@/components/candidates/types';
+import { createEngineerHandlers } from './utils/engineerHandlers';
 
 interface EmailHandlerBindingsProps {
   mailCases: MailCase[];
@@ -37,8 +38,8 @@ interface EmailHandlerBindingsProps {
     setSignature: (signature: string) => void;
   };
   engineerState: {
-    selectedEngineers: any[];
-    setSelectedEngineers: (engineers: any[]) => void;
+    selectedEngineers: Engineer[];
+    setSelectedEngineers: (engineers: Engineer[]) => void;
     setIsEngineerDialogOpen: (isOpen: boolean) => void;
     setEngineerCurrentPage: (page: number) => void;
     setEngineerFilter: (filter: string) => void;
@@ -105,37 +106,45 @@ export const useEmailHandlerBindings = ({
     emailState.setSending,
   );
 
-  const engineerHandleOpen = () => {
-    openEngineerDialog(
-      engineerState.setIsEngineerDialogOpen,
-      engineerState.setEngineerCurrentPage,
-      engineerState.setEngineerFilter,
-      engineerState.setEngineerCompanyFilter
-    );
-  };
-
-  const engineerHandleToggle = (engineer: any) => toggleEngineerSelection(
-    engineer,
-    engineerState.selectedEngineers,
-    engineerState.setSelectedEngineers
+  const engineerHandlers = createEngineerHandlers(
+    () => {
+      // Reset pagination and filters
+      engineerState.setEngineerCurrentPage(1);
+      engineerState.setEngineerFilter("");
+      engineerState.setEngineerCompanyFilter("all");
+      
+      // Open the dialog
+      engineerState.setIsEngineerDialogOpen(true);
+    },
+    (engineerId: string) => {
+      // Remove engineer by ID
+      const filteredEngineers = engineerState.selectedEngineers.filter(
+        engineer => engineer.id !== engineerId
+      );
+      engineerState.setSelectedEngineers(filteredEngineers);
+    },
+    () => {
+      if (engineerState.selectedEngineers.length === 0) {
+        return;
+      }
+      
+      // Format engineer skills
+      const engineerSkills = engineerState.selectedEngineers
+        .map(eng => Array.isArray(eng.skills) ? eng.skills.join(', ') : eng.skills)
+        .filter(Boolean)
+        .join('\n- ');
+      
+      // Get engineer names
+      const engineerNames = engineerState.selectedEngineers
+        .map(eng => eng.name)
+        .join('、');
+      
+      // Append engineer info to email body
+      const engineerInfo = `\n\n【ご提案する技術者】\n${engineerNames}\n\n【技術者のスキル】\n- ${engineerSkills}`;
+      
+      emailState.setEmailBody(prev => prev + engineerInfo);
+    }
   );
-
-  const engineerHandleRemove = (engineerId: string) => removeSelectedEngineer(
-    engineerId,
-    engineerState.selectedEngineers,
-    engineerState.setSelectedEngineers
-  );
-
-  const engineerHandleApply = () => {
-    console.log("Applying engineers to template:", engineerState.selectedEngineers.length, "engineers");
-    applyEngineerToTemplate(
-      engineerState.selectedEngineers,
-      emailState.selectedCases,
-      emailState.setSelectedTemplate,
-      emailState.setSubject,
-      emailState.setEmailBody
-    );
-  };
 
   // Updated to handle unselecting a specific row using rowId
   const handleUnselectCase = (caseId: string, rowId: string) => {
@@ -158,10 +167,20 @@ export const useEmailHandlerBindings = ({
     emailHandleEnhance,
     emailHandleSend,
     emailHandleTest,
-    engineerHandleOpen,
-    engineerHandleToggle,
-    engineerHandleRemove,
-    engineerHandleApply,
+    engineerHandleOpen: engineerHandlers.openEngineerDialog,
+    engineerHandleToggle: (engineer: Engineer) => {
+      // Simplified implementation
+      const isSelected = engineerState.selectedEngineers.some(e => e.id === engineer.id);
+      if (isSelected) {
+        engineerState.setSelectedEngineers(
+          engineerState.selectedEngineers.filter(e => e.id !== engineer.id)
+        );
+      } else {
+        engineerState.setSelectedEngineers([...engineerState.selectedEngineers, engineer]);
+      }
+    },
+    engineerHandleRemove: engineerHandlers.removeSelectedEngineer,
+    engineerHandleApply: engineerHandlers.applyEngineerToTemplate,
     handleUnselectCase
   };
 };

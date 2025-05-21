@@ -141,3 +141,24 @@ export const handleSelectCase = (
     }
   }
 };
+
+// Create handlers for case selection actions
+export const createCaseSelectionHandlers = ({ 
+  setSelectedCases, 
+  selectedCases, 
+  selectAll, 
+  setSelectAll 
+}: {
+  setSelectedCases: (cases: MailCase[]) => void;
+  selectedCases: MailCase[];
+  selectAll: boolean;
+  setSelectAll: (value: boolean) => void;
+}) => {
+  return {
+    handleSelectAll: (paginatedCases: MailCase[]) => 
+      handleSelectAll(paginatedCases, selectAll, setSelectedCases, setSelectAll),
+    
+    handleSelectCase: (id: string, rowId: string, paginatedCases: MailCase[]) => 
+      handleSelectCase(id, rowId, selectedCases, paginatedCases, setSelectedCases, setSelectAll)
+  };
+};

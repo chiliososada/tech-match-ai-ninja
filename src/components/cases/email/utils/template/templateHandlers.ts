@@ -1,5 +1,6 @@
 
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../../types';
+import { Engineer } from '@/components/candidates/types';
 
 // Update template placeholders in text
 export const replacePlaceholders = (text: string, data: Record<string, any>) => {
@@ -15,7 +16,7 @@ export const replacePlaceholders = (text: string, data: Record<string, any>) => 
 // Apply selected template to subject and body fields
 export const applyTemplate = (templateId: string, data: { 
   selectedCases: MailCase[],
-  selectedEngineers: any[]
+  selectedEngineers: Engineer[]
 }) => {
   // Ensure templateId is valid and not empty
   if (!templateId || templateId === 'no-template') {
@@ -49,7 +50,7 @@ export const applyTemplate = (templateId: string, data: {
     companyContact: 'AI採用担当',
     engineerName: firstEngineer?.name || '',
     engineerYears: firstEngineer?.experience || '',
-    engineerSkills: firstEngineer?.skills ? firstEngineer.skills.join('、') : ''
+    engineerSkills: firstEngineer?.skills ? (Array.isArray(firstEngineer.skills) ? firstEngineer.skills.join('、') : firstEngineer.skills) : ''
   };
   
   // Replace placeholders
@@ -75,4 +76,22 @@ export const handleTemplateChange = (
   
   setSubject(subject);
   setEmailBody(body);
+};
+
+// Create template handlers
+export const createTemplateHandlers = ({
+  setSelectedTemplate,
+  setSubject,
+  setEmailBody,
+  selectedEngineers
+}: {
+  setSelectedTemplate: (template: string) => void;
+  setSubject: (subject: string) => void;
+  setEmailBody: (body: string) => void;
+  selectedEngineers: Engineer[];
+}) => {
+  return {
+    handleTemplateChange: (templateId: string) => 
+      handleTemplateChange(templateId, setSelectedTemplate, setSubject, setEmailBody)
+  };
 };
