@@ -27,6 +27,7 @@ export function CandidateToCase() {
   const [selectedCase, setSelectedCase] = useState<CaseItem | null>(null);
   const [matchingStarted, setMatchingStarted] = useState(false);
   const [matchingComplete, setMatchingComplete] = useState(false);
+  const [progress, setProgress] = useState(0); // Added progress state
   
   const handleCandidateSelect = (candidate: CandidateItem) => {
     setSelectedCandidate(candidate);
@@ -57,15 +58,24 @@ export function CandidateToCase() {
     }
 
     setMatchingStarted(true);
+    setProgress(0);
     
-    // Simulate matching process
-    setTimeout(() => {
-      setMatchingComplete(true);
-      toast({
-        title: "マッチング完了",
-        description: "候補者と案件のマッチングが完了しました",
+    // Simulate matching process with progress updates
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        const newProgress = prev + 20;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          setMatchingComplete(true);
+          toast({
+            title: "マッチング完了",
+            description: "候補者と案件のマッチングが完了しました",
+          });
+          return 100;
+        }
+        return newProgress;
       });
-    }, 2000);
+    }, 500);
   };
 
   return (
@@ -132,14 +142,26 @@ export function CandidateToCase() {
       
       {/* Progress Card */}
       {matchingStarted && !matchingComplete && (
-        <MatchingProgressCard />
+        <MatchingProgressCard 
+          progress={progress}
+          isInProgress={true}
+          completionMessage="マッチングが完了しました"
+          processingMessage="候補者と案件のマッチングを実行中..."
+        />
       )}
       
       {/* Results Card */}
       {matchingComplete && (
         <MatchingResultsCard 
-          candidateName={selectedCandidate?.name || ""} 
-          caseTitle={selectedCase?.title || ""} 
+          title="マッチング結果"
+          description={`${selectedCandidate?.name}と${selectedCase?.title}のマッチング結果`}
+          matches={[
+            {
+              id: "1",
+              name: selectedCase?.title || "",
+              skills: [selectedCandidate?.skills || ""]
+            }
+          ]}
         />
       )}
     </div>
