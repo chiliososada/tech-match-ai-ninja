@@ -48,8 +48,10 @@ ${caseItem.id.includes('2') ? '- チームリーダーとしてのタスク管�
 開発環境：${caseItem.skills[0]}、${caseItem.skills.length > 1 ? caseItem.skills[1] : 'JavaScript'}
 ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）' : '原則常駐（リモート応相談）'}`;
 
-      // Always ensure we have a valid company name
-      const safeCompany = caseItem.company || "未分類会社";
+      // Always ensure we have a valid company name - this is crucial for avoiding Select.Item errors
+      const safeCompany = caseItem.company && typeof caseItem.company === 'string' && caseItem.company.trim() !== '' 
+        ? caseItem.company 
+        : "未分類会社";
 
       // Add multiple senders to some cases based on their ID to ensure consistency
       if (caseItem.id.includes('1') || caseItem.id.includes('3') || caseItem.id.includes('5')) {
@@ -123,6 +125,21 @@ ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）
     
     // Debug company list
     console.log("- Company list:", caseData.companyList);
+    
+    // Validate all company names to make sure they're all valid strings
+    const companyListValid = caseData.companyList.every(company => 
+      company !== null && 
+      company !== undefined && 
+      company !== "" &&
+      typeof company === 'string'
+    );
+    
+    console.log("- All company names valid:", companyListValid);
+    
+    if (!companyListValid) {
+      console.warn("WARNING: Some company names are null, undefined, empty string, or not a string!");
+      console.warn("Invalid companies:", caseData.companyList.filter(c => !c || c === "" || typeof c !== 'string'));
+    }
   }, [isOtherCompanyMode, mailCases.length, enhancedMailCases.length, emailState.currentPage, caseData.totalPages, caseData.companyList]);
 
   return (

@@ -18,17 +18,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setTechFilter,
   companyList
 }) => {
-  // Filter out null or empty string values from companyList and ensure they're unique
+  // Filter out null, undefined, empty strings and ensure they're unique
   const validCompanyList = React.useMemo(() => {
-    // Filter out nulls, empty strings, and ensure they are strings
-    const filtered = companyList.filter(company => 
-      company !== null && 
-      company !== undefined && 
-      company !== "" && 
-      typeof company === 'string'
-    );
+    // Filter out nulls, empty strings, and ensure they are valid strings
+    const filtered = companyList
+      .filter(company => 
+        company !== null && 
+        company !== undefined && 
+        company !== "" && 
+        typeof company === 'string'
+      );
     
-    // Remove duplicates
+    // Remove duplicates using a Set
     return Array.from(new Set(filtered));
   }, [companyList]);
 

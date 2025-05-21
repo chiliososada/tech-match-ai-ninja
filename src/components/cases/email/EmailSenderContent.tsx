@@ -71,7 +71,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
   const [selectedCase, setSelectedCase] = React.useState<MailCase | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = React.useState(false);
   
-  // Filter company list based on search term with extra validation to ensure no empty values
+  // Filter company list based on search term with extra validation
   const filteredCompanyList = React.useMemo(() => {
     // First filter out null, empty strings, and non-string values
     const validCompanies = caseData.companyList
@@ -81,13 +81,18 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
         company !== "" && 
         typeof company === 'string'
       )
-      // Remove duplicates directly in the filter logic
-      .reduce((acc: string[], curr) => {
+      // Ensure we don't have duplicates
+      .reduce<string[]>((acc, curr) => {
         if (!acc.includes(curr)) {
           acc.push(curr);
         }
         return acc;
       }, []);
+    
+    // Add a fallback company if the list is empty to avoid rendering issues
+    if (validCompanies.length === 0) {
+      validCompanies.push("未分類会社");
+    }
     
     // Then filter based on search term
     if (!companySearchTerm) return validCompanies;
