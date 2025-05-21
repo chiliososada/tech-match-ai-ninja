@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card, 
@@ -54,7 +55,7 @@ interface EmailSenderContentProps {
     engineerHandleOpen: () => void;
     engineerHandleRemove: (engineerId: string) => void;
     engineerHandleApply: () => void;
-    handleUnselectCase: (caseId: string) => void;
+    handleUnselectCase: (caseId: string, rowId: string) => void;
   };
 }
 
@@ -84,9 +85,9 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
     setIsDetailDialogOpen(true);
   };
   
-  // Handle unselecting a case directly from the selected senders list
-  const handleUnselectCase = (caseId: string) => {
-    handlers.handleUnselectCase(caseId);
+  // Handle unselecting a specific row from the selected senders list
+  const handleUnselectCase = (caseId: string, rowId: string) => {
+    handlers.handleUnselectCase(caseId, rowId);
   };
 
   return (
@@ -144,7 +145,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             removeSelectedEngineer={handlers.engineerHandleRemove}
             applyEngineerToTemplate={handlers.engineerHandleApply}
             isOtherCompanyMode={isOtherCompanyMode}
-            handleUnselectCase={handlers.handleUnselectCase}
+            handleUnselectCase={handleUnselectCase}
           />
         </CardContent>
       </Card>

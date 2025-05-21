@@ -32,7 +32,7 @@ interface EmailSenderLayoutProps {
   removeSelectedEngineer: (engineerId: string) => void;
   applyEngineerToTemplate: () => void;
   isOtherCompanyMode: boolean;
-  handleUnselectCase: (caseId: string) => void;
+  handleUnselectCase: (caseId: string, rowId: string) => void;
 }
 
 export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
@@ -54,7 +54,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
       email: string;
       caseId: string;
       caseTitle: string;
-      rowId?: string;
+      rowId: string; // Ensure rowId is always present
     }[] } = {};
     
     emailState.selectedCases.forEach(caseItem => {
@@ -70,7 +70,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
         email: caseItem.selectedSenderEmail || caseItem.senderEmail || '',
         caseId: caseItem.id,
         caseTitle: caseItem.title,
-        rowId: caseItem.selectedRowId
+        rowId: caseItem.selectedRowId || `${caseItem.id}-default-0`
       });
     });
     
@@ -111,7 +111,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
                     </h4>
                     <div className="space-y-2">
                       {senders.map((sender, idx) => (
-                        <div key={`${sender.caseId}-${idx}`} className="flex items-center justify-between bg-muted/30 rounded-md p-2 text-sm">
+                        <div key={`${sender.rowId || sender.caseId + '-' + idx}`} className="flex items-center justify-between bg-muted/30 rounded-md p-2 text-sm">
                           <div className="flex-1">
                             <div className="font-medium">{sender.name || '名前なし'}</div>
                             <div className="text-xs text-muted-foreground">{sender.email || 'メールなし'}</div>
@@ -121,7 +121,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
                             variant="ghost" 
                             size="sm" 
                             className="h-6 w-6 p-0"
-                            onClick={() => handleUnselectCase(sender.caseId)}
+                            onClick={() => handleUnselectCase(sender.caseId, sender.rowId)}
                           >
                             <X className="h-4 w-4" />
                             <span className="sr-only">選択解除</span>

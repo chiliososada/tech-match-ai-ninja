@@ -124,11 +124,12 @@ export const useEmailHandlerBindings = ({
     emailState.setEmailBody
   );
 
-  // Add a function to handle unselecting a case by case ID
-  const handleUnselectCase = (caseId: string) => {
+  // Updated to handle unselecting a specific row using rowId
+  const handleUnselectCase = (caseId: string, rowId: string) => {
     const updatedCases = emailState.selectedCases.filter(
-      item => item.id !== caseId
+      item => !(item.id === caseId && item.selectedRowId === rowId)
     );
+    
     emailState.setSelectedCases(updatedCases);
     
     // Check if all cases are now unselected
