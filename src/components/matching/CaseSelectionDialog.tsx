@@ -1,15 +1,23 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FileText } from 'lucide-react';
+import { FileText, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
-interface CaseItem {
+export interface CaseItem {
   id: number;
   title: string;
   client: string;
+  skills?: string[];
+  experience?: string;
+  budget?: string;
+  location?: string;
+  workType?: string;
+  priority?: string;
+  description?: string;
 }
 
 interface CaseSelectionDialogProps {
@@ -17,13 +25,85 @@ interface CaseSelectionDialogProps {
 }
 
 export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
-  // Dummy data for existing cases
-  const existingCases = [
-    { id: 1, title: 'Java開発エンジニア', client: '株式会社テック' },
-    { id: 2, title: 'フロントエンドエンジニア', client: 'デジタルソリューション株式会社' },
-    { id: 3, title: 'インフラエンジニア', client: 'クラウドシステム株式会社' },
-    { id: 4, title: 'バックエンドエンジニア', client: 'ウェブサービス株式会社' }
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  
+  // Enhanced dummy data for existing cases
+  const existingCases: CaseItem[] = [
+    { 
+      id: 1, 
+      title: 'Java開発エンジニア', 
+      client: '株式会社テック',
+      skills: ['Java', 'Spring Boot', 'MySQL'],
+      experience: '5',
+      budget: '60~80',
+      location: '東京',
+      workType: 'リモート可',
+      description: '金融系システムの開発案件。Java/Spring Bootの経験者を募集。'
+    },
+    { 
+      id: 2, 
+      title: 'フロントエンドエンジニア', 
+      client: 'デジタルソリューション株式会社',
+      skills: ['React', 'TypeScript', 'Next.js'],
+      experience: '3',
+      budget: '50~70',
+      location: '大阪',
+      workType: 'リモート可',
+      description: 'ECサイトのフロントエンド開発。React/TypeScriptの経験者必須。'
+    },
+    { 
+      id: 3, 
+      title: 'インフラエンジニア', 
+      client: 'クラウドシステム株式会社',
+      skills: ['AWS', 'Docker', 'Kubernetes'],
+      experience: '3',
+      budget: '70~90',
+      location: '東京',
+      workType: 'オンサイト',
+      description: 'クラウド環境の構築・運用。AWS、Docker、Kubernetesの経験者を募集。'
+    },
+    { 
+      id: 4, 
+      title: 'バックエンドエンジニア', 
+      client: 'ウェブサービス株式会社',
+      skills: ['Python', 'Django', 'PostgreSQL'],
+      experience: '3',
+      budget: '55~75',
+      location: '福岡',
+      workType: 'フルリモート',
+      description: 'WebサービスのAPI開発。Python/Djangoの経験者を募集。'
+    },
+    { 
+      id: 5, 
+      title: 'モバイルアプリ開発者', 
+      client: 'モバイルテクノロジー株式会社',
+      skills: ['iOS', 'Swift', 'Objective-C'],
+      experience: '4',
+      budget: '65~85',
+      location: '東京',
+      workType: 'ハイブリッド',
+      description: 'iOSアプリケーション開発。Swift/Objective-Cの経験者必須。'
+    },
+    { 
+      id: 6, 
+      title: 'データアナリスト', 
+      client: 'データインサイト株式会社',
+      skills: ['Python', 'R', 'SQL', 'Tableau'],
+      experience: '3',
+      budget: '60~80',
+      location: '名古屋',
+      workType: 'リモート可',
+      description: 'データ分析と可視化。Python/R/SQLの経験者を募集。'
+    }
   ];
+
+  // Filter cases based on search query
+  const filteredCases = existingCases.filter(caseItem => 
+    !searchQuery || 
+    caseItem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    caseItem.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    caseItem.skills?.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <Dialog>
@@ -33,33 +113,73 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
           既存案件から選択
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="japanese-text">既存案件から選択</DialogTitle>
           <DialogDescription className="japanese-text">
             マッチングに使用する案件を選択してください
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 max-h-80 overflow-y-auto">
-          <Input placeholder="案件を検索" className="japanese-text" />
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="flex items-center border rounded-md border-input hover:border-primary/60 transition-colors bg-background px-3 shadow-sm">
+            <Search className="h-4 w-4 text-muted-foreground mr-2" />
+            <Input 
+              placeholder="案件名、会社名、スキルを検索" 
+              className="japanese-text border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="japanese-text">案件名</TableHead>
                 <TableHead className="japanese-text">クライアント</TableHead>
+                <TableHead className="japanese-text">スキル</TableHead>
                 <TableHead className="w-24 text-right"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {existingCases.map((caseItem) => (
-                <TableRow key={caseItem.id}>
+              {filteredCases.map((caseItem) => (
+                <TableRow key={caseItem.id} className="cursor-pointer hover:bg-muted/40">
                   <TableCell className="font-medium japanese-text">{caseItem.title}</TableCell>
                   <TableCell className="japanese-text">{caseItem.client}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {caseItem.skills?.slice(0, 2).map((skill, idx) => (
+                        <Badge key={idx} variant="outline" className="bg-blue-50 text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                      {(caseItem.skills?.length || 0) > 2 && (
+                        <Badge variant="outline" className="bg-gray-100 text-xs">
+                          +{(caseItem.skills?.length || 0) - 2}
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="outline" onClick={() => onSelect(caseItem)} className="japanese-text">選択</Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => onSelect(caseItem)} 
+                      className="japanese-text"
+                    >
+                      選択
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredCases.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-24 text-center">
+                    <div className="text-muted-foreground japanese-text">
+                      該当する案件がありません
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

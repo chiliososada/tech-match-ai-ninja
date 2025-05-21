@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -12,6 +13,7 @@ import { MatchingProgressCard } from './MatchingProgressCard';
 import { MatchingResultsCard } from './MatchingResultsCard';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CaseTextInput } from './CaseTextInput';
+import { Badge } from '@/components/ui/badge';
 
 export interface CaseMatchingResult {
   id: number;
@@ -29,10 +31,24 @@ export interface CaseMatchingResult {
   statusClass: string;
 }
 
+interface CaseItem {
+  id: number;
+  title: string;
+  client: string;
+  skills?: string[];
+  experience?: string;
+  budget?: string;
+  location?: string;
+  workType?: string;
+  priority?: string;
+  description?: string;
+}
+
 export function CaseToCandidate() {
   // Case to candidate matching states
   const [matchingInProgress, setMatchingInProgress] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [selectedCase, setSelectedCase] = useState<CaseItem | null>(null);
   const [matchingResults, setMatchingResults] = useState<CaseMatchingResult[]>([
     {
       id: 1,
@@ -174,17 +190,58 @@ export function CaseToCandidate() {
   };
 
   // Handle case selection
-  const handleCaseSelect = (selectedCase: any) => {
+  const handleCaseSelect = (caseItem: CaseItem) => {
+    setSelectedCase(caseItem);
+    
+    // Update form with the selected case data
+    if (caseItem.skills) {
+      caseForm.setValue('skills', Array.isArray(caseItem.skills) ? caseItem.skills.join(', ') : caseItem.skills);
+    }
+    
+    if (caseItem.experience) {
+      caseForm.setValue('experience', caseItem.experience);
+    }
+    
+    if (caseItem.budget) {
+      caseForm.setValue('budget', caseItem.budget);
+    }
+    
+    if (caseItem.location) {
+      caseForm.setValue('location', caseItem.location);
+    }
+    
+    if (caseItem.workType) {
+      caseForm.setValue('workType', caseItem.workType);
+    }
+    
+    if (caseItem.priority) {
+      caseForm.setValue('priority', caseItem.priority);
+    }
+    
     toast({
       title: "案件を選択しました",
-      description: `${selectedCase.title}の情報をフォームに反映しました`,
+      description: `${caseItem.title}の情報をフォームに反映しました`,
     });
-    
-    // Here you would update the form with the selected case data
   };
 
   // Handle structured data from text input
   const handleStructuredData = (data: any) => {
+    // Update selected case with extracted data
+    const extractedCase = {
+      id: Date.now(),
+      title: data.title || "案件テキストから抽出",
+      client: data.company || "未指定",
+      skills: data.skills.split(',').map((s: string) => s.trim()),
+      experience: data.experience,
+      budget: data.budget,
+      location: data.location,
+      workType: data.workType,
+      priority: "medium",
+      description: data.originalText
+    };
+    
+    setSelectedCase(extractedCase);
+    
     // Update form with extracted data
     caseForm.setValue('skills', data.skills);
     caseForm.setValue('experience', data.experience);
@@ -230,6 +287,45 @@ export function CaseToCandidate() {
                 </DialogContent>
               </Dialog>
             </div>
+
+            {/* Display selected case info */}
+            {selectedCase && (
+              <Card className="mb-6 bg-muted/50">
+                <CardContent className="p-4 space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-lg japanese-text">{selectedCase.title}</h4>
+                      <Badge variant="outline" className="bg-blue-100 text-blue-800">選択済み</Badge>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm font-medium japanese-text">クライアント:</p>
+                      <p className="japanese-text">{selectedCase.client}</p>
+                    </div>
+                    
+                    {selectedCase.description && (
+                      <div>
+                        <p className="text-sm font-medium japanese-text">概要:</p>
+                        <p className="japanese-text text-sm text-muted-foreground line-clamp-3">{selectedCase.description}</p>
+                      </div>
+                    )}
+                    
+                    {selectedCase.skills && selectedCase.skills.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium japanese-text">必要スキル:</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {Array.isArray(selectedCase.skills) ? selectedCase.skills.map((skill, index) => (
+                            <Badge key={index} variant="outline" className="bg-blue-50">
+                              {skill}
+                            </Badge>
+                          )) : <Badge variant="outline" className="bg-blue-50">{selectedCase.skills}</Badge>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <Form {...caseForm}>
               <form onSubmit={caseForm.handleSubmit(startMatching)} className="space-y-6">

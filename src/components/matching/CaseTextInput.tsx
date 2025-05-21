@@ -1,172 +1,175 @@
 
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { FileText, Wand2 } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
+import { Loader } from 'lucide-react';
 
 interface CaseTextInputProps {
-  onStructuredData: (data: any) => void;
+  onStructuredData: (data: {
+    title: string;
+    company: string;
+    skills: string;
+    experience: string;
+    budget: string;
+    location: string;
+    workType: string;
+    originalText: string;
+  }) => void;
 }
 
 export function CaseTextInput({ onStructuredData }: CaseTextInputProps) {
-  const [caseText, setCaseText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [caseText, setCaseText] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const handleGenerateStructure = () => {
+  const handleExtract = () => {
     if (!caseText.trim()) {
       toast({
-        title: "テキストが入力されていません",
-        description: "案件情報を入力してください",
+        title: "エラー",
+        description: "案件テキストを入力してください",
+        variant: "destructive",
       });
       return;
     }
 
     setIsProcessing(true);
-    
-    // Simulate processing - in a real app, this would call an API
-    setTimeout(() => {
-      // Extract data from text using simple parsing
-      // This is a simplified example - in a real app, you'd use NLP or an AI service
-      const extractedData = {
-        skills: extractSkills(caseText),
-        experience: extractExperience(caseText),
-        budget: extractBudget(caseText),
-        location: extractLocation(caseText),
-        workType: extractWorkType(caseText),
-        title: extractTitle(caseText),
-        company: extractCompany(caseText),
-        manager: '担当者',
-        managerEmail: 'contact@example.com',
-        duration: '6ヶ月〜',
-        japanese: 'ビジネスレベル',
-        priority: '中',
-        status: '募集中',
-        foreignerAccepted: true,
-        freelancerAccepted: true,
-        interviewCount: '1',
-        processes: ['要件定義', '基本設計'],
-        detailDescription: caseText
-      };
-      
-      onStructuredData(extractedData);
-      setIsProcessing(false);
-      
-      toast({
-        title: "構造化完了",
-        description: "案件情報が構造化されました",
-      });
-    }, 1500);
-  };
-  
-  // Simple extraction functions (these would be more sophisticated in a real app)
-  const extractSkills = (text: string) => {
-    const skills = ['Java', 'Python', 'React', 'AWS', 'Docker', 'TypeScript', 'JavaScript'];
-    return skills.filter(skill => text.includes(skill)).join(', ');
-  };
-  
-  const extractExperience = (text: string) => {
-    if (text.includes('10年')) return '10';
-    if (text.includes('5年')) return '5';
-    if (text.includes('3年')) return '3';
-    return '1';
-  };
-  
-  const extractBudget = (text: string) => {
-    // Look for patterns like "60~80万円" or "60万円"
-    const budgetMatch = text.match(/(\d+)\s*[~～]\s*(\d+)\s*万円/) || text.match(/(\d+)\s*万円/);
-    if (budgetMatch) {
-      if (budgetMatch.length > 2) {
-        return `${budgetMatch[1]}~${budgetMatch[2]}`;
-      } else {
-        return budgetMatch[1];
-      }
-    }
-    return '50~80';
-  };
-  
-  const extractLocation = (text: string) => {
-    if (text.includes('東京')) return '東京';
-    if (text.includes('大阪')) return '大阪';
-    if (text.includes('名古屋')) return '名古屋';
-    return '東京';
-  };
-  
-  const extractWorkType = (text: string) => {
-    if (text.includes('フルリモート')) return 'フルリモート';
-    if (text.includes('リモート')) return 'リモート可';
-    return 'オンサイト';
-  };
 
-  const extractTitle = (text: string) => {
-    // Simple extraction of the first line or first sentence as title
-    const firstLine = text.split('\n')[0];
-    if (firstLine && firstLine.length < 50) {
-      return firstLine;
-    }
-    
-    const firstSentence = text.split('。')[0];
-    if (firstSentence && firstSentence.length < 50) {
-      return firstSentence;
-    }
-    
-    return text.substring(0, 30) + '...';
-  };
-  
-  const extractCompany = (text: string) => {
-    const companyNames = ['株式会社', 'テクノロジー', 'システムズ', 'ソリューションズ'];
-    for (const name of companyNames) {
-      if (text.includes(name)) {
-        const index = text.indexOf(name);
-        const possibleCompany = text.substring(index, index + 15);
-        return possibleCompany;
+    // Simulate AI processing with a timeout
+    setTimeout(() => {
+      try {
+        // Extract information from text (in a real app, this would use AI or pattern matching)
+        // This is a simple simulation of extracting structured data
+        let title = "未特定";
+        let company = "未特定";
+        let skills = "";
+        let experience = "3";
+        let budget = "60~80";
+        let location = "東京";
+        let workType = "リモート可";
+        
+        // Simple extractors based on keywords
+        const lines = caseText.split('\n');
+        
+        // Check for title in the first few lines
+        for (let i = 0; i < Math.min(3, lines.length); i++) {
+          if (lines[i].includes('案件') || lines[i].includes('募集') || lines[i].includes('開発')) {
+            title = lines[i].trim();
+            break;
+          }
+        }
+        
+        // Extract client/company
+        const companyMatch = caseText.match(/[株式会社|合同会社|有限会社][\w\s]{1,20}/g);
+        if (companyMatch && companyMatch.length > 0) {
+          company = companyMatch[0];
+        }
+        
+        // Extract skills
+        const skillKeywords = [
+          'Java', 'Python', 'JavaScript', 'TypeScript', 'React', 'Angular', 'Vue.js',
+          'Node.js', 'PHP', 'Ruby', 'C#', 'C++', 'Swift', 'Kotlin', 'Go', 'Rust',
+          'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 'Spring', 'Django', 'Rails',
+          'MySQL', 'PostgreSQL', 'MongoDB', 'Oracle', 'SQL Server'
+        ];
+        
+        const foundSkills = skillKeywords.filter(skill => 
+          caseText.includes(skill)
+        );
+        
+        skills = foundSkills.join(', ');
+        
+        // Extract experience
+        const expMatch = caseText.match(/(\d+)年.*経験/);
+        if (expMatch) {
+          experience = expMatch[1];
+        }
+        
+        // Extract budget
+        const budgetMatch = caseText.match(/(\d+)万[~～](\d+)万/);
+        if (budgetMatch) {
+          budget = `${budgetMatch[1]}~${budgetMatch[2]}`;
+        }
+        
+        // Extract location
+        const locations = ['東京', '大阪', '名古屋', '福岡', '札幌', '仙台', '広島', '横浜'];
+        for (const loc of locations) {
+          if (caseText.includes(loc)) {
+            location = loc;
+            break;
+          }
+        }
+        
+        // Extract work type
+        if (caseText.includes('リモート')) {
+          if (caseText.includes('フルリモート')) {
+            workType = 'フルリモート';
+          } else {
+            workType = 'リモート可';
+          }
+        } else if (caseText.includes('オンサイト')) {
+          workType = 'オンサイト';
+        } else if (caseText.includes('ハイブリッド')) {
+          workType = 'ハイブリッド';
+        }
+
+        // Return structured data
+        onStructuredData({
+          title,
+          company,
+          skills,
+          experience,
+          budget,
+          location,
+          workType,
+          originalText: caseText
+        });
+        
+        toast({
+          title: "抽出成功",
+          description: "案件テキストからデータを抽出しました",
+        });
+      } catch (error) {
+        toast({
+          title: "抽出エラー",
+          description: "データの抽出に失敗しました",
+          variant: "destructive",
+        });
+      } finally {
+        setIsProcessing(false);
       }
-    }
-    return '株式会社テック';
+    }, 1500);
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="japanese-text">案件テキスト入力</CardTitle>
-        <CardDescription className="japanese-text">
-          案件の説明テキストを入力して、構造化データに変換します
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid w-full gap-4">
-          <div className="grid w-full gap-1.5">
-            <Label htmlFor="case-text" className="japanese-text">案件の説明文</Label>
-            <Textarea
-              id="case-text"
-              placeholder="例：「Java、SpringBootの経験者を募集しています。勤務地は東京、期間は6ヶ月～、単価は60〜80万円です。」"
-              className="min-h-[120px] japanese-text"
-              value={caseText}
-              onChange={(e) => setCaseText(e.target.value)}
-            />
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleGenerateStructure} 
-          disabled={isProcessing || !caseText.trim()}
-          className="w-full japanese-text"
-        >
-          {isProcessing ? (
-            <>処理中...</>
-          ) : (
-            <>
-              <Wand2 className="mr-2 h-4 w-4" />
-              構造化データを生成
-            </>
-          )}
-        </Button>
-      </CardFooter>
-    </Card>
+    <div className="space-y-4">
+      <Textarea
+        placeholder="案件テキストを貼り付けてください。例：
+【案件名】Java開発エンジニア
+【会社名】株式会社テック
+【スキル】Java, Spring Boot, MySQL
+【経験】5年以上
+【単価】60万～80万円
+【場所】東京
+【勤務形態】リモート可能"
+        value={caseText}
+        onChange={(e) => setCaseText(e.target.value)}
+        className="min-h-[200px] japanese-text"
+      />
+      
+      <Button 
+        onClick={handleExtract} 
+        disabled={isProcessing || !caseText.trim()} 
+        className="w-full japanese-text"
+      >
+        {isProcessing ? (
+          <>
+            <Loader className="mr-2 h-4 w-4 animate-spin" />
+            <span>分析中...</span>
+          </>
+        ) : (
+          "テキストからデータを抽出"
+        )}
+      </Button>
+    </div>
   );
 }
-
-export default CaseTextInput;
