@@ -1,34 +1,48 @@
 
 import { useState } from 'react';
-import { Engineer } from '@/components/cases/email/types';  // Import Engineer type from our local types
+import { Engineer } from '../types';
 
-export const useEngineerState = () => {
-  const [isEngineerDialogOpen, setIsEngineerDialogOpen] = useState(false);
+export const useEngineerState = (mailCases?: any[]) => {
   const [selectedEngineers, setSelectedEngineers] = useState<Engineer[]>([]);
+  const [isEngineerDialogOpen, setIsEngineerDialogOpen] = useState(false);
+  const [engineerCurrentPage, setEngineerCurrentPage] = useState(1);
+  const [engineerFilter, setEngineerFilter] = useState('');
+  const [engineerCompanyFilter, setEngineerCompanyFilter] = useState('all');
 
+  // For opening the engineer selection dialog
   const openEngineerDialog = () => {
     setIsEngineerDialogOpen(true);
   };
 
+  // For closing the engineer selection dialog
   const closeEngineerDialog = () => {
     setIsEngineerDialogOpen(false);
   };
 
+  // For adding an engineer to the selected list
   const addEngineer = (engineer: Engineer) => {
-    // Check if engineer is already selected
-    if (!selectedEngineers.some(e => e.id === engineer.id)) {
-      setSelectedEngineers([...selectedEngineers, engineer]);
+    const isAlreadySelected = selectedEngineers.some(e => e.id === engineer.id);
+    if (!isAlreadySelected) {
+      setSelectedEngineers(prev => [...prev, engineer]);
     }
   };
 
+  // For removing an engineer from the selected list
   const removeEngineer = (engineerId: string) => {
-    setSelectedEngineers(selectedEngineers.filter(e => e.id !== engineerId));
+    setSelectedEngineers(prev => prev.filter(engineer => engineer.id !== engineerId));
   };
 
   return {
-    isEngineerDialogOpen,
     selectedEngineers,
-    setSelectedEngineers, // Added this method to fix the error
+    setSelectedEngineers,
+    isEngineerDialogOpen,
+    setIsEngineerDialogOpen,
+    engineerCurrentPage,
+    setEngineerCurrentPage,
+    engineerFilter,
+    setEngineerFilter,
+    engineerCompanyFilter,
+    setEngineerCompanyFilter,
     openEngineerDialog,
     closeEngineerDialog,
     addEngineer,

@@ -13,7 +13,7 @@ interface EmailSenderContainerProps {
 export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   // Use custom hooks
   const emailState = useEmailState();
-  const engineerState = useEngineerState();
+  const engineerState = useEngineerState(mailCases); // Pass mailCases to the hook
   
   // Get paginated cases based on filters and pagination
   const { paginatedCases, totalPages, companyList } = processCaseData(
