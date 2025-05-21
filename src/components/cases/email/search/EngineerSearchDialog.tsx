@@ -7,6 +7,7 @@ import { EngineerSearchForm } from './EngineerSearchForm';
 import { EngineerList } from './EngineerList';
 import { EngineerSearchPagination } from './EngineerSearchPagination';
 import { EngineerSearchActions } from './EngineerSearchActions';
+import { StatusLegend } from './StatusLegend';
 
 interface EngineerSearchDialogProps {
   isOpen: boolean;
@@ -60,6 +61,8 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
             showCompanyType={showCompanyType}
           />
           
+          <StatusLegend />
+          
           <EngineerList 
             paginatedEngineers={paginatedEngineers}
             selectedEngineers={selectedEngineers}
@@ -83,4 +86,3 @@ export const EngineerSearchDialog: React.FC<EngineerSearchDialogProps> = ({
     </Dialog>
   );
 };
-

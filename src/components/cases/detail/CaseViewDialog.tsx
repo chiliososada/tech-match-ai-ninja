@@ -25,6 +25,13 @@ export const CaseViewDialog: React.FC<CaseViewDialogProps> = ({
 }) => {
   if (!caseItem) return null;
 
+  // Helper function to get appropriate badge variant based on status
+  const getBadgeVariant = (status: string) => {
+    if (status === "募集中") return "success";
+    if (status === "募集終了") return "completed";
+    return "default";
+  };
+
   console.log("Showing case detail dialog with data:", caseItem);
 
   return (
@@ -36,7 +43,7 @@ export const CaseViewDialog: React.FC<CaseViewDialogProps> = ({
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <Badge className="japanese-text">{caseItem.status}</Badge>
+            <Badge variant={getBadgeVariant(caseItem.status)} className="japanese-text">{caseItem.status}</Badge>
             <div className="text-sm text-muted-foreground">
               登録日: {caseItem.registeredAt 
                 ? format(new Date(caseItem.registeredAt), 'yyyy年MM月dd日 HH:mm') 

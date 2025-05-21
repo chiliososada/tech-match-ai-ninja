@@ -24,6 +24,16 @@ const badgeVariants = cva(
           "border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200/80",
         purple:
           "border-transparent bg-purple-100 text-purple-800 hover:bg-purple-200/80",
+        interview:
+          "border-transparent bg-purple-500 text-white hover:bg-purple-600/80",
+        proposed:
+          "border-transparent bg-blue-500 text-white hover:bg-blue-600/80",
+        preliminary:
+          "border-transparent bg-orange-500 text-white hover:bg-orange-600/80",
+        waiting:
+          "border-transparent bg-amber-400 text-white hover:bg-amber-500/80",
+        completed:
+          "border-transparent bg-gray-500 text-white hover:bg-gray-600/80",
       },
     },
     defaultVariants: {

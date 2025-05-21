@@ -200,15 +200,15 @@ export const CandidateList: React.FC<CandidateListProps> = ({
   const getStatusBadge = (status: string) => {
     switch(status) {
       case '提案中':
-        return <Badge variant="default" className="bg-blue-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+        return <Badge variant="proposed" className="japanese-text text-xs mr-1">{status}</Badge>;
       case '事前面談':
-        return <Badge variant="default" className="bg-orange-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+        return <Badge variant="preliminary" className="japanese-text text-xs mr-1">{status}</Badge>;
       case '面談':
-        return <Badge variant="default" className="bg-green-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+        return <Badge variant="interview" className="japanese-text text-xs mr-1">{status}</Badge>;
       case '結果待ち':
-        return <Badge variant="default" className="bg-purple-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+        return <Badge variant="waiting" className="japanese-text text-xs mr-1">{status}</Badge>;
       case '営業終了':
-        return <Badge variant="default" className="bg-gray-500 text-white japanese-text text-xs mr-1">{status}</Badge>;
+        return <Badge variant="completed" className="japanese-text text-xs mr-1">{status}</Badge>;
       default:
         return <Badge variant="outline" className="japanese-text text-xs mr-1">{status}</Badge>;
     }
