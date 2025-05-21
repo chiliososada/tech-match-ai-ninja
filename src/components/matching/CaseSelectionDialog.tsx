@@ -6,6 +6,8 @@ import { FileText, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 export interface CaseItem {
   id: number;
@@ -18,6 +20,7 @@ export interface CaseItem {
   workType?: string;
   priority?: string;
   description?: string;
+  companyType?: string; // Added companyType field
 }
 
 interface CaseSelectionDialogProps {
@@ -26,6 +29,8 @@ interface CaseSelectionDialogProps {
 
 export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [companyTypeFilter, setCompanyTypeFilter] = useState<string>("all");
+  const [open, setOpen] = useState(false);
   
   // Enhanced dummy data for existing cases
   const existingCases: CaseItem[] = [
@@ -38,7 +43,8 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
       budget: '60~80',
       location: '東京',
       workType: 'リモート可',
-      description: '金融系システムの開発案件。Java/Spring Bootの経験者を募集。'
+      description: '金融系システムの開発案件。Java/Spring Bootの経験者を募集。',
+      companyType: '自社'
     },
     { 
       id: 2, 
@@ -49,7 +55,8 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
       budget: '50~70',
       location: '大阪',
       workType: 'リモート可',
-      description: 'ECサイトのフロントエンド開発。React/TypeScriptの経験者必須。'
+      description: 'ECサイトのフロントエンド開発。React/TypeScriptの経験者必須。',
+      companyType: '他社'
     },
     { 
       id: 3, 
@@ -60,7 +67,8 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
       budget: '70~90',
       location: '東京',
       workType: 'オンサイト',
-      description: 'クラウド環境の構築・運用。AWS、Docker、Kubernetesの経験者を募集。'
+      description: 'クラウド環境の構築・運用。AWS、Docker、Kubernetesの経験者を募集。',
+      companyType: '自社'
     },
     { 
       id: 4, 
@@ -71,7 +79,8 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
       budget: '55~75',
       location: '福岡',
       workType: 'フルリモート',
-      description: 'WebサービスのAPI開発。Python/Djangoの経験者を募集。'
+      description: 'WebサービスのAPI開発。Python/Djangoの経験者を募集。',
+      companyType: '他社'
     },
     { 
       id: 5, 
@@ -82,7 +91,8 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
       budget: '65~85',
       location: '東京',
       workType: 'ハイブリッド',
-      description: 'iOSアプリケーション開発。Swift/Objective-Cの経験者必須。'
+      description: 'iOSアプリケーション開発。Swift/Objective-Cの経験者必須。',
+      companyType: '自社'
     },
     { 
       id: 6, 
@@ -93,20 +103,32 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
       budget: '60~80',
       location: '名古屋',
       workType: 'リモート可',
-      description: 'データ分析と可視化。Python/R/SQLの経験者を募集。'
+      description: 'データ分析と可視化。Python/R/SQLの経験者を募集。',
+      companyType: '他社'
     }
   ];
 
-  // Filter cases based on search query
-  const filteredCases = existingCases.filter(caseItem => 
-    !searchQuery || 
-    caseItem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    caseItem.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    caseItem.skills?.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Filter cases based on search query and company type
+  const filteredCases = existingCases.filter(caseItem => {
+    const matchesSearch = !searchQuery || 
+      caseItem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      caseItem.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      caseItem.skills?.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesCompanyType = companyTypeFilter === "all" || 
+      caseItem.companyType === companyTypeFilter;
+    
+    return matchesSearch && matchesCompanyType;
+  });
+
+  // Handle case selection and close dialog
+  const handleSelect = (caseItem: CaseItem) => {
+    onSelect(caseItem);
+    setOpen(false); // Close dialog after selection
+  };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full japanese-text">
           <FileText className="mr-2 h-4 w-4" />
@@ -121,14 +143,33 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 max-h-96 overflow-y-auto">
-          <div className="flex items-center border rounded-md border-input hover:border-primary/60 transition-colors bg-background px-3 shadow-sm">
-            <Search className="h-4 w-4 text-muted-foreground mr-2" />
-            <Input 
-              placeholder="案件名、会社名、スキルを検索" 
-              className="japanese-text border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="space-y-4">
+            <div className="flex items-center border rounded-md border-input hover:border-primary/60 transition-colors bg-background px-3 shadow-sm">
+              <Search className="h-4 w-4 text-muted-foreground mr-2" />
+              <Input 
+                placeholder="案件名、会社名、スキルを検索" 
+                className="japanese-text border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="company-type" className="japanese-text mb-2 block">所属会社</Label>
+              <Select 
+                value={companyTypeFilter} 
+                onValueChange={setCompanyTypeFilter}
+              >
+                <SelectTrigger id="company-type" className="w-full japanese-text">
+                  <SelectValue placeholder="所属会社を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="japanese-text">全て</SelectItem>
+                  <SelectItem value="自社" className="japanese-text">自社</SelectItem>
+                  <SelectItem value="他社" className="japanese-text">他社</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           <Table>
@@ -137,6 +178,7 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
                 <TableHead className="japanese-text">案件名</TableHead>
                 <TableHead className="japanese-text">クライアント</TableHead>
                 <TableHead className="japanese-text">スキル</TableHead>
+                <TableHead className="japanese-text">所属</TableHead>
                 <TableHead className="w-24 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -159,11 +201,12 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
                       )}
                     </div>
                   </TableCell>
+                  <TableCell className="japanese-text">{caseItem.companyType || '未設定'}</TableCell>
                   <TableCell className="text-right">
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => onSelect(caseItem)} 
+                      onClick={() => handleSelect(caseItem)} 
                       className="japanese-text"
                     >
                       選択
@@ -173,7 +216,7 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
               ))}
               {filteredCases.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={5} className="h-24 text-center">
                     <div className="text-muted-foreground japanese-text">
                       該当する案件がありません
                     </div>

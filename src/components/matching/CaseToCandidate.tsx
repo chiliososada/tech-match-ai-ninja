@@ -9,6 +9,7 @@ import { MatchingResultsCard } from './MatchingResultsCard';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CaseTextInput } from './CaseTextInput';
 import { Badge } from '@/components/ui/badge';
+import { CaseDetailDisplay } from './CaseDetailDisplay';
 
 export interface CaseMatchingResult {
   id: number;
@@ -37,6 +38,7 @@ interface CaseItem {
   workType?: string;
   priority?: string;
   description?: string;
+  companyType?: string;
 }
 
 export function CaseToCandidate() {
@@ -204,7 +206,8 @@ export function CaseToCandidate() {
       location: data.location,
       workType: data.workType,
       priority: "medium",
-      description: data.originalText
+      description: data.originalText,
+      companyType: data.companyType || "未設定"
     };
     
     setSelectedCase(extractedCase);
@@ -248,90 +251,12 @@ export function CaseToCandidate() {
               </Dialog>
             </div>
 
-            {/* Display selected case info */}
-            {selectedCase && (
-              <Card className="mb-6 bg-muted/50">
-                <CardContent className="p-4 space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-lg japanese-text">{selectedCase.title}</h4>
-                      <Badge variant="outline" className="bg-blue-100 text-blue-800">選択済み</Badge>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm font-medium japanese-text">クライアント:</p>
-                      <p className="japanese-text">{selectedCase.client}</p>
-                    </div>
-                    
-                    {selectedCase.description && (
-                      <div>
-                        <p className="text-sm font-medium japanese-text">概要:</p>
-                        <p className="japanese-text text-sm text-muted-foreground line-clamp-3">{selectedCase.description}</p>
-                      </div>
-                    )}
-                    
-                    {selectedCase.skills && selectedCase.skills.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium japanese-text">必要スキル:</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {Array.isArray(selectedCase.skills) ? selectedCase.skills.map((skill, index) => (
-                            <Badge key={index} variant="outline" className="bg-blue-50">
-                              {skill}
-                            </Badge>
-                          )) : <Badge variant="outline" className="bg-blue-50">{selectedCase.skills}</Badge>}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="grid grid-cols-2 gap-4 mt-2">
-                      {selectedCase.experience && (
-                        <div>
-                          <p className="text-sm font-medium japanese-text">必要経験年数:</p>
-                          <p className="japanese-text">{selectedCase.experience}年以上</p>
-                        </div>
-                      )}
-                      
-                      {selectedCase.budget && (
-                        <div>
-                          <p className="text-sm font-medium japanese-text">予算範囲:</p>
-                          <p className="japanese-text">{selectedCase.budget}万円</p>
-                        </div>
-                      )}
-                      
-                      {selectedCase.location && (
-                        <div>
-                          <p className="text-sm font-medium japanese-text">勤務地:</p>
-                          <p className="japanese-text">{selectedCase.location}</p>
-                        </div>
-                      )}
-                      
-                      {selectedCase.workType && (
-                        <div>
-                          <p className="text-sm font-medium japanese-text">勤務形態:</p>
-                          <p className="japanese-text">{selectedCase.workType}</p>
-                        </div>
-                      )}
-                      
-                      {selectedCase.priority && (
-                        <div>
-                          <p className="text-sm font-medium japanese-text">優先度:</p>
-                          <p className="japanese-text">
-                            {selectedCase.priority === 'low' && '低'}
-                            {selectedCase.priority === 'medium' && '中'}
-                            {selectedCase.priority === 'high' && '高'}
-                            {selectedCase.priority === 'urgent' && '緊急'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {/* Display selected case info using the new component */}
+            {selectedCase && <CaseDetailDisplay caseData={selectedCase} />}
             
             <Button 
               onClick={startMatching} 
-              className="w-full japanese-text" 
+              className="w-full japanese-text mt-6" 
               disabled={matchingInProgress || !selectedCase}
             >
               {matchingInProgress ? (
