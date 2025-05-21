@@ -47,7 +47,7 @@ export function EngineerSelectionDialog({ isOpen, onClose, onSelect }: EngineerS
       japaneseLevel: 'ネイティブレベル',
       experience: '3年',
       availability: '1ヶ月後',
-      status: ['面談', '結果待ち'],
+      status: ['事前面談'],
       remarks: 'リモート勤務希望, 週5日可',
       companyType: '他社',
       companyName: 'フロントエンドパートナーズ株式会社',

@@ -20,6 +20,7 @@ export interface MailCase {
   selectedSenderEmail?: string;
   selectedSenderPosition?: string;
   startDate?: string;
+  description?: string; // Added missing description property
   
   // Add the missing properties used in the codebase
   status?: string;
@@ -46,10 +47,36 @@ export interface MailCase {
 export interface Engineer {
   id: string;
   name: string;
-  skills: string[];
+  skills: string[] | string;
   experience: string;
   currentStatus?: string;
   company?: string;
+  
+  // Add the missing properties used in components
+  status?: string[] | string;
+  japaneseLevel?: string;
+  availability?: string;
+  remarks?: string;
+  companyType?: string;
+  companyName?: string;
+  source?: string;
+  recommendation?: string;
+  email?: string;
+  phone?: string;
+  nationality?: string;
+  age?: string;
+  gender?: string;
+  nearestStation?: string;
+  education?: string;
+  arrivalYear?: string;
+  certifications?: string[];
+  englishLevel?: string;
+  technicalKeywords?: string[];
+  selfPromotion?: string;
+  workScope?: string;
+  workExperience?: string;
+  registeredAt?: string;
+  updatedAt?: string;
 }
 
 // Define EmailTemplate interface

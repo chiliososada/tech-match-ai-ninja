@@ -114,7 +114,7 @@ export const processEngineerData = (
   currentPage: number,
   itemsPerPage: number
 ) => {
-  // Mock data for engineers that matches the talent management data format
+  // Mock data for engineers that matches the updated Engineer interface
   const mockEngineers: Engineer[] = [
     {
       id: 'eng-1',
