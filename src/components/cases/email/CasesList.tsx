@@ -102,8 +102,8 @@ export const CasesList: React.FC<CasesListProps> = ({
                 )}
                 <TableCell className="japanese-text">{item.keyTechnologies}</TableCell>
                 <TableCell className="japanese-text">
-                  {/* Simplified sender display - only name and email */}
-                  {item.senders ? (
+                  {/* Unified sender display format for both single and multiple senders */}
+                  {item.senders && item.senders.length > 0 ? (
                     <div>
                       {item.senders.map((sender, index) => (
                         <div key={index} className="text-sm">
@@ -111,11 +111,12 @@ export const CasesList: React.FC<CasesListProps> = ({
                         </div>
                       ))}
                     </div>
-                  ) : (
+                  ) : item.sender ? (
                     <div className="text-sm">
-                      {item.sender || '-'} 
-                      {item.senderEmail && <span className="text-xs text-muted-foreground ml-1">{item.senderEmail}</span>}
+                      {item.sender} <span className="text-xs text-muted-foreground">{item.senderEmail || ''}</span>
                     </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">送信者なし</div>
                   )}
                 </TableCell>
                 {showCompanyInfo && (
