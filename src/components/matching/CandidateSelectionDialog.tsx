@@ -12,7 +12,14 @@ interface CandidateItem {
   id: number;
   name: string;
   skills: string;
-  companyType?: string; 
+  companyType?: string;
+  nationality?: string;
+  age?: string;
+  gender?: string;
+  experience?: string;
+  japaneseLevel?: string;
+  availability?: string;
+  status?: string[];
 }
 
 interface CandidateSelectionDialogProps {
@@ -23,16 +30,112 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
   const [companyTypeFilter, setCompanyTypeFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   
-  // Expanded dummy data for candidates from both company types
+  // Expanded dummy data for candidates from both company types with more information
   const existingCandidates = [
-    { id: 1, name: '鈴木太郎', skills: 'Java, Spring, AWS', companyType: '自社' },
-    { id: 2, name: '田中花子', skills: 'React, TypeScript, Node.js', companyType: '他社' },
-    { id: 3, name: '佐藤一郎', skills: 'AWS, Docker, Kubernetes', companyType: '自社' },
-    { id: 4, name: '山田健太', skills: 'Python, Django, MySQL', companyType: '他社' },
-    { id: 5, name: '伊藤誠', skills: 'iOS, Android, Flutter', companyType: '自社' },
-    { id: 6, name: '高橋直樹', skills: 'Python, 機械学習, データ分析', companyType: '他社' },
-    { id: 7, name: '中村美咲', skills: 'Ruby, Rails, PostgreSQL', companyType: '自社' },
-    { id: 8, name: '小林隆', skills: 'PHP, Laravel, MySQL', companyType: '他社' }
+    { 
+      id: 1, 
+      name: '鈴木太郎', 
+      skills: 'Java, Spring, AWS', 
+      companyType: '自社',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
+      experience: '10年',
+      japaneseLevel: 'ネイティブ',
+      availability: '即日',
+      status: ['提案中', '面談']
+    },
+    { 
+      id: 2, 
+      name: '田中花子', 
+      skills: 'React, TypeScript, Node.js', 
+      companyType: '他社',
+      nationality: '日本',
+      age: '28歳',
+      gender: '女性',
+      experience: '5年',
+      japaneseLevel: 'ネイティブ',
+      availability: '2週間以内',
+      status: ['提案中']
+    },
+    { 
+      id: 3, 
+      name: '佐藤一郎', 
+      skills: 'AWS, Docker, Kubernetes', 
+      companyType: '自社',
+      nationality: '日本',
+      age: '42歳',
+      gender: '男性',
+      experience: '15年',
+      japaneseLevel: 'ネイティブ',
+      availability: '1ヶ月以内',
+      status: ['面談']
+    },
+    { 
+      id: 4, 
+      name: '山田健太', 
+      skills: 'Python, Django, MySQL', 
+      companyType: '他社',
+      nationality: '日本',
+      age: '31歳',
+      gender: '男性',
+      experience: '7年',
+      japaneseLevel: 'ネイティブ',
+      availability: '即日',
+      status: ['未提案']
+    },
+    { 
+      id: 5, 
+      name: '伊藤誠', 
+      skills: 'iOS, Android, Flutter', 
+      companyType: '自社',
+      nationality: '日本',
+      age: '33歳',
+      gender: '男性',
+      experience: '8年',
+      japaneseLevel: 'ネイティブ',
+      availability: '2週間以内',
+      status: ['提案中', '結果待ち']
+    },
+    { 
+      id: 6, 
+      name: '高橋直樹', 
+      skills: 'Python, 機械学習, データ分析', 
+      companyType: '他社',
+      nationality: '日本',
+      age: '36歳',
+      gender: '男性',
+      experience: '9年', 
+      japaneseLevel: 'ネイティブ',
+      availability: '即日',
+      status: ['未提案']
+    },
+    { 
+      id: 7, 
+      name: '中村美咲', 
+      skills: 'Ruby, Rails, PostgreSQL', 
+      companyType: '自社',
+      nationality: '日本',
+      age: '29歳',
+      gender: '女性',
+      experience: '6年',
+      japaneseLevel: 'ネイティブ',
+      availability: '即日',
+      status: ['営業終了']
+    },
+    { 
+      id: 8, 
+      name: '小林隆', 
+      skills: 'PHP, Laravel, MySQL', 
+      companyType: '他社',
+      nationality: '日本',
+      age: '34歳',
+      gender: '男性',
+      experience: '8年',
+      japaneseLevel: 'ネイティブ',
+      availability: '1週間以内',
+      status: ['未提案']
+    }
   ];
   
   // Filter candidates based on company type and search query
@@ -60,7 +163,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
           既存人材から選択
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
           <DialogTitle className="japanese-text">既存人材から選択</DialogTitle>
           <DialogDescription className="japanese-text">
