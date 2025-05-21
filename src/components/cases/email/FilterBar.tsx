@@ -18,8 +18,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setTechFilter,
   companyList
 }) => {
-  // Filter out null or empty string values from companyList
-  const validCompanyList = companyList.filter(company => company !== null && company !== "");
+  // Filter out null or empty string values from companyList and ensure they're unique
+  const validCompanyList = React.useMemo(() => {
+    // Filter out nulls and empty strings
+    const filtered = companyList.filter(company => 
+      company !== null && 
+      company !== "" && 
+      typeof company === 'string'
+    );
+    
+    // Remove duplicates
+    return Array.from(new Set(filtered));
+  }, [companyList]);
 
   return (
     <div className="mt-4 flex flex-col sm:flex-row gap-4">
@@ -30,8 +40,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <SelectContent className="max-h-[300px] overflow-y-auto">
           <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
           {validCompanyList.map((company, index) => (
-            <SelectItem key={`${company}-${index}`} value={company as string} className="japanese-text">
-              {company as string}
+            <SelectItem key={`${company}-${index}`} value={company} className="japanese-text">
+              {company}
             </SelectItem>
           ))}
         </SelectContent>

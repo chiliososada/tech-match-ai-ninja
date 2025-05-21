@@ -12,10 +12,13 @@ export const CompanyTypeDropdown: React.FC<CompanyTypeDropdownProps> = ({
   value,
   onChange
 }) => {
+  // Ensure we have a valid default value
+  const safeValue = value || 'all';
+  
   return (
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor="companyType" className="japanese-text">所属会社</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={safeValue} onValueChange={onChange}>
         <SelectTrigger id="companyType" className="w-full japanese-text">
           <SelectValue placeholder="所属会社" />
         </SelectTrigger>
@@ -28,3 +31,5 @@ export const CompanyTypeDropdown: React.FC<CompanyTypeDropdownProps> = ({
     </div>
   );
 };
+
+export default CompanyTypeDropdown;

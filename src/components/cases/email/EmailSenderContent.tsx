@@ -44,7 +44,7 @@ interface EmailSenderContentProps {
   caseData: {
     paginatedCases: MailCase[];
     totalPages: number;
-    companyList: any[];
+    companyList: (string | null)[];
   };
   handlers: {
     casesHandleSelectAll: () => void;
@@ -73,15 +73,21 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
   
   // Filter company list based on search term and ensure no null or empty string values
   const filteredCompanyList = React.useMemo(() => {
-    // First filter out null or empty strings
+    // First filter out null, empty strings, or non-string values
     const validCompanies = caseData.companyList.filter(company => 
-      company !== null && company !== ""
+      company !== null && 
+      company !== "" && 
+      typeof company === 'string'
     );
     
+    // Remove duplicates
+    const uniqueCompanies = Array.from(new Set(validCompanies));
+    
     // Then filter based on search term
-    if (!companySearchTerm) return validCompanies;
-    return validCompanies.filter((company) => 
-      company && company.toLowerCase().includes(companySearchTerm.toLowerCase())
+    if (!companySearchTerm) return uniqueCompanies;
+    
+    return uniqueCompanies.filter((company) => 
+      company.toLowerCase().includes(companySearchTerm.toLowerCase())
     );
   }, [caseData.companyList, companySearchTerm]);
 
