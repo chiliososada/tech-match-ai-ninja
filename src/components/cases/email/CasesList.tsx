@@ -92,7 +92,7 @@ export const CasesList: React.FC<CasesListProps> = ({
               <TableRow key={item.id}>
                 <TableCell>
                   <Checkbox 
-                    checked={selectedCases.some(caseItem => caseItem.id === item.id)} // Updated to check using object comparison
+                    checked={selectedCases.some(caseItem => caseItem.id === item.id)}
                     onCheckedChange={() => handleSelectCase(item.id)}
                   />
                 </TableCell>
@@ -102,17 +102,20 @@ export const CasesList: React.FC<CasesListProps> = ({
                 )}
                 <TableCell className="japanese-text">{item.keyTechnologies}</TableCell>
                 <TableCell className="japanese-text">
-                  {/* Show multiple senders with comma separation if they exist */}
+                  {/* Simplified sender display - only name and email */}
                   {item.senders ? (
                     <div>
                       {item.senders.map((sender, index) => (
                         <div key={index} className="text-sm">
-                          {sender.name} <span className="text-xs text-muted-foreground">({sender.email})</span>
+                          {sender.name} <span className="text-xs text-muted-foreground">{sender.email}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    item.sender || '-'
+                    <div className="text-sm">
+                      {item.sender || '-'} 
+                      {item.senderEmail && <span className="text-xs text-muted-foreground ml-1">{item.senderEmail}</span>}
+                    </div>
                   )}
                 </TableCell>
                 {showCompanyInfo && (
@@ -159,4 +162,3 @@ export const CasesList: React.FC<CasesListProps> = ({
     </div>
   );
 };
-

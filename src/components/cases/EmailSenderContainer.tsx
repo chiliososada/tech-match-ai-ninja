@@ -24,7 +24,8 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
   
   // Add multiple senders to some cases for demonstration and add detail descriptions
   const enhancedMailCases = React.useMemo(() => {
-    return mailCases.map(caseItem => {
+    // Process the mail cases to organize by company and sender
+    const processedCases = mailCases.map(caseItem => {
       // Generate a detailed description based on case ID to ensure consistency
       const detailDescription = `【案件概要】
 ${caseItem.title}は、${caseItem.location}での${caseItem.skills.join('、')}を活用した案件です。
@@ -81,6 +82,8 @@ ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）
         detailDescription
       };
     });
+
+    return processedCases;
   }, [mailCases]);
   
   // Process data with improved pagination
