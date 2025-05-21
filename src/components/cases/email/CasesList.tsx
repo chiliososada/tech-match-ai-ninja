@@ -19,7 +19,7 @@ import { Eye } from 'lucide-react';
 
 interface CasesListProps {
   paginatedCases: MailCase[];
-  selectedCases: MailCase[]; // Changed from string[] to MailCase[]
+  selectedCases: MailCase[]; 
   handleSelectCase: (id: string) => void;
   selectAll: boolean;
   handleSelectAll: () => void;
@@ -53,6 +53,84 @@ export const CasesList: React.FC<CasesListProps> = ({
   console.log('Number of cases to display:', paginatedCases.length);
   console.log('Current page:', currentPage, 'Total pages:', totalPages);
 
+  // Flatten cases to show senders as the primary entity
+  const flattenedSenders = React.useMemo(() => {
+    const flattened: {
+      caseId: string;
+      caseTitle: string;
+      company: string;
+      keyTechnologies: string;
+      sender: string;
+      email: string;
+      registrationType?: string;
+      registeredAt?: string;
+      originalCase: MailCase;
+    }[] = [];
+    
+    paginatedCases.forEach(caseItem => {
+      // If case has multiple senders, create an entry for each
+      if (caseItem.senders && caseItem.senders.length > 0) {
+        caseItem.senders.forEach(sender => {
+          flattened.push({
+            caseId: caseItem.id,
+            caseTitle: caseItem.title,
+            company: caseItem.company || '',
+            keyTechnologies: caseItem.keyTechnologies || '',
+            sender: sender.name,
+            email: sender.email,
+            registrationType: caseItem.registrationType,
+            registeredAt: caseItem.registeredAt,
+            originalCase: caseItem
+          });
+        });
+      } 
+      // If case has a single sender
+      else if (caseItem.sender) {
+        flattened.push({
+          caseId: caseItem.id,
+          caseTitle: caseItem.title,
+          company: caseItem.company || '',
+          keyTechnologies: caseItem.keyTechnologies || '',
+          sender: caseItem.sender,
+          email: caseItem.senderEmail || '',
+          registrationType: caseItem.registrationType,
+          registeredAt: caseItem.registeredAt,
+          originalCase: caseItem
+        });
+      }
+      // If case has no sender, still include it but with empty sender fields
+      else {
+        flattened.push({
+          caseId: caseItem.id,
+          caseTitle: caseItem.title,
+          company: caseItem.company || '',
+          keyTechnologies: caseItem.keyTechnologies || '',
+          sender: '',
+          email: '',
+          registrationType: caseItem.registrationType,
+          registeredAt: caseItem.registeredAt,
+          originalCase: caseItem
+        });
+      }
+    });
+    
+    return flattened;
+  }, [paginatedCases]);
+
+  // Check if a sender is selected
+  const isSenderSelected = (caseId: string, sender: string, email: string) => {
+    const caseSelected = selectedCases.find(c => c.id === caseId);
+    if (!caseSelected) return false;
+    
+    // If the case has senders array, check if this specific sender is in it
+    if (caseSelected.senders) {
+      return caseSelected.senders.some(s => s.name === sender && s.email === email);
+    }
+    
+    // If the case has a single sender, check if it matches
+    return caseSelected.sender === sender && caseSelected.senderEmail === email;
+  };
+
   return (
     <div className="space-y-4">
       <Table>
@@ -60,17 +138,18 @@ export const CasesList: React.FC<CasesListProps> = ({
           <TableRow>
             <TableHead className="w-12">
               <Checkbox 
-                checked={selectAll && paginatedCases.length > 0} 
+                checked={selectAll && flattenedSenders.length > 0} 
                 onCheckedChange={handleSelectAll}
-                disabled={paginatedCases.length === 0}
+                disabled={flattenedSenders.length === 0}
               />
             </TableHead>
+            <TableHead className="japanese-text">送信者</TableHead>
+            <TableHead className="japanese-text">メールアドレス</TableHead>
             <TableHead className="japanese-text">案件名</TableHead>
             {showCompanyInfo && (
               <TableHead className="japanese-text">会社名</TableHead>
             )}
             <TableHead className="japanese-text">キー技術</TableHead>
-            <TableHead className="japanese-text">送信者</TableHead>
             {showCompanyInfo && (
               <TableHead className="japanese-text">
                 <div>登録方式</div>
@@ -81,44 +160,30 @@ export const CasesList: React.FC<CasesListProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paginatedCases.length === 0 ? (
+          {flattenedSenders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={showCompanyInfo ? 7 : 5} className="text-center text-muted-foreground japanese-text">
+              <TableCell colSpan={showCompanyInfo ? 8 : 6} className="text-center text-muted-foreground japanese-text">
                 表示できる案件がありません
               </TableCell>
             </TableRow>
           ) : (
-            paginatedCases.map((item) => (
-              <TableRow key={item.id}>
+            flattenedSenders.map((item, index) => (
+              <TableRow key={`${item.caseId}-${item.sender}-${index}`}>
                 <TableCell>
                   <Checkbox 
-                    checked={selectedCases.some(caseItem => caseItem.id === item.id)}
-                    onCheckedChange={() => handleSelectCase(item.id)}
+                    checked={isSenderSelected(item.caseId, item.sender, item.email)}
+                    onCheckedChange={() => handleSelectCase(item.caseId)}
                   />
                 </TableCell>
-                <TableCell className="font-medium japanese-text">{item.title}</TableCell>
+                <TableCell className="font-medium japanese-text">{item.sender || '送信者なし'}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {item.email || '-'}
+                </TableCell>
+                <TableCell className="japanese-text">{item.caseTitle}</TableCell>
                 {showCompanyInfo && (
                   <TableCell className="japanese-text">{item.company}</TableCell>
                 )}
                 <TableCell className="japanese-text">{item.keyTechnologies}</TableCell>
-                <TableCell className="japanese-text">
-                  {/* Unified sender display format for both single and multiple senders */}
-                  {item.senders && item.senders.length > 0 ? (
-                    <div>
-                      {item.senders.map((sender, index) => (
-                        <div key={index} className="text-sm">
-                          {sender.name} <span className="text-xs text-muted-foreground">{sender.email}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : item.sender ? (
-                    <div className="text-sm">
-                      {item.sender} <span className="text-xs text-muted-foreground">{item.senderEmail || ''}</span>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">送信者なし</div>
-                  )}
-                </TableCell>
                 {showCompanyInfo && (
                   <TableCell className="japanese-text">
                     <div className={`px-2 py-0.5 rounded text-xs inline-flex 
@@ -136,7 +201,7 @@ export const CasesList: React.FC<CasesListProps> = ({
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (onViewCase) onViewCase(item);
+                      if (onViewCase) onViewCase(item.originalCase);
                     }}
                     className="h-8 w-8 p-0"
                   >

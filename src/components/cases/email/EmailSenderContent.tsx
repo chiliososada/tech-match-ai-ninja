@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card, 
@@ -82,6 +83,11 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
     setSelectedCase(caseItem);
     setIsDetailDialogOpen(true);
   };
+  
+  // Handle unselecting a case directly from the selected senders list
+  const handleUnselectCase = (caseId: string) => {
+    handlers.casesHandleSelectCase(caseId);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -89,7 +95,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
         <CardHeader className="pb-3 bg-muted/30">
           <CardTitle className="japanese-text text-xl font-bold text-primary">一括メール送信</CardTitle>
           <CardDescription className="japanese-text text-md mt-2">
-            メール案件の送信者に一括でメールを送信します
+            案件送信者に一括でメールを送信します
           </CardDescription>
           
           {/* Company search input */}
@@ -114,7 +120,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
           />
         </CardHeader>
         <CardContent className="pt-6">
-          {/* 案件一覧 - 他社モードの場合は会社名と登録方法も表示 */}
+          {/* 送信者一覧 - 送信者を中心にした表示に変更 */}
           <CasesList
             paginatedCases={caseData.paginatedCases}
             selectedCases={emailState.selectedCases}
@@ -124,7 +130,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             currentPage={emailState.currentPage}
             setCurrentPage={emailState.setCurrentPage}
             totalPages={caseData.totalPages}
-            showCompanyInfo={isOtherCompanyMode} // 他社モードの場合のみ会社情報を表示
+            showCompanyInfo={isOtherCompanyMode}
             onViewCase={handleViewCase}
           />
           
@@ -138,6 +144,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             removeSelectedEngineer={handlers.engineerHandleRemove}
             applyEngineerToTemplate={handlers.engineerHandleApply}
             isOtherCompanyMode={isOtherCompanyMode}
+            handleUnselectCase={handleUnselectCase}
           />
         </CardContent>
       </Card>
