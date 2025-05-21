@@ -1,17 +1,17 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { EmailOptimizationCard } from '../tabs/EmailOptimizationCard';
-import { EMAIL_TEMPLATES } from './types';
-import { SendHorizontal, TestTube } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EmailTemplate } from './types';
+import { MailCheck, Send, Sparkles, MailPlus } from 'lucide-react';
 
 interface EmailFormProps {
-  emailTemplates: typeof EMAIL_TEMPLATES;
+  emailTemplates: EmailTemplate[];
   selectedTemplate: string;
   handleTemplateChange: (templateId: string) => void;
   subject: string;
@@ -22,13 +22,13 @@ interface EmailFormProps {
   setSignature: (signature: string) => void;
   handleEnhanceEmail: () => void;
   handleSendEmail: () => void;
-  handleTestEmail?: () => void; // Add new prop for test email
+  handleTestEmail?: () => void; // New optional prop for test email functionality
   sending: boolean;
   selectedCasesCount: number;
   hideOptimizationSection?: boolean;
 }
 
-export const EmailForm: React.FC<EmailFormProps> = ({
+export function EmailForm({
   emailTemplates,
   selectedTemplate,
   handleTemplateChange,
@@ -40,124 +40,120 @@ export const EmailForm: React.FC<EmailFormProps> = ({
   setSignature,
   handleEnhanceEmail,
   handleSendEmail,
-  handleTestEmail, // Add handler for test email
+  handleTestEmail,
   sending,
   selectedCasesCount,
   hideOptimizationSection = false
-}) => {
-  // Use effect to log template selection for debugging
-  React.useEffect(() => {
-    console.log("Current selected template:", selectedTemplate);
-  }, [selectedTemplate]);
-
+}: EmailFormProps) {
   return (
-    <>
-      <Card className="p-4 shadow-sm">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="template" className="japanese-text">メールテンプレート</Label>
-            <Select 
-              value={selectedTemplate} 
-              onValueChange={(value) => {
-                console.log("Template selected:", value);
-                handleTemplateChange(value);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="テンプレートを選択" />
-              </SelectTrigger>
-              <SelectContent>
-                {emailTemplates.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
-                    {template.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <Card className="shadow-sm hover:shadow-md transition-shadow duration-300 border-primary/10 overflow-hidden">
+      <div className="bg-gradient-to-r from-custom-blue-600/80 to-custom-blue-400/70 h-1"></div>
+      <CardHeader className="pb-4 bg-gradient-to-b from-muted/30 to-transparent">
+        <CardTitle className="flex items-center space-x-2 japanese-text">
+          <MailPlus className="h-5 w-5 text-custom-blue-600" />
+          <span>メール作成</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Tabs defaultValue="compose" className="w-full">
+          <TabsList className="grid grid-cols-2 mb-2">
+            <TabsTrigger value="compose" className="japanese-text">メール作成</TabsTrigger>
+            <TabsTrigger value="signature" className="japanese-text">署名設定</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="compose" className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="email-template" className="japanese-text">テンプレート選択</Label>
+              </div>
+              <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+                <SelectTrigger className="japanese-text">
+                  <SelectValue placeholder="テンプレートを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">テンプレートなし</SelectItem>
+                  {emailTemplates.map(template => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email-subject" className="japanese-text">件名</Label>
+              <Input 
+                id="email-subject" 
+                value={subject} 
+                onChange={(e) => setSubject(e.target.value)} 
+                className="japanese-text"
+                placeholder="メールの件名を入力してください" 
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email-body" className="japanese-text">本文</Label>
+              <Textarea 
+                id="email-body" 
+                value={emailBody} 
+                onChange={(e) => setEmailBody(e.target.value)} 
+                className="min-h-[200px] japanese-text resize-y"
+                placeholder="メール本文を入力してください" 
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="subject" className="japanese-text">件名</Label>
-            <Input 
-              id="subject" 
-              value={subject} 
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="メールの件名"
-              className="japanese-text"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="body" className="japanese-text">本文</Label>
-            <Textarea 
-              id="body" 
-              value={emailBody} 
-              onChange={(e) => setEmailBody(e.target.value)}
-              className="min-h-[200px] japanese-text"
-              placeholder="メールの本文をここに入力してください"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="signature" className="japanese-text">署名</Label>
-            <Textarea 
-              id="signature" 
-              value={signature} 
-              onChange={(e) => setSignature(e.target.value)}
-              className="min-h-[80px] japanese-text"
-              placeholder="メールの署名をここに入力してください"
-            />
-          </div>
-
-          {!hideOptimizationSection && (
-            <EmailOptimizationCard 
-              handleEnhanceEmail={handleEnhanceEmail}
-            />
-          )}
-
-          <div className="pt-4 space-y-2">
-            {/* Add test email button */}
-            {handleTestEmail && (
-              <Button 
-                className="w-full japanese-text bg-secondary" 
-                onClick={handleTestEmail}
-                disabled={sending || subject.trim() === '' || emailBody.trim() === ''}
-              >
-                <span className="flex items-center">
-                  <TestTube className="mr-2 h-5 w-5" /> 
-                  テストメールを自分に送信
-                </span>
-              </Button>
+            {!hideOptimizationSection && (
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleEnhanceEmail}
+                  disabled={sending || !emailBody.trim()}
+                  className="w-full bg-gradient-to-r from-custom-blue-600 to-custom-blue-500 hover:from-custom-blue-700 hover:to-custom-blue-600 text-white japanese-text"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {sending ? 'AIによる最適化中...' : 'AIでメール本文を最適化'}
+                </Button>
+              </div>
             )}
-
-            <Button 
-              className="w-full japanese-text bg-primary" 
-              onClick={handleSendEmail}
-              disabled={sending || subject.trim() === '' || emailBody.trim() === '' || selectedCasesCount === 0}
-            >
-              {sending ? (
-                <span className="flex items-center">
-                  <span className="animate-spin mr-2">⏳</span>送信中...
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <SendHorizontal className="mr-2 h-5 w-5" /> 
-                  {selectedCasesCount}件のメールを送信 
-                </span>
-              )}
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {!hideOptimizationSection && (
-        <div className="mt-4 p-3 border border-amber-200 bg-amber-50 rounded-md">
-          <p className="text-sm text-amber-800 japanese-text">
-            AIによる自動最適化を使用して、メールの内容を改善できます。
-            「メールを最適化」ボタンをクリックしてください。
-          </p>
-        </div>
-      )}
-    </>
+          </TabsContent>
+          
+          <TabsContent value="signature" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="signature" className="japanese-text">署名</Label>
+              <Textarea 
+                id="signature" 
+                value={signature} 
+                onChange={(e) => setSignature(e.target.value)} 
+                className="min-h-[200px] japanese-text resize-y"
+                placeholder="メール署名を入力してください。すべてのメールの末尾に追加されます。" 
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+      <CardFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 bg-gradient-to-t from-muted/10 to-transparent">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleTestEmail}
+          disabled={sending || !subject.trim() || !emailBody.trim()}
+          className="w-full sm:w-auto japanese-text hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+        >
+          <MailCheck className="h-4 w-4 mr-2" />
+          テストメール送信
+        </Button>
+        <Button
+          type="button"
+          onClick={handleSendEmail}
+          disabled={sending || selectedCasesCount === 0}
+          className="w-full sm:w-auto japanese-text bg-gradient-to-r from-custom-blue-600 to-custom-blue-500 hover:from-custom-blue-700 hover:to-custom-blue-600 text-white"
+        >
+          <Send className="h-4 w-4 mr-2" />
+          {sending ? '送信中...' : selectedCasesCount > 0 ? `${selectedCasesCount}名にメール送信` : 'メール送信'}
+        </Button>
+      </CardFooter>
+    </Card>
   );
-};
+}

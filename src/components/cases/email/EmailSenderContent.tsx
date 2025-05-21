@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card, 
@@ -12,7 +13,7 @@ import { EmailSenderLayout } from './EmailSenderLayout';
 import { FilterBar } from './FilterBar';
 import { MailCase } from './types';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Building } from 'lucide-react';
 import { CaseViewDialog } from '../detail/CaseViewDialog';
 
 interface EmailSenderContentProps {
@@ -92,16 +93,25 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <Card className="shadow-md border-primary/10">
-        <CardHeader className="pb-3 bg-muted/30">
-          <CardTitle className="japanese-text text-xl font-bold text-primary">一括メール送信</CardTitle>
+      <Card className="shadow-md border-primary/10 overflow-hidden">
+        <div className="bg-gradient-to-r from-custom-blue-700/80 to-custom-blue-500/70 h-2"></div>
+        <CardHeader className="pb-3 bg-gradient-to-b from-muted/50 to-transparent">
+          <div className="flex items-center space-x-2">
+            <Building className="h-5 w-5 text-custom-blue-600" />
+            <CardTitle className="japanese-text text-xl font-bold text-primary flex items-center">
+              一括メール送信
+              <span className="text-xs bg-custom-blue-100 text-custom-blue-800 px-2 py-0.5 rounded-full ml-3 font-normal">
+                他社案件
+              </span>
+            </CardTitle>
+          </div>
           <CardDescription className="japanese-text text-md mt-2">
             案件送信者に一括でメールを送信します
           </CardDescription>
           
           {/* Company search input */}
           <div className="mt-4 mb-2">
-            <div className="flex items-center border rounded-md border-input bg-background px-3">
+            <div className="flex items-center border rounded-md border-input hover:border-primary/60 transition-colors bg-background px-3 shadow-sm">
               <Search className="h-4 w-4 text-muted-foreground mr-2" />
               <Input 
                 placeholder="会社名で検索..." 
@@ -160,3 +170,4 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
     </div>
   );
 };
+
