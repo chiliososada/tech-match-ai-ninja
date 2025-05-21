@@ -11,7 +11,8 @@ export {
 // Re-export signature handlers
 export {
   updateSignatureInBody,
-  removeSignatureFromBody
+  removeSignatureFromBody,
+  formatSignaturePreview
 } from './signature/signatureHandlers';
 
 // Re-export case selection handlers

@@ -28,3 +28,13 @@ export const removeSignatureFromBody = (body: string, signature: string) => {
   
   return body;
 };
+
+// New function to display signature in a preview format
+export const formatSignaturePreview = (signature: string) => {
+  if (!signature.trim()) {
+    return '';
+  }
+  
+  // Simply return the signature for now, but we could format it differently if needed
+  return signature;
+};

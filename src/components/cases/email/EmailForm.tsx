@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -7,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmailTemplate } from './types';
-import { MailCheck, Send, Sparkles, MailPlus } from 'lucide-react';
-import { updateSignatureInBody } from './utils/signature/signatureHandlers';
+import { MailCheck, Send, Sparkles, MailPlus, Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface EmailFormProps {
   emailTemplates: EmailTemplate[];
@@ -48,29 +49,34 @@ export function EmailForm({
   // Ensure selectedTemplate is never undefined or null
   const safeSelectedTemplate = selectedTemplate || "";
   
-  // Using a ref to track if this is the first render
-  const isFirstRender = React.useRef(true);
+  // State to track if signature is visible in the preview
+  const [showSignature, setShowSignature] = React.useState(false);
+  // State to store draft signature before applying it
+  const [draftSignature, setDraftSignature] = React.useState(signature);
   
-  // Effect to append signature to email body when signature changes
-  // But skip the first render to prevent automatically adding signature when component loads
-  useEffect(() => {
-    // Skip the first render
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    
-    // Use the utility function to update the signature
-    const updatedBody = updateSignatureInBody(emailBody, signature);
-    if (updatedBody !== emailBody) {
-      setEmailBody(updatedBody);
-    }
+  // Initialize draft signature when component mounts or signature prop changes
+  React.useEffect(() => {
+    setDraftSignature(signature);
   }, [signature]);
-
-  // Handle signature changes
+  
+  // Handle signature changes in the textarea
   const handleSignatureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newSignature = e.target.value;
-    setSignature(newSignature);
+    setDraftSignature(e.target.value);
+  };
+  
+  // Apply signature button handler
+  const handleApplySignature = () => {
+    setSignature(draftSignature);
+    setShowSignature(true);
+    toast({
+      title: "署名設定が完了しました",
+      description: "メール送信時に署名が適用されます",
+    });
+  };
+  
+  // Toggle signature visibility
+  const toggleSignatureVisibility = () => {
+    setShowSignature(!showSignature);
   };
   
   return (
@@ -131,6 +137,29 @@ export function EmailForm({
               />
             </div>
 
+            {/* Signature Preview */}
+            {showSignature && signature && (
+              <div className="mt-4 pt-2 border-t border-dashed border-muted-foreground/30">
+                <div className="flex justify-between items-center mb-1">
+                  <Label className="text-sm text-muted-foreground japanese-text flex items-center gap-1">
+                    <Pencil className="h-3 w-3" />
+                    設定された署名
+                  </Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 text-xs japanese-text"
+                    onClick={toggleSignatureVisibility}
+                  >
+                    {showSignature ? '非表示' : '表示'}
+                  </Button>
+                </div>
+                <div className="bg-muted/30 rounded p-2 text-sm font-mono whitespace-pre-wrap text-muted-foreground">
+                  {signature}
+                </div>
+              </div>
+            )}
+
             {!hideOptimizationSection && (
               <div className="pt-2">
                 <Button
@@ -152,12 +181,23 @@ export function EmailForm({
               <Label htmlFor="signature" className="japanese-text">署名</Label>
               <Textarea 
                 id="signature" 
-                value={signature} 
+                value={draftSignature} 
                 onChange={handleSignatureChange} 
                 className="min-h-[200px] japanese-text resize-y"
-                placeholder="メール署名を入力してください。すべてのメールの末尾に追加されます。" 
+                placeholder="メール署名を入力してください。" 
               />
+              <p className="text-xs text-muted-foreground japanese-text">
+                全てのメールの送信時に追加されます。
+              </p>
             </div>
+            
+            <Button 
+              type="button" 
+              onClick={handleApplySignature}
+              className="w-full japanese-text"
+            >
+              署名を設定する
+            </Button>
           </TabsContent>
         </Tabs>
       </CardContent>
