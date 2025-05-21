@@ -117,14 +117,39 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
   // Filtered mail cases for the email-related tabs
-  const filteredMailCases = filterMailCases(
-    normalizedCaseData,
-    effectiveCompanyType,
-    companyFilter,
-    techKeyword,
-    emailDateFrom,
+  // Important: Use the same filtering logic as filteredCases to ensure consistency
+  const filteredMailCases = React.useMemo(() => {
+    // First apply the same filtering as the case list 
+    const baseCases = filterCases(
+      normalizedCaseData,
+      effectiveCompanyType,
+      statusFilter,
+      searchTerm,
+      dateRange,
+      foreignerFilter
+    );
+    
+    // Then apply any additional email-specific filters
+    return filterMailCases(
+      baseCases, // Use already filtered cases as the base
+      effectiveCompanyType,
+      companyFilter,
+      techKeyword,
+      emailDateFrom,
+      emailDateTo
+    );
+  }, [
+    normalizedCaseData, 
+    effectiveCompanyType, 
+    statusFilter, 
+    searchTerm, 
+    dateRange, 
+    foreignerFilter,
+    companyFilter, 
+    techKeyword, 
+    emailDateFrom, 
     emailDateTo
-  );
+  ]);
   
   // Paginated mail cases for display
   const paginatedMailCases = getPaginatedData(filteredMailCases, currentPage, itemsPerPage);
@@ -217,7 +242,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
-                <EmailSenderContainer mailCases={filteredMailCases} />
+                <EmailSenderContainer mailCases={filteredCases} />
               </TabsContent>
             </>
           )}

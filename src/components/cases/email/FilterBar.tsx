@@ -1,15 +1,15 @@
 
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Calendar } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface FilterBarProps {
   companyFilter: string;
-  setCompanyFilter: (value: string) => void;
+  setCompanyFilter: (filter: string) => void;
   techFilter: string;
-  setTechFilter: (value: string) => void;
-  companyList: (string | null)[];
+  setTechFilter: (filter: string) => void;
+  companyList: string[];
   startDateFilter?: string;
   setStartDateFilter?: (value: string) => void;
 }
@@ -20,67 +20,71 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   techFilter,
   setTechFilter,
   companyList,
-  startDateFilter = "",
+  startDateFilter,
   setStartDateFilter
 }) => {
-  // Filter out null, undefined, empty strings and ensure they're unique
-  const validCompanyList = React.useMemo(() => {
-    // Filter out nulls, empty strings, and ensure they are valid strings
-    const filtered = companyList
-      .filter(company => 
-        company !== null && 
-        company !== undefined && 
-        company !== "" && 
-        typeof company === 'string'
-      );
-    
-    // Remove duplicates using a Set
-    return Array.from(new Set(filtered));
-  }, [companyList]);
+  // Organize dates for the dropdown
+  const standardDates = React.useMemo(() => {
+    const dates = ['2025-06-01', '2025-06-15', '2025-07-01'];
+    return ['すべての日付', ...dates];
+  }, []);
 
   return (
-    <div className="mt-4 flex flex-col sm:flex-row gap-4">
-      <Select value={companyFilter} onValueChange={setCompanyFilter}>
-        <SelectTrigger className="japanese-text w-full sm:w-[200px] bg-white">
-          <SelectValue placeholder="会社でフィルター" />
-        </SelectTrigger>
-        <SelectContent className="max-h-[300px] overflow-y-auto">
-          <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-          {validCompanyList.length > 0 && validCompanyList.map((company, index) => (
-            <SelectItem 
-              key={`${company}-${index}`} 
-              value={company} 
-              className="japanese-text"
+    <div className="flex flex-wrap gap-4 items-center justify-between">
+      <div className="flex items-center space-x-2 flex-1">
+        <div className="relative flex-1">
+          <Select 
+            value={companyFilter} 
+            onValueChange={setCompanyFilter}
+          >
+            <SelectTrigger className="w-full japanese-text">
+              <SelectValue placeholder="会社で絞り込み..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
+              {companyList.map((company, index) => (
+                <SelectItem key={`${company}-${index}`} value={company} className="japanese-text">
+                  {company}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Add start date filter */}
+        {setStartDateFilter && (
+          <div className="relative flex-1">
+            <Select 
+              value={startDateFilter || 'all'} 
+              onValueChange={setStartDateFilter}
             >
-              {company}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      
-      <Input 
-        placeholder="技術キーワードでフィルター" 
-        value={techFilter}
-        onChange={(e) => setTechFilter(e.target.value)}
-        className="japanese-text bg-white"
-      />
-      
-      {setStartDateFilter && (
-        <div className="relative">
-          <div className="absolute left-3 top-3 text-muted-foreground">
-            <Calendar className="h-4 w-4" />
+              <SelectTrigger className="w-full japanese-text">
+                <SelectValue placeholder="開始日で絞り込み..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="japanese-text">すべての開始日</SelectItem>
+                {standardDates.filter(date => date !== 'すべての日付').map((date) => (
+                  <SelectItem key={date} value={date} className="japanese-text">
+                    {date}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Input 
-            type="date" 
-            placeholder="参画開始日" 
-            value={startDateFilter}
-            onChange={(e) => setStartDateFilter(e.target.value)}
-            className="japanese-text pl-10 bg-white"
+        )}
+        
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-2 flex items-center">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <Input
+            placeholder="技術キーワードで検索..."
+            value={techFilter}
+            onChange={(e) => setTechFilter(e.target.value)}
+            className="pl-8 japanese-text"
           />
         </div>
-      )}
+      </div>
     </div>
   );
 };
-
-export default FilterBar;

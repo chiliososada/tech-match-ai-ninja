@@ -1,53 +1,26 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { MailCase } from '../types';
 
-export const useEmailState = (mailCases: MailCase[] = []) => {
+export const useEmailState = (initialCases: MailCase[] = []) => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedCases, setSelectedCases] = useState<MailCase[]>([]);
   const [companyFilter, setCompanyFilter] = useState('all');
   const [techFilter, setTechFilter] = useState('');
+  const [startDateFilter, setStartDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedTemplate, setSelectedTemplate] = useState('default');
+  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [subject, setSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
-  const [signature, setSignature] = useState(`
-
---
-テックリクルーターAI
-担当：AI採用部
-Tel: 03-1234-5678
-Email: contact@techrecruiter.ai
-`);
   const [sending, setSending] = useState(false);
-  const [startDateFilter, setStartDateFilter] = useState('');
-  
-  // For demonstration, we'll limit the number of cases displayed
-  const [limitedMailCases, setLimitedMailCases] = useState<MailCase[] | null>(null);
+  const [signature, setSignature] = useState('');
 
-  // Effect to initialize limited data for demonstration
-  useEffect(() => {
-    if (mailCases.length > 0) {
-      setLimitedMailCases(mailCases.slice(0, 14));
-    }
-  }, [mailCases]);
-
-  // Effect to reset current page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [companyFilter, techFilter, startDateFilter]);
-
-  // Effect to deselect all when changing pages or filters
-  useEffect(() => {
-    setSelectAll(false);
-  }, [currentPage, companyFilter, techFilter, startDateFilter]);
-
-  // Handle unselect case with specific rowId
-  const handleUnselectCase = useCallback((caseId: string, rowId: string) => {
-    setSelectedCases(prevSelected => 
-      prevSelected.filter(c => !(c.id === caseId && c.selectedRowId === rowId))
+  // Handle unselecting a case
+  const handleUnselectCase = (caseId: string, rowId: string) => {
+    setSelectedCases(prev => 
+      prev.filter(c => !(c.id === caseId && c.selectedRowId === rowId))
     );
-  }, []);
+  };
 
   return {
     selectAll,
@@ -58,6 +31,8 @@ Email: contact@techrecruiter.ai
     setCompanyFilter,
     techFilter,
     setTechFilter,
+    startDateFilter,
+    setStartDateFilter,
     currentPage,
     setCurrentPage,
     selectedTemplate,
@@ -70,9 +45,6 @@ Email: contact@techrecruiter.ai
     setSending,
     signature,
     setSignature,
-    limitedMailCases,
-    handleUnselectCase,
-    startDateFilter,
-    setStartDateFilter
+    handleUnselectCase
   };
 };

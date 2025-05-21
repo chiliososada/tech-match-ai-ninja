@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
@@ -9,12 +8,12 @@ import { processCaseData } from './email/utils/dataProcessing';
 import { MailCase } from './email/types';
 
 interface EmailSenderContainerProps {
-  mailCases: any[];
+  mailCases: MailCase[];  // This now receives filtered cases from the parent component
 }
 
 export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   // Use custom hooks
-  const emailState = useEmailState(mailCases); // Pass mailCases to useEmailState
+  const emailState = useEmailState(mailCases); 
   const engineerState = useEngineerState(mailCases);
   
   // State for sorting
@@ -27,31 +26,14 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
       mailCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
   }, [mailCases]);
   
-  // Apply filters and sorting to cases
-  const filteredAndSortedCases = React.useMemo(() => {
-    let filtered = [...mailCases];
-    
-    // Apply company filter
-    if (emailState.companyFilter !== 'all') {
-      filtered = filtered.filter(item => item.company === emailState.companyFilter);
-    }
-    
-    // Apply tech filter
-    if (emailState.techFilter) {
-      const techKeyword = emailState.techFilter.toLowerCase();
-      filtered = filtered.filter(item => {
-        const skills = Array.isArray(item.skills) ? item.skills.join(' ').toLowerCase() : '';
-        return skills.includes(techKeyword);
-      });
-    }
+  // Apply sorting to cases (filtering is already done in parent component)
+  const sortedCases = React.useMemo(() => {
+    let sorted = [...mailCases];
     
     // Apply start date filter
     if (emailState.startDateFilter) {
       console.log("Filtering by startDate:", emailState.startDateFilter);
-      filtered = filtered.filter(item => {
-        // Log to debug filtering
-        console.log("Item startDate:", item.id, item.startDate);
-        // Ensure item.startDate exists and matches the format in filter
+      sorted = sorted.filter(item => {
         return item.startDate === emailState.startDateFilter;
       });
     }
@@ -59,7 +41,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     // Apply sorting if requested
     if (sortField === 'startDate') {
       console.log("Sorting by startDate, direction:", sortDirection);
-      filtered.sort((a, b) => {
+      sorted.sort((a, b) => {
         const dateA = a.startDate || '';
         const dateB = b.startDate || '';
         
@@ -74,25 +56,25 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
       });
     }
     
-    return filtered;
-  }, [mailCases, emailState.companyFilter, emailState.techFilter, emailState.startDateFilter, sortField, sortDirection]);
+    return sorted;
+  }, [mailCases, emailState.startDateFilter, sortField, sortDirection]);
   
-  // Get paginated cases based on filters, sorting and pagination
+  // Get paginated cases based on sorting and pagination
   const { paginatedCases, totalPages, companyList } = processCaseData(
-    filteredAndSortedCases,
+    sortedCases,
     emailState.companyFilter,
     emailState.techFilter,
     emailState.currentPage,
     10
   );
   
-  // Log the filtered, sorted and paginated cases
+  // Log the sorted and paginated cases
   useEffect(() => {
-    console.log("Filtered and sorted cases:", 
-      filteredAndSortedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
+    console.log("Sorted cases:", 
+      sortedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
     console.log("Paginated cases:", 
       paginatedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
-  }, [filteredAndSortedCases, paginatedCases]);
+  }, [sortedCases, paginatedCases]);
   
   // Handle sorting
   const handleSort = (field: string, direction: 'asc' | 'desc') => {
