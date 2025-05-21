@@ -1,3 +1,4 @@
+
 export interface MailCase {
   id: string;
   title: string;
@@ -16,7 +17,29 @@ export interface MailCase {
     email: string;
     position?: string;
   }[];
-  selectedRowId?: string; // Add this property to track which specific row is selected
+  selectedRowId?: string; // To track which specific row is selected
+  
+  // Additional properties that are used in the codebase but were missing in the type definition
+  status?: string;
+  budget?: string;
+  source?: string;
+  receivedDate?: string;
+  senderName?: string;
+  createdAt?: string;
+  startDate?: string;
+  keyTechnologies?: string;
+  foreignerAccepted?: boolean;
+  freelancerAccepted?: boolean;
+  desiredBudget?: string;
+  experience?: string;
+  workType?: string;
+  duration?: string;
+  japanese?: string;
+  priority?: string;
+  manager?: string;
+  managerEmail?: string;
+  processes?: string[];
+  interviewCount?: string;
 }
 
 export interface EmailTemplate {
