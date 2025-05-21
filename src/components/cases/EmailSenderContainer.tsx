@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
@@ -197,6 +196,35 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     );
   };
   
+  // Define the missing engineerHandleApply function
+  const engineerHandleApply = () => {
+    if (engineerState.selectedEngineers.length === 0) {
+      toast.error('技術者が選択されていません');
+      return;
+    }
+    
+    if (emailState.selectedCases.length === 0) {
+      toast.error('案件が選択されていません');
+      return;
+    }
+    
+    // Logic to apply engineer info to template
+    const engineerSkills = engineerState.selectedEngineers
+      .map(eng => Array.isArray(eng.skills) ? eng.skills.join(', ') : eng.skills)
+      .filter(Boolean)
+      .join('\n- ');
+    
+    const engineerNames = engineerState.selectedEngineers
+      .map(eng => eng.name)
+      .join('、');
+    
+    const updatedBody = emailState.emailBody +
+      `\n\n【ご提案する技術者】\n${engineerNames}\n\n【技術者のスキル】\n- ${engineerSkills}`;
+    
+    emailState.setEmailBody(updatedBody);
+    toast.success('技術者情報をメール本文に反映しました');
+  };
+  
   // Combined handlers
   const handlers = {
     casesHandleSelectAll: handleSelectAll,
@@ -207,33 +235,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     emailHandleTest: handleTestEmail,
     engineerHandleOpen: engineerState.openEngineerDialog,
     engineerHandleRemove: engineerState.removeEngineer,
-    engineerHandleApply: () => {
-      if (engineerState.selectedEngineers.length === 0) {
-        toast.error('技術者が選択されていません');
-        return;
-      }
-      
-      if (emailState.selectedCases.length === 0) {
-        toast.error('案件が選択されていません');
-        return;
-      }
-      
-      // Logic to apply engineer info to template
-      const engineerSkills = engineerState.selectedEngineers
-        .map(eng => Array.isArray(eng.skills) ? eng.skills.join(', ') : eng.skills)
-        .filter(Boolean)
-        .join('\n- ');
-      
-      const engineerNames = engineerState.selectedEngineers
-        .map(eng => eng.name)
-        .join('、');
-      
-      const updatedBody = emailState.emailBody +
-        `\n\n【ご提案する技術者】\n${engineerNames}\n\n【技術者のスキル】\n- ${engineerSkills}`;
-      
-      emailState.setEmailBody(updatedBody);
-      toast.success('技術者情報をメール本文に反映しました');
-    },
+    engineerHandleApply: engineerHandleApply,
     handleUnselectCase: handleUnselectCase
   };
   
