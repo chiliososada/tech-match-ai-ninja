@@ -26,10 +26,13 @@ export const useSenderMapper = ({ paginatedCases }: UseSenderMapperProps) => {
       registeredAt?: string;
       originalCase: MailCase;
       rowId: string;
-      startDate?: string; // Add startDate property
+      startDate?: string; // Make sure startDate is defined here
     }[] = [];
 
     paginatedCases.forEach((caseItem) => {
+      // Log each case to debug
+      console.log("Processing case item:", caseItem.id, caseItem.title, "startDate:", caseItem.startDate);
+      
       // Extract key technologies as comma-separated string
       const keyTechs = Array.isArray(caseItem.skills) 
         ? caseItem.skills.slice(0, 3).join(', ') 
@@ -51,7 +54,7 @@ export const useSenderMapper = ({ paginatedCases }: UseSenderMapperProps) => {
             registeredAt: caseItem.registeredAt,
             originalCase: caseItem,
             rowId: rowId,
-            startDate: caseItem.startDate || '', // Add startDate
+            startDate: caseItem.startDate || '', // Ensure startDate is copied
           });
         });
       } 
@@ -72,11 +75,14 @@ export const useSenderMapper = ({ paginatedCases }: UseSenderMapperProps) => {
           registeredAt: caseItem.registeredAt,
           originalCase: caseItem,
           rowId: rowId,
-          startDate: caseItem.startDate || '', // Add startDate
+          startDate: caseItem.startDate || '', // Ensure startDate is copied
         });
       }
     });
 
+    // Log the flattened senders to debug
+    console.log("Flattened senders with startDate:", flattened.map(s => ({id: s.caseId, startDate: s.startDate})));
+    
     return flattened;
   }, [paginatedCases]);
 

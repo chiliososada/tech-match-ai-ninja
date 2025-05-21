@@ -16,10 +16,11 @@ interface CasesListBodyProps {
     registrationType?: string;
     registeredAt?: string;
     originalCase: MailCase;
-    rowId: string; // Add the rowId property
+    rowId: string;
+    startDate?: string; // Add startDate property
   }[];
   selectedCases: MailCase[];
-  handleSelectCase: (id: string, rowId: string) => void; // Update to accept rowId
+  handleSelectCase: (id: string, rowId: string) => void;
   showCompanyInfo: boolean;
   onViewCase?: (caseItem: MailCase) => void;
 }

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
@@ -20,6 +21,12 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
+  // Log the incoming mailCases to debug
+  useEffect(() => {
+    console.log("EmailSenderContainer received mailCases:", 
+      mailCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
+  }, [mailCases]);
+  
   // Apply filters and sorting to cases
   const filteredAndSortedCases = React.useMemo(() => {
     let filtered = [...mailCases];
@@ -40,7 +47,10 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     
     // Apply start date filter
     if (emailState.startDateFilter) {
+      console.log("Filtering by startDate:", emailState.startDateFilter);
       filtered = filtered.filter(item => {
+        // Log to debug filtering
+        console.log("Item startDate:", item.id, item.startDate);
         // Ensure item.startDate exists and matches the format in filter
         return item.startDate === emailState.startDateFilter;
       });
@@ -48,6 +58,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     
     // Apply sorting if requested
     if (sortField === 'startDate') {
+      console.log("Sorting by startDate, direction:", sortDirection);
       filtered.sort((a, b) => {
         const dateA = a.startDate || '';
         const dateB = b.startDate || '';
@@ -74,6 +85,14 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     emailState.currentPage,
     10
   );
+  
+  // Log the filtered, sorted and paginated cases
+  useEffect(() => {
+    console.log("Filtered and sorted cases:", 
+      filteredAndSortedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
+    console.log("Paginated cases:", 
+      paginatedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
+  }, [filteredAndSortedCases, paginatedCases]);
   
   // Handle sorting
   const handleSort = (field: string, direction: 'asc' | 'desc') => {
