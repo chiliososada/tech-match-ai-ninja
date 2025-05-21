@@ -80,6 +80,84 @@ export interface MailCase {
   registeredAt?: string;
 }
 
+// Engineer interface for the engineer selection functionality
+export interface Engineer {
+  id: string;
+  name: string;
+  skills: string[];
+  experience: string;
+  status: string;
+  companyType: string;
+}
+
+// Sample engineer data for demonstration
+export const SAMPLE_ENGINEERS: Engineer[] = [
+  {
+    id: "e1",
+    name: "山田 太郎",
+    skills: ["Java", "Spring Boot", "AWS"],
+    experience: "5年",
+    status: "稼働可能",
+    companyType: "自社"
+  },
+  {
+    id: "e2",
+    name: "佐藤 次郎",
+    skills: ["React", "TypeScript", "Node.js"],
+    experience: "3年",
+    status: "稼働中",
+    companyType: "自社"
+  },
+  {
+    id: "e3",
+    name: "鈴木 花子",
+    skills: ["Python", "Django", "機械学習"],
+    experience: "7年",
+    status: "稼働可能",
+    companyType: "他社"
+  },
+  {
+    id: "e4",
+    name: "高橋 健太",
+    skills: ["PHP", "Laravel", "MySQL"],
+    experience: "4年",
+    status: "稼働可能",
+    companyType: "自社"
+  },
+  {
+    id: "e5",
+    name: "伊藤 真理",
+    skills: ["C#", ".NET", "Azure"],
+    experience: "6年",
+    status: "稼働中",
+    companyType: "他社"
+  },
+  {
+    id: "e6",
+    name: "渡辺 一郎",
+    skills: ["JavaScript", "Vue.js", "Firebase"],
+    experience: "3年",
+    status: "稼働可能",
+    companyType: "自社"
+  },
+  {
+    id: "e7",
+    name: "小林 優子",
+    skills: ["Ruby", "Rails", "PostgreSQL"],
+    experience: "5年",
+    status: "稼働可能",
+    companyType: "他社"
+  },
+  {
+    id: "e8",
+    name: "加藤 洋平",
+    skills: ["Go", "Docker", "Kubernetes"],
+    experience: "4年",
+    status: "稼働中",
+    companyType: "自社"
+  }
+];
+
 export interface EmailSenderProps {
   mailCases: MailCase[];
 }

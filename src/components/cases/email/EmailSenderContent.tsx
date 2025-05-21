@@ -36,6 +36,8 @@ interface EmailSenderContentProps {
     setCcEmails: (emails: string) => void;
     sending: boolean;
     setSending: (sending: boolean) => void;
+    signature: string;
+    setSignature: (signature: string) => void;
   };
   engineerState: {
     selectedEngineers: any[];
