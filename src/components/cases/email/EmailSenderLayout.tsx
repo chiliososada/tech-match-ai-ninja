@@ -120,7 +120,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
                 送信者が選択されていません
               </div>
             ) : (
-              <ScrollArea className="h-[500px] pr-4">
+              <ScrollArea className="h-full min-h-[500px] pr-4">
                 {Object.entries(selectedSendersByCompany).map(([company, senders]) => (
                   <div key={company} className="mb-4">
                     <h4 className="font-semibold text-sm bg-muted px-2 py-1 rounded mb-2 japanese-text">
