@@ -23,10 +23,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   startDateFilter,
   setStartDateFilter
 }) => {
-  // Organize dates for the dropdown
+  // Get unique start dates from the filterable cases
   const standardDates = React.useMemo(() => {
     const dates = ['2025-06-01', '2025-06-15', '2025-07-01'];
-    return ['すべての日付', ...dates];
+    return ['all', ...dates];
   }, []);
 
   return (
@@ -63,7 +63,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all" className="japanese-text">すべての開始日</SelectItem>
-                {standardDates.filter(date => date !== 'すべての日付').map((date) => (
+                {standardDates.filter(date => date !== 'all').map((date) => (
                   <SelectItem key={date} value={date} className="japanese-text">
                     {date}
                   </SelectItem>

@@ -1,3 +1,4 @@
+
 // Import the MailCase type
 import { MailCase } from '../email/types';
 
@@ -15,6 +16,19 @@ export const caseData: MailCase[] = [
     receivedDate: "2025-05-10T09:30:00",
     sender: "tanaka@technosolution.co.jp",
     senderName: "田中 一郎",
+    senderEmail: "tanaka@technosolution.co.jp",
+    senders: [
+      {
+        name: "田中 一郎",
+        email: "tanaka@technosolution.co.jp",
+        position: "営業担当"
+      },
+      {
+        name: "佐藤 太郎",
+        email: "sato@technosolution.co.jp",
+        position: "PM"
+      }
+    ],
     createdAt: "2025-05-10",
     startDate: "2025-07-01",
     keyTechnologies: "Java, SpringBoot, AWS",
@@ -63,6 +77,9 @@ export const caseData: MailCase[] = [
     priority: "高",
     manager: "佐藤 太郎",
     managerEmail: "sato@technosolution.co.jp",
+    processes: ["要件定義", "設計", "実装", "テスト"],
+    interviewCount: "2",
+    description: "金融系システムの新規開発プロジェクトにおけるJavaエンジニアの募集案件です。既存システムのリプレイス案件となります。"
   },
   {
     id: "2",
@@ -72,13 +89,33 @@ export const caseData: MailCase[] = [
     budget: "55~70万円",
     status: "募集中",
     source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
+    company: "デジタルフロンティア株式会社",
+    receivedDate: "2025-05-15T13:45:00",
+    sender: "yoshida@digital-frontier.co.jp",
+    senderName: "吉田 健太",
+    senderEmail: "yoshida@digital-frontier.co.jp",
+    senders: [
+      {
+        name: "吉田 健太",
+        email: "yoshida@digital-frontier.co.jp",
+        position: "技術部長"
+      }
+    ],
     createdAt: "2025-05-10",
     keyTechnologies: "React, TypeScript, Next.js",
     registrationType: "手動",
+    startDate: "2025-06-15",
+    experience: "2年以上",
+    workType: "オンサイト（リモート勤務は要相談）",
+    duration: "3ヶ月〜（延長の可能性あり）",
+    japanese: "ビジネス会話レベル",
+    priority: "中",
+    manager: "山田 隆",
+    managerEmail: "yamada@digital-frontier.co.jp",
+    foreignerAccepted: true,
+    freelancerAccepted: true,
+    processes: ["設計", "実装", "テスト"],
+    interviewCount: "1",
     detailDescription: `
 ECサイトのフロントエンド開発を担当するエンジニアを募集しています。
 
@@ -112,16 +149,7 @@ ECサイトのフロントエンド開発を担当するエンジニアを募集
 - 勤務地：大阪市内（リモート勤務は要相談）
 - 面談回数：1〜2回
 `,
-    startDate: null,
-    experience: "2年以上",
-    workType: "オンサイト（リモート勤務は要相談）",
-    duration: "3ヶ月〜（延長の可能性あり）",
-    japanese: "不問",
-    priority: "中",
-    manager: null,
-    managerEmail: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
+    description: "ECサイトのフロントエンド開発を担当するエンジニアを募集しています。主にReactとTypeScriptを使用した開発となります。"
   },
   {
     id: "3",
@@ -135,754 +163,519 @@ ECサイトのフロントエンド開発を担当するエンジニアを募集
     receivedDate: "2025-05-08T14:15:00",
     sender: "suzuki@cloudtech.jp",
     senderName: "鈴木 次郎",
+    senderEmail: "suzuki@cloudtech.jp",
+    senders: [
+      {
+        name: "鈴木 次郎",
+        email: "suzuki@cloudtech.jp",
+        position: "インフラ部門マネージャー"
+      },
+      {
+        name: "伊藤 浩",
+        email: "ito@cloudtech.jp",
+        position: "採用担当"
+      }
+    ],
     createdAt: "2025-05-08",
     keyTechnologies: "AWS, Docker, Kubernetes",
     registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
+    startDate: "2025-07-01",
+    foreignerAccepted: true,
+    freelancerAccepted: true,
+    manager: "中村 誠",
+    managerEmail: "nakamura@cloudtech.jp",
+    experience: "4年以上",
+    workType: "週2回オンサイト/リモート併用可",
+    duration: "6ヶ月〜12ヶ月",
+    japanese: "日常会話レベル",
+    priority: "高",
+    processes: ["設計", "構築", "運用"],
+    interviewCount: "2",
+    detailDescription: `
+クラウドインフラの設計・構築・運用を担当するインフラエンジニアを募集しています。
+
+【業務内容】
+- AWS環境の設計・構築・運用
+- Kubernetes/Dockerを用いたコンテナ環境の構築
+- CI/CDパイプラインの整備
+- インフラ監視の仕組み構築
+
+【必要スキル】
+- AWSの各種サービスの設計・構築経験
+- Docker/Kubernetesの実務経験
+- Terraform等のIaCツールの使用経験
+- Linux/UNIXサーバー運用経験
+
+【歓迎スキル】
+- AWS認定資格保持者
+- セキュリティ対策の知識・経験
+- マイクロサービスアーキテクチャの理解
+- 大規模システム運用経験
+
+【勤務条件】
+- 週2日オンサイト（名古屋市内）、残りはリモート勤務
+- 単価：スキル・経験により65~90万円
+- 稼働時間：140~180時間/月
+- 参画期間：6ヶ月～（延長の可能性あり）
+`,
+    description: "クラウドインフラの設計・構築・運用を担当するエンジニアを募集しています。AWSとKubernetesを中心とした環境です。"
   },
   {
     id: "4",
-    title: "QAエンジニア",
-    skills: ["テスト自動化", "Selenium"],
-    location: "リモート",
-    budget: "50~65万円",
-    status: "提案済",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-07",
-    keyTechnologies: "Selenium, Jenkins, Python",
-    registrationType: "手動",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
+    title: "データサイエンティスト",
+    skills: ["Python", "機械学習", "統計解析"],
+    location: "東京（フルリモート可）",
+    budget: "70~90万円",
+    status: "募集中",
+    source: "mail",
+    company: "AIリサーチ株式会社",
+    receivedDate: "2025-05-18T09:30:00",
+    sender: "matsuda@ai-research.co.jp",
+    senderName: "松田 洋子",
+    senderEmail: "matsuda@ai-research.co.jp",
+    senders: [
+      {
+        name: "松田 洋子",
+        email: "matsuda@ai-research.co.jp",
+        position: "研究開発部門長"
+      }
+    ],
+    createdAt: "2025-05-18",
+    keyTechnologies: "Python, TensorFlow, Scikit-learn, 機械学習",
+    registrationType: "自動（メール）",
+    startDate: "2025-06-01",
+    foreignerAccepted: true,
+    freelancerAccepted: true,
+    manager: "高橋 誠",
+    managerEmail: "takahashi@ai-research.co.jp",
+    experience: "3年以上",
+    workType: "フルリモート",
+    duration: "長期（1年以上）",
+    japanese: "日常会話レベル",
+    priority: "高",
+    processes: ["要件定義", "データ分析", "モデル開発", "評価"],
+    interviewCount: "2",
+    detailDescription: `
+機械学習モデルの研究開発を行うデータサイエンティストを募集しています。
+
+【業務内容】
+- 大規模データの分析と前処理
+- 機械学習モデルの設計と実装
+- モデルの評価と改善
+- ビジネス部門との連携によるソリューション提案
+
+【必要スキル・経験】
+- Pythonでのデータ分析・機械学習の実務経験3年以上
+- 統計学の知識
+- TensorFlow、PyTorch等のディープラーニングフレームワークの使用経験
+- データ可視化の経験
+
+【開発環境】
+- 言語：Python
+- フレームワーク：TensorFlow, PyTorch, Scikit-learn
+- データ処理：Pandas, NumPy
+- 可視化：Matplotlib, Seaborn
+
+【勤務条件】
+- フルリモート可
+- 稼働時間：160〜180時間/月
+- 単価：70〜90万円（スキル・経験による）
+- 長期案件（1年以上を想定）
+`,
+    description: "機械学習モデルの研究開発を行うデータサイエンティストを募集しています。大規模データ分析と機械学習モデル開発が主な業務です。"
   },
   {
     id: "5",
-    title: "PHP開発エンジニア",
-    skills: ["PHP", "Laravel", "MySQL"],
-    location: "東京",
-    budget: "55~75万円",
-    status: "募集中",
-    source: "mail",
-    company: "ウェブシステム株式会社",
-    receivedDate: "2025-05-12T11:20:00",
-    sender: "yamada@websystem.co.jp",
-    senderName: "山田 三郎",
-    createdAt: "2025-05-12",
-    keyTechnologies: "PHP, Laravel, MySQL",
-    registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "6",
-    title: "Android開発エンジニア",
-    skills: ["Kotlin", "Java", "Android SDK"],
-    location: "福岡",
-    budget: "60~75万円",
-    status: "募集中",
-    source: "mail",
-    company: "モバイルソリューション株式会社",
-    receivedDate: "2025-05-11T10:15:00",
-    sender: "watanabe@mobile-solution.jp",
-    senderName: "渡辺 四郎",
-    createdAt: "2025-05-11",
-    keyTechnologies: "Kotlin, Android, Firebase",
-    registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "7",
-    title: "データサイエンスト",
-    skills: ["Python", "R", "機械学習"],
-    location: "東京",
-    budget: "70~90万円",
-    status: "募集中",
-    source: "mail",
-    company: "AIソリューション株式会社",
-    receivedDate: "2025-05-09T15:45:00",
-    sender: "saito@ai-solution.co.jp",
-    senderName: "斉藤 五郎",
-    createdAt: "2025-05-09",
-    keyTechnologies: "Python, R, TensorFlow",
-    registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "8",
     title: "セキュリティエンジニア",
-    skills: ["ネットワークセキュリティ", "CISSP"],
+    skills: ["情報セキュリティ", "脆弱性診断", "ペネトレーションテスト"],
     location: "大阪",
     budget: "65~85万円",
-    status: "選考中",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-08",
-    keyTechnologies: "CISSP, Firewall, SIEM",
-    registrationType: "手動",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "9",
-    title: "UI/UXデザイナー",
-    skills: ["Figma", "Adobe XD", "Sketch"],
-    location: "東京",
-    budget: "55~70万円",
-    status: "提案済",
-    source: "mail",
-    company: "デザインスタジオ株式会社",
-    receivedDate: "2025-05-07T09:10:00",
-    sender: "tanaka@design-studio.jp",
-    senderName: "田中 六郎",
-    createdAt: "2025-05-07",
-    keyTechnologies: "Figma, Adobe XD, Sketch",
-    registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "10",
-    title: "DevOpsエンジニア",
-    skills: ["Jenkins", "AWS", "Terraform"],
-    location: "名古屋",
-    budget: "65~85万円",
-    status: "募集中",
-    source: "mail",
-    company: "クラウドマネジメント株式会社",
-    receivedDate: "2025-05-06T13:25:00",
-    sender: "nakamura@cloud-mgmt.co.jp",
-    senderName: "中村 七郎",
-    createdAt: "2025-05-06",
-    keyTechnologies: "Jenkins, AWS, Terraform",
-    registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "11",
-    title: "Goバックエンド開発者",
-    skills: ["Go", "PostgreSQL", "gRPC"],
-    location: "リモート",
-    budget: "70~90万円",
-    status: "募集中",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-05",
-    keyTechnologies: "Go, PostgreSQL, gRPC",
-    registrationType: "手動",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "12",
-    title: "Rubyエンジニア",
-    skills: ["Ruby", "Rails", "PostgreSQL"],
-    location: "福岡",
-    budget: "55~75万円",
-    status: "選考中",
-    source: "mail",
-    company: "ウェブアプリケーション株式会社",
-    receivedDate: "2025-05-04T11:05:00",
-    sender: "kobayashi@webapps.co.jp",
-    senderName: "小林 八郎",
-    createdAt: "2025-05-04",
-    keyTechnologies: "Ruby, Rails, PostgreSQL",
-    registrationType: "自動（メール）",
-    startDate: null,
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    manager: null,
-    managerEmail: null
-  },
-  {
-    id: "13",
-    title: "フロントエンドリードエンジニア",
-    skills: ["React", "Next.js", "GraphQL"],
-    location: "東京（リモート可）",
-    budget: "70~95万円",
-    status: "募集中",
-    source: "mail",
-    company: "シナジーテクノロジー株式会社",
-    receivedDate: "2025-05-14T10:15:00",
-    sender: "ishikawa@synergy-tech.co.jp",
-    senderName: "石川 九郎",
-    createdAt: "2025-05-14",
-    keyTechnologies: "React, Next.js, GraphQL, TypeScript",
-    startDate: "2025-06-15",
-    foreignerAccepted: true,
-    freelancerAccepted: true,
-    desiredBudget: "85万円",
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-14T10:30:25",
-    manager: "高橋 浩",
-    managerEmail: "takahashi@synergy-tech.co.jp",
-    processes: ["要件定義", "設計", "実装", "テスト"],
-    interviewCount: "2"
-  },
-  {
-    id: "14",
-    title: "バックエンド開発者",
-    skills: ["Node.js", "Express", "MongoDB"],
-    location: "大阪（週2出社）",
-    budget: "60~80万円",
-    status: "選考中",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-13",
-    keyTechnologies: "Node.js, Express, MongoDB, Redis",
-    startDate: "2025-06-01",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
-    registrationType: "手動",
-    registeredAt: "2025-05-13T14:45:10",
-    processes: ["実装", "テスト"],
-    interviewCount: "1"
-  },
-  {
-    id: "15",
-    title: "AWSクラウドエンジニア",
-    skills: ["AWS", "Terraform", "CloudFormation"],
-    location: "リモート",
-    budget: "65~85万円",
-    status: "募集中",
-    source: "mail",
-    company: "クラウドエキスパート株式会社",
-    receivedDate: "2025-05-12T09:45:00",
-    sender: "yamamoto@cloud-expert.jp",
-    senderName: "山本 十郎",
-    createdAt: "2025-05-12",
-    keyTechnologies: "AWS, Terraform, DevOps, CI/CD",
-    startDate: "2025-07-01",
-    foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-12T10:02:18",
-    processes: ["設計", "構築", "運用"],
-    interviewCount: "2"
-  },
-  {
-    id: "16",
-    title: "C#/.NETエンジニア",
-    skills: ["C#", ".NET Core", "SQL Server"],
-    location: "名古屋",
-    budget: "55~75万円",
-    status: "提案済",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-11",
-    keyTechnologies: "C#, .NET Core, SQL Server, Entity Framework",
-    startDate: "2025-06-15",
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    registrationType: "手動",
-    registeredAt: "2025-05-11T11:30:45",
-    processes: ["実装", "テスト"],
-    interviewCount: "1"
-  },
-  {
-    id: "17",
-    title: "機械学習エンジニア",
-    skills: ["Python", "TensorFlow", "PyTorch"],
-    location: "東京（週3出社）",
-    budget: "75~95万円",
-    status: "募集中",
-    source: "mail",
-    company: "AIイノベーション株式会社",
-    receivedDate: "2025-05-10T16:20:00",
-    sender: "matsuda@ai-innovation.co.jp",
-    senderName: "松田 真一",
-    createdAt: "2025-05-10",
-    keyTechnologies: "Python, TensorFlow, PyTorch, 機械学習",
-    startDate: "2025-07-15",
-    foreignerAccepted: true,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-10T16:45:12",
-    processes: ["データ分析", "モデル開発", "評価"],
-    interviewCount: "3"
-  },
-  {
-    id: "18",
-    title: "モバイルアプリ開発者",
-    skills: ["Swift", "Kotlin", "Firebase"],
-    location: "大阪",
-    budget: "60~80万円",
-    status: "選考中",
-    source: "mail",
-    company: "モバイルアプリ株式会社",
-    receivedDate: "2025-05-09T11:10:00",
-    sender: "kimura@mobileapp.co.jp",
-    senderName: "木村 健太",
-    createdAt: "2025-05-09",
-    keyTechnologies: "Swift, Kotlin, Firebase, Flutter",
-    startDate: "2025-06-01",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-09T11:35:28",
-    processes: ["設計", "実装", "テスト"],
-    interviewCount: "2"
-  },
-  {
-    id: "19",
-    title: "Pythonバックエンドエンジニア",
-    skills: ["Python", "Django", "PostgreSQL"],
-    location: "福岡（リモート可）",
-    budget: "55~75万円",
-    status: "募集中",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-08",
-    keyTechnologies: "Python, Django, PostgreSQL, REST API",
-    startDate: "2025-06-15",
-    foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "手動",
-    registeredAt: "2025-05-08T14:20:33",
-    processes: ["設計", "実装"],
-    interviewCount: "1"
-  },
-  {
-    id: "20",
-    title: "ブロックチェーン開発者",
-    skills: ["Solidity", "Ethereum", "Web3.js"],
-    location: "東京",
-    budget: "70~90万円",
-    status: "募集中",
-    source: "mail",
-    company: "ブロックチェーンテック株式会社",
-    receivedDate: "2025-05-07T13:40:00",
-    sender: "nakamura@blockchain-tech.co.jp",
-    senderName: "中村 誠",
-    createdAt: "2025-05-07",
-    keyTechnologies: "Solidity, Ethereum, Web3.js, Smart Contracts",
-    startDate: "2025-07-01",
-    foreignerAccepted: true,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-07T14:05:42",
-    processes: ["設計", "実装", "テスト", "監査"],
-    interviewCount: "2"
-  },
-  {
-    id: "21",
-    title: "システム運用エンジニア",
-    skills: ["Linux", "Shell", "Ansible"],
-    location: "大阪（リモート不可）",
-    budget: "50~65万円",
-    status: "提案済",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-06",
-    keyTechnologies: "Linux, Shell, Ansible, Monitoring",
-    startDate: "2025-06-01",
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    registrationType: "手動",
-    registeredAt: "2025-05-06T10:15:08",
-    processes: ["運用", "保守"],
-    interviewCount: "1"
-  },
-  {
-    id: "22",
-    title: "Goプログラマー",
-    skills: ["Go", "Docker", "REST API"],
-    location: "名古屋（週2出社）",
-    budget: "65~85万円",
-    status: "募集中",
-    source: "mail",
-    company: "テックイノベーション株式会社",
-    receivedDate: "2025-05-05T15:30:00",
-    sender: "saito@tech-innovation.co.jp",
-    senderName: "斎藤 裕",
-    createdAt: "2025-05-05",
-    keyTechnologies: "Go, Docker, REST API, Microservices",
-    startDate: "2025-06-15",
-    foreignerAccepted: true,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-05T15:55:17",
-    processes: ["設計", "実装", "テスト"],
-    interviewCount: "2"
-  },
-  {
-    id: "23",
-    title: "UI/UXデザイナー兼フロントエンド",
-    skills: ["Figma", "React", "HTML/CSS"],
-    location: "リモート",
-    budget: "60~80万円",
-    status: "選考中",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-04",
-    keyTechnologies: "Figma, React, HTML/CSS, UI/UX",
-    startDate: "2025-07-01",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
-    registrationType: "手動",
-    registeredAt: "2025-05-04T09:30:25",
-    processes: ["デザイン", "実装"],
-    interviewCount: "2"
-  },
-  {
-    id: "24",
-    title: "エンタープライズJavaエンジニア",
-    skills: ["Java", "Spring", "Oracle"],
-    location: "東京",
-    budget: "65~85万円",
-    status: "募集中",
-    source: "mail",
-    company: "エンタープライズソリューションズ株式会社",
-    receivedDate: "2025-05-03T10:20:00",
-    sender: "watanabe@enterprise-solutions.co.jp",
-    senderName: "渡辺 隆",
-    createdAt: "2025-05-03",
-    keyTechnologies: "Java, Spring, Oracle, Hibernate",
-    startDate: "2025-06-15",
-    foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-03T10:45:33",
-    processes: ["要件定義", "設計", "実装", "テスト"],
-    interviewCount: "3"
-  },
-  {
-    id: "25",
-    title: "クラウドインフラエンジニア",
-    skills: ["Azure", "Kubernetes", "Terraform"],
-    location: "福岡（リモート可）",
-    budget: "60~80万円",
-    status: "募集中",
-    source: "manual",
-    company: null,
-    receivedDate: null,
-    sender: null,
-    senderName: null,
-    createdAt: "2025-05-02",
-    keyTechnologies: "Azure, Kubernetes, Terraform, DevOps",
-    startDate: "2025-07-01",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
-    registrationType: "手動",
-    registeredAt: "2025-05-02T14:10:05",
-    processes: ["設計", "構築", "運用"],
-    interviewCount: "1"
-  },
-  {
-    id: "26",
-    title: "PHPバックエンド開発者",
-    skills: ["PHP", "Laravel", "MySQL"],
-    location: "大阪",
-    budget: "55~70万円",
-    status: "提案済",
-    source: "mail",
-    company: "ウェブシステム株式会社",
-    receivedDate: "2025-05-01T11:15:00",
-    sender: "tanaka@websystem.co.jp",
-    senderName: "田中 弘",
-    createdAt: "2025-05-01",
-    keyTechnologies: "PHP, Laravel, MySQL, API",
-    startDate: "2025-06-01",
-    foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-01T11:40:22",
-    processes: ["実装", "テスト"],
-    interviewCount: "1"
-  },
-  {
-    id: "27",
-    title: "SREエンジニア",
-    skills: ["Linux", "AWS", "Kubernetes", "Terraform"],
-    location: "東京",
-    budget: "70~90万円",
-    status: "募集中",
-    source: "mail",
-    company: "クラウドマネジメント株式会社",
-    receivedDate: "2025-05-01T09:10:00",
-    sender: "akiyama@cloud-mgmt.co.jp",
-    senderName: "秋山 健二",
-    createdAt: "2025-05-01",
-    keyTechnologies: "Linux, AWS, Kubernetes, Terraform, Prometheus",
-    startDate: "2025-06-15",
-    foreignerAccepted: true,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-05-01T09:35:42",
-    processes: ["設計", "構築", "運用", "監視"],
-    interviewCount: "2",
-    manager: "大山 隆",
-    managerEmail: "oyama@cloud-mgmt.co.jp"
-  },
-  {
-    id: "28",
-    title: "シニアPythonエンジニア",
-    skills: ["Python", "Flask", "FastAPI", "MongoDB"],
-    location: "大阪（リモート可）",
-    budget: "65~85万円",
-    status: "募集中",
-    source: "mail",
-    company: "データアナリティクス株式会社",
-    receivedDate: "2025-04-30T13:20:00",
-    sender: "matsumoto@data-analytics.jp",
-    senderName: "松本 直樹",
-    createdAt: "2025-04-30",
-    keyTechnologies: "Python, Flask, FastAPI, MongoDB, データ分析",
-    startDate: "2025-06-01",
-    foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-30T13:50:12",
-    processes: ["設計", "実装", "テスト"],
-    interviewCount: "2",
-    manager: "佐々木 洋介",
-    managerEmail: "sasaki@data-analytics.jp"
-  },
-  {
-    id: "29",
-    title: "マイクロサービス開発者",
-    skills: ["Java", "Spring Boot", "Docker", "Kubernetes"],
-    location: "福岡",
-    budget: "60~80万円",
-    status: "募集中",
-    source: "mail",
-    company: "テクニカルソフト株式会社",
-    receivedDate: "2025-04-29T10:45:00",
-    sender: "takahashi@technicalsoft.co.jp",
-    senderName: "高橋 修",
-    createdAt: "2025-04-29",
-    keyTechnologies: "Java, Spring Boot, Docker, Kubernetes, マイクロサービス",
-    startDate: "2025-06-15",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-29T11:10:33",
-    processes: ["設計", "実装", "テスト", "デプロイ"],
-    interviewCount: "1",
-    manager: "森田 健太郎",
-    managerEmail: "morita@technicalsoft.co.jp"
-  },
-  {
-    id: "30",
-    title: "VMwareスペシャリスト",
-    skills: ["VMware", "ESXi", "vCenter", "PowerCLI"],
-    location: "東京",
-    budget: "65~85万円",
-    status: "選考中",
-    source: "mail",
-    company: "ITインフラ株式会社",
-    receivedDate: "2025-04-28T14:30:00",
-    sender: "ito@itinfra.co.jp",
-    senderName: "伊藤 誠",
-    createdAt: "2025-04-28",
-    keyTechnologies: "VMware, ESXi, vCenter, PowerCLI, 仮想化",
-    startDate: "2025-06-01",
-    foreignerAccepted: false,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-28T15:05:18",
-    processes: ["設計", "構築", "運用"],
-    interviewCount: "2",
-    manager: "鈴木 茂",
-    managerEmail: "suzuki@itinfra.co.jp"
-  },
-  {
-    id: "31",
-    title: "サイバーセキュリティエンジニア",
-    skills: ["セキュリティ監査", "脆弱性診断", "SIEM", "ペネトレーションテスト"],
-    location: "大阪",
-    budget: "70~90万円",
     status: "募集中",
     source: "mail",
     company: "セキュアネットワーク株式会社",
-    receivedDate: "2025-04-27T09:15:00",
-    sender: "nakamura@secure-network.co.jp",
-    senderName: "中村 隆",
-    createdAt: "2025-04-27",
-    keyTechnologies: "セキュリティ監査, 脆弱性診断, SIEM, ペネトレーションテスト",
-    startDate: "2025-06-15",
+    receivedDate: "2025-05-20T11:20:00",
+    sender: "yamamoto@secure-network.co.jp",
+    senderName: "山本 康弘",
+    senderEmail: "yamamoto@secure-network.co.jp",
+    senders: [
+      {
+        name: "山本 康弘",
+        email: "yamamoto@secure-network.co.jp",
+        position: "セキュリティ部門マネージャー"
+      }
+    ],
+    createdAt: "2025-05-20",
+    keyTechnologies: "セキュリティ診断, ペネトレーションテスト, SIEM",
+    registrationType: "自動（メール）",
+    startDate: "2025-07-15",
     foreignerAccepted: false,
     freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-27T09:45:27",
-    processes: ["監査", "診断", "対策立案"],
+    manager: "中村 隆",
+    managerEmail: "nakamura@secure-network.co.jp",
+    experience: "5年以上",
+    workType: "オンサイト（大阪市内）",
+    duration: "6ヶ月（延長の可能性あり）",
+    japanese: "ネイティブレベル",
+    priority: "中",
+    processes: ["セキュリティ診断", "脆弱性対策", "セキュリティ強化策の提案"],
     interviewCount: "3",
-    manager: "山本 康弘",
-    managerEmail: "yamamoto@secure-network.co.jp"
+    detailDescription: `
+情報セキュリティ対策を担当するセキュリティエンジニアを募集しています。
+
+【業務内容】
+- セキュリティ診断（脆弱性診断、ペネトレーションテスト）
+- セキュリティインシデント対応
+- セキュリティポリシーの策定
+- セキュリティ教育の実施
+
+【必要スキル・経験】
+- 情報セキュリティ分野での実務経験5年以上
+- 脆弱性診断・ペネトレーションテストの実施経験
+- セキュリティツールの導入・運用経験
+- セキュリティ関連の資格保有者（CISSP、情報セキュリティスペシャリスト等）
+
+【歓迎スキル】
+- サイバーセキュリティ対策の経験
+- CSIRT（Computer Security Incident Response Team）での活動経験
+- プログラミングスキル（Python、Bash等）
+
+【勤務条件】
+- オンサイト勤務（大阪市内）
+- 稼働時間：160〜180時間/月
+- 単価：65〜85万円
+- 期間：6ヶ月（延長の可能性あり）
+`,
+    description: "情報セキュリティ対策を担当するセキュリティエンジニアを募集しています。脆弱性診断・ペネトレーションテストが主な業務です。"
   },
   {
-    id: "32",
-    title: "iOSアプリ開発者",
-    skills: ["Swift", "Objective-C", "SwiftUI", "Xcode"],
-    location: "東京（リモート可）",
+    id: "6",
+    title: "AWSクラウドアーキテクト",
+    skills: ["AWS", "クラウドアーキテクチャ", "サーバーレス"],
+    location: "東京",
+    budget: "75~95万円",
+    status: "募集中",
+    source: "mail",
+    company: "クラウドソリューション株式会社",
+    receivedDate: "2025-05-22T14:30:00",
+    sender: "tanaka@cloud-solutions.co.jp",
+    senderName: "田中 雄一",
+    senderEmail: "tanaka@cloud-solutions.co.jp",
+    senders: [
+      {
+        name: "田中 雄一",
+        email: "tanaka@cloud-solutions.co.jp",
+        position: "クラウドソリューション部長"
+      },
+      {
+        name: "佐々木 健",
+        email: "sasaki@cloud-solutions.co.jp",
+        position: "営業担当"
+      }
+    ],
+    createdAt: "2025-05-22",
+    keyTechnologies: "AWS, サーバーレス, マイクロサービス",
+    registrationType: "自動（メール）",
+    startDate: "2025-06-15",
+    foreignerAccepted: true,
+    freelancerAccepted: true,
+    manager: "佐々木 健",
+    managerEmail: "sasaki@cloud-solutions.co.jp",
+    experience: "5年以上",
+    workType: "週2回オンサイト/リモート併用可",
+    duration: "1年（延長の可能性あり）",
+    japanese: "ビジネスレベル",
+    priority: "高",
+    processes: ["要件定義", "アーキテクチャ設計", "実装支援", "運用設計"],
+    interviewCount: "2",
+    detailDescription: `
+大規模基幹システムのクラウド移行を担当するAWSクラウドアーキテクトを募集しています。
+
+【業務内容】
+- オンプレミス環境からAWSへの移行設計・構築
+- クラウドアーキテクチャの最適化設計
+- サーバーレスアーキテクチャの設計・実装
+- マイクロサービス化の推進
+
+【必要スキル・経験】
+- AWSでのクラウドアーキテクト経験5年以上
+- AWS認定資格（ソリューションアーキテクト - プロフェッショナル以上）
+- 大規模システム移行プロジェクトの経験
+- サーバーレスアーキテクチャの設計・実装経験
+
+【歓迎スキル】
+- コンテナ技術（Docker、Kubernetes）の知識
+- CI/CDパイプラインの構築経験
+- マルチクラウド環境の設計経験
+- コスト最適化の知識
+
+【勤務条件】
+- 週2回オンサイト（東京都内）、他はリモート勤務
+- 稼働時間：160〜180時間/月
+- 単価：75〜95万円（スキル・経験により）
+- 期間：1年（延長の可能性あり）
+`,
+    description: "大規模基幹システムのクラウド移行を担当するAWSクラウドアーキテクトを募集しています。オンプレミスからAWSへの移行が主な業務です。"
+  },
+  {
+    id: "7",
+    title: "フルスタックエンジニア",
+    skills: ["React", "Node.js", "MongoDB"],
+    location: "福岡（リモート可）",
+    budget: "60~80万円",
+    status: "募集中",
+    source: "mail",
+    company: "テックイノベーション株式会社",
+    receivedDate: "2025-05-25T10:45:00",
+    sender: "watanabe@tech-innovation.co.jp",
+    senderName: "渡辺 健太",
+    senderEmail: "watanabe@tech-innovation.co.jp",
+    senders: [
+      {
+        name: "渡辺 健太",
+        email: "watanabe@tech-innovation.co.jp",
+        position: "開発部マネージャー"
+      }
+    ],
+    createdAt: "2025-05-25",
+    keyTechnologies: "React, Node.js, MongoDB, Express",
+    registrationType: "自動（メール）",
+    startDate: "2025-07-01",
+    foreignerAccepted: true,
+    freelancerAccepted: true,
+    manager: "佐藤 隆",
+    managerEmail: "sato@tech-innovation.co.jp",
+    experience: "3年以上",
+    workType: "リモート（月1回オンサイト）",
+    duration: "6ヶ月〜12ヶ月",
+    japanese: "ビジネス会話レベル",
+    priority: "中",
+    processes: ["設計", "実装", "テスト"],
+    interviewCount: "1",
+    detailDescription: `
+Webアプリケーションの開発を担当するフルスタックエンジニアを募集しています。
+
+【業務内容】
+- フロントエンド（React）の設計・実装
+- バックエンド（Node.js/Express）の設計・実装
+- データベース（MongoDB）の設計・実装
+- APIの設計・実装
+
+【必要スキル・経験】
+- React, Node.jsでの開発経験3年以上
+- RESTful APIの設計・実装経験
+- MongoDBなどのNoSQLデータベース使用経験
+- GitHubを使用したチーム開発経験
+
+【開発環境】
+- フロントエンド：React, TypeScript
+- バックエンド：Node.js, Express
+- データベース：MongoDB
+- その他：Docker, GitHub Actions
+
+【勤務条件】
+- リモートワーク主体（月1回福岡オフィスでの打ち合わせあり）
+- 稼働時間：140〜160時間/月
+- 単価：60〜80万円
+- 期間：6ヶ月〜12ヶ月（延長の可能性あり）
+`,
+    description: "Webアプリケーションの開発を担当するフルスタックエンジニアを募集しています。ReactとNode.jsを使った開発が中心です。"
+  },
+  {
+    id: "8",
+    title: "DevOpsエンジニア",
+    skills: ["Jenkins", "AWS", "Terraform", "Ansible"],
+    location: "東京（週3リモート可）",
+    budget: "70~90万円",
+    status: "募集中",
+    source: "mail",
+    company: "デジタルトランスフォーメーション株式会社",
+    receivedDate: "2025-05-28T13:15:00",
+    sender: "nakamura@digital-transformation.co.jp",
+    senderName: "中村 健太",
+    senderEmail: "nakamura@digital-transformation.co.jp",
+    senders: [
+      {
+        name: "中村 健太",
+        email: "nakamura@digital-transformation.co.jp",
+        position: "DevOps部門リーダー"
+      }
+    ],
+    createdAt: "2025-05-28",
+    keyTechnologies: "Jenkins, AWS, Terraform, Ansible, CI/CD",
+    registrationType: "自動（メール）",
+    startDate: "2025-06-15",
+    foreignerAccepted: true,
+    freelancerAccepted: false,
+    manager: "鈴木 大輔",
+    managerEmail: "suzuki@digital-transformation.co.jp",
+    experience: "4年以上",
+    workType: "週2回オンサイト/週3回リモート",
+    duration: "1年（延長の可能性あり）",
+    japanese: "ビジネスレベル",
+    priority: "高",
+    processes: ["設計", "自動化構築", "運用改善"],
+    interviewCount: "2",
+    detailDescription: `
+CI/CD環境の構築・運用を担当するDevOpsエンジニアを募集しています。
+
+【業務内容】
+- CI/CDパイプラインの構築・改善
+- インフラ環境の自動化（IaC）
+- 監視・ロギング環境の整備
+- 開発・運用プロセスの改善
+
+【必要スキル・経験】
+- CI/CDツール（Jenkins、GitLab CI等）の構築・運用経験
+- AWS環境でのインフラ構築経験
+- Terraform、Ansibleなどのツールを使用した自動化経験
+- Linux/Unixサーバー運用経験
+
+【歓迎スキル】
+- Kubernetes環境の構築・運用経験
+- コンテナ技術（Docker）の実務経験
+- プログラミングスキル（Python, Go等）
+- セキュリティ対策の知識
+
+【勤務条件】
+- 週2日オンサイト（東京都内）、週3日リモートワーク
+- 稼働時間：160〜180時間/月
+- 単価：70〜90万円（スキル・経験による）
+- 期間：1年（延長の可能性あり）
+`,
+    description: "CI/CD環境の構築・運用を担当するDevOpsエンジニアを募集しています。インフラ自動化とCI/CDパイプラインの整備が主な業務です。"
+  },
+  {
+    id: "9",
+    title: "iOS/Androidアプリ開発者",
+    skills: ["Swift", "Kotlin", "Flutter"],
+    location: "大阪（フルリモート可）",
     budget: "65~85万円",
     status: "募集中",
     source: "mail",
-    company: "モバイルアプリ株式会社",
-    receivedDate: "2025-04-26T11:40:00",
-    sender: "yamada@mobileapp.co.jp",
-    senderName: "山田 健",
-    createdAt: "2025-04-26",
-    keyTechnologies: "Swift, Objective-C, SwiftUI, Xcode, iOS",
+    company: "モバイルソリューションズ株式会社",
+    receivedDate: "2025-05-30T09:20:00",
+    sender: "yamada@mobile-solutions.co.jp",
+    senderName: "山田 直樹",
+    senderEmail: "yamada@mobile-solutions.co.jp",
+    senders: [
+      {
+        name: "山田 直樹",
+        email: "yamada@mobile-solutions.co.jp",
+        position: "モバイルアプリ部門長"
+      },
+      {
+        name: "田中 美咲",
+        email: "tanaka@mobile-solutions.co.jp",
+        position: "HR担当"
+      }
+    ],
+    createdAt: "2025-05-30",
+    keyTechnologies: "Swift, Kotlin, Flutter, Firebase",
+    registrationType: "自動（メール）",
     startDate: "2025-06-01",
     foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-26T12:05:33",
+    freelancerAccepted: true,
+    manager: "伊藤 健",
+    managerEmail: "ito@mobile-solutions.co.jp",
+    experience: "3年以上",
+    workType: "フルリモート",
+    duration: "6ヶ月（延長の可能性あり）",
+    japanese: "日常会話レベル",
+    priority: "中",
     processes: ["設計", "実装", "テスト"],
     interviewCount: "2",
-    manager: "田中 明",
-    managerEmail: "tanaka@mobileapp.co.jp"
+    detailDescription: `
+iOS/Androidアプリ開発を担当するモバイルアプリ開発者を募集しています。
+
+【業務内容】
+- iOSアプリ開発（Swift）
+- Androidアプリ開発（Kotlin）
+- Flutterを使用したクロスプラットフォーム開発
+- Firebase連携機能の実装
+
+【必要スキル・経験】
+- iOS/AndroidまたはFlutterでの開発経験3年以上
+- アプリの設計・実装・テスト・リリース経験
+- Firebase（Authentication, Firestore, Cloud Functions等）の使用経験
+- 複雑なUIの実装経験
+
+【歓迎スキル】
+- CI/CDの知識・経験
+- バックエンド開発の経験
+- UX/UIデザインの知識
+- アプリのパフォーマンス最適化の経験
+
+【勤務条件】
+- フルリモート可
+- 稼働時間：140〜160時間/月
+- 単価：65〜85万円
+- 期間：6ヶ月（延長の可能性あり）
+`,
+    description: "iOS/Androidアプリ開発を担当するモバイルアプリ開発者を募集しています。SwiftやKotlin、Flutterを使用した開発が主な業務です。"
   },
   {
-    id: "33",
-    title: "Webアクセシビリティ専門家",
-    skills: ["HTML", "CSS", "JavaScript", "WCAG"],
-    location: "名古屋（リモート可）",
-    budget: "55~70万円",
+    id: "10",
+    title: "UI/UXデザイナー",
+    skills: ["Figma", "Adobe XD", "Sketch"],
+    location: "東京（週2リモート可）",
+    budget: "60~80万円",
     status: "募集中",
     source: "mail",
-    company: "デジタルアクセス株式会社",
-    receivedDate: "2025-04-25T15:20:00",
-    sender: "saito@digital-access.co.jp",
-    senderName: "斎藤 美香",
-    createdAt: "2025-04-25",
-    keyTechnologies: "HTML, CSS, JavaScript, WCAG, アクセシビリティ",
-    startDate: "2025-06-15",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
+    company: "クリエイティブデザイン株式会社",
+    receivedDate: "2025-06-02T11:30:00",
+    sender: "suzuki@creative-design.co.jp",
+    senderName: "鈴木 明美",
+    senderEmail: "suzuki@creative-design.co.jp",
+    senders: [
+      {
+        name: "鈴木 明美",
+        email: "suzuki@creative-design.co.jp",
+        position: "デザイン部門長"
+      }
+    ],
+    createdAt: "2025-06-02",
+    keyTechnologies: "Figma, Adobe XD, ユーザーテスト",
     registrationType: "自動（メール）",
-    registeredAt: "2025-04-25T15:50:22",
-    processes: ["監査", "改善", "テスト"],
-    interviewCount: "1",
-    manager: "佐藤 恵",
-    managerEmail: "sato@digital-access.co.jp"
-  },
-  {
-    id: "34",
-    title: "ビッグデータエンジニア",
-    skills: ["Hadoop", "Spark", "Kafka", "Hive"],
-    location: "東京",
-    budget: "70~90万円",
-    status: "選考中",
-    source: "mail",
-    company: "データテクノロジー株式会社",
-    receivedDate: "2025-04-24T13:10:00",
-    sender: "kimura@data-tech.co.jp",
-    senderName: "木村 達也",
-    createdAt: "2025-04-24",
-    keyTechnologies: "Hadoop, Spark, Kafka, Hive, ビッグデータ",
-    startDate: "2025-06-01",
-    foreignerAccepted: true,
-    freelancerAccepted: false,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-24T13:40:18",
-    processes: ["設計", "構築", "分析"],
-    interviewCount: "2",
-    manager: "高山 健一",
-    managerEmail: "takayama@data-tech.co.jp"
-  },
-  {
-    id: "35",
-    title: "Rubyオンレイルズエンジニア",
-    skills: ["Ruby", "Ruby on Rails", "PostgreSQL"],
-    location: "大阪",
-    budget: "55~75万円",
-    status: "募集中",
-    source: "mail",
-    company: "ウェブシステム株式会社",
-    receivedDate: "2025-04-23T10:30:00",
-    sender: "watanabe@websystem.co.jp",
-    senderName: "渡辺 隆",
-    createdAt: "2025-04-23",
-    keyTechnologies: "Ruby, Ruby on Rails, PostgreSQL, Hotwire",
-    startDate: "2025-06-15",
-    foreignerAccepted: false,
-    freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-23T11:00:42",
-    processes: ["設計", "実装", "テスト"],
-    interviewCount: "2",
-    manager: "吉田 健太",
-    managerEmail: "yoshida@websystem.co.jp"
-  },
-  {
-    id: "36",
-    title: "フロントエンドリーダー",
-    skills: ["React", "TypeScript", "Next.js", "Tailwind CSS"],
-    location: "東京（週2出社）",
-    budget: "80~100万円",
-    status: "募集中",
-    source: "mail",
-    company: "デジタルフロンティア株式会社",
-    receivedDate: "2025-04-22T14:20:00",
-    sender: "akiyama@digital-frontier.co.jp",
-    senderName: "秋山 直人",
-    createdAt: "2025-04-22",
-    keyTechnologies: "React, TypeScript, Next.js, Tailwind CSS, リーダーシップ",
-    startDate: "2025-06-01",
+    startDate: "2025-07-01",
     foreignerAccepted: true,
     freelancerAccepted: true,
-    registrationType: "自動（メール）",
-    registeredAt: "2025-04-22T14:55:38",
-    processes: ["設計", "実装", "コードレビュー", "マネジメント"],
-    interviewCount: "3",
-    manager: "鈴木 大輔",
-    managerEmail: "suzuki@digital-frontier.co.jp"
+    manager: "高橋 真理",
+    managerEmail: "takahashi@creative-design.co.jp",
+    experience: "3年以上",
+    workType: "週3オンサイト/週2リモート",
+    duration: "6ヶ月〜12ヶ月",
+    japanese: "ビジネス会話レベル",
+    priority: "中",
+    processes: ["要件定義", "デザイン設計", "プロトタイプ作成", "ユーザーテスト"],
+    interviewCount: "2",
+    detailDescription: `
+Webサービス・モバイルアプリのUI/UXデザインを担当するデザイナーを募集しています。
+
+【業務内容】
+- UI/UXデザイン設計
+- プロトタイプの作成
+- ユーザーテストの実施・分析
+- デザインシステムの構築
+
+【必要スキル・経験】
+- UI/UXデザインの実務経験3年以上
+- Figma, Adobe XD, Sketchいずれかの高度な使用経験
+- ユーザーテスト・分析の経験
+- フロントエンド開発者との協業経験
+
+【歓迎スキル】
+- HTML/CSSの基本的な知識
+- アニメーション・インタラクションデザインの経験
+- アクセシビリティに関する知識
+- 情報アーキテクチャの知識
+
+【勤務条件】
+- 週3日オンサイト（東京都内）、週2日リモートワーク
+- 稼働時間：140〜160時間/月
+- 単価：60〜80万円
+- 期間：6ヶ月〜12ヶ月（延長の可能性あり）
+`,
+    description: "WebサービスとモバイルアプリのUI/UXデザインを担当するデザイナーを募集しています。デザイン設計からユーザーテストまで一貫して担当できる方を求めています。"
   }
 ];
 
@@ -890,3 +683,4 @@ ECサイトのフロントエンド開発を担当するエンジニアを募集
 export const getCompanyList = () => {
   return Array.from(new Set(caseData.filter(item => item.company).map(item => item.company)));
 };
+
