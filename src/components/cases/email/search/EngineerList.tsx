@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { Engineer } from '../types';
 
 interface EngineerListProps {
@@ -16,10 +17,20 @@ export const EngineerList: React.FC<EngineerListProps> = ({
   toggleEngineerSelection,
   filteredEngineersLength
 }) => {
+  // Function to determine badge color based on status
+  const getBadgeVariant = (status: string) => {
+    if (status === "稼働可能") return "success";
+    if (status === "条件付き") return "warning";
+    if (status === "稼働中") return "info";
+    if (status === "予約済み") return "secondary";
+    return "default"; // fallback
+  };
+  
   return (
     <div className="space-y-2">
       {paginatedEngineers.map(engineer => {
         const isSelected = selectedEngineers.some(e => e.id === engineer.id);
+        const badgeVariant = getBadgeVariant(engineer.status);
         
         return (
           <div 
@@ -38,10 +49,9 @@ export const EngineerList: React.FC<EngineerListProps> = ({
                 <span className="japanese-text mr-2">経験:</span>
                 <span className="japanese-text">{engineer.experience}</span>
                 <span className="mx-2">|</span>
-                <span className={`japanese-text px-2 py-0.5 rounded-full text-xs 
-                  ${engineer.status === "稼働可能" ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
+                <Badge variant={badgeVariant} className="japanese-text text-xs font-medium">
                   {engineer.status}
-                </span>
+                </Badge>
               </div>
             </div>
             
@@ -61,4 +71,3 @@ export const EngineerList: React.FC<EngineerListProps> = ({
     </div>
   );
 };
-

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Search, UserPlus, User } from 'lucide-react';
 import { Engineer } from './types';
 
@@ -20,6 +21,15 @@ export const EngineerSelection: React.FC<EngineerSelectionProps> = ({
   applyEngineerToTemplate,
   selectedCasesLength
 }) => {
+  // Helper function to determine badge color based on status
+  const getBadgeVariant = (status: string) => {
+    if (status === "稼働可能") return "success";
+    if (status === "条件付き") return "warning";
+    if (status === "稼働中") return "info";
+    if (status === "予約済み") return "secondary";
+    return "default"; // fallback
+  };
+  
   return (
     <div className="space-y-4">
       <div className="flex flex-row justify-between items-center">
@@ -46,9 +56,16 @@ export const EngineerSelection: React.FC<EngineerSelectionProps> = ({
                 <User className="h-4 w-4 mr-2 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium japanese-text">{engineer.name}</p>
-                  <p className="text-xs text-muted-foreground japanese-text">
-                    {engineer.skills && engineer.skills.join(", ")} | {engineer.experience}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      {engineer.skills && engineer.skills.join(", ")} | {engineer.experience}
+                    </p>
+                    {engineer.status && (
+                      <Badge variant={getBadgeVariant(engineer.status)} className="text-xs">
+                        {engineer.status}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
               <Button 
