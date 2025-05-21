@@ -1,3 +1,4 @@
+
 export interface EmailTemplate {
   id: string;
   name: string;
@@ -46,15 +47,37 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
 export interface MailCase {
   id: string;
   title: string;
-  company: string;
-  registrationType: "direct" | "platform";
-  contactEmail: string;
-  techStack: string[];
+  company: string | null;
+  registrationType: "direct" | "platform" | "自動（メール）" | "手動";
+  contactEmail?: string;
+  techStack?: string[];
   status: string;
-  startDate: string;
+  startDate: string | null;
   endDate?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+  source?: string;
+  receivedDate?: string | null;
+  sender?: string | null;
+  senderName?: string | null;
+  keyTechnologies?: string;
+  skills: string[];
+  location: string;
+  budget: string;
+  foreignerAccepted: boolean;
+  freelancerAccepted: boolean;
+  desiredBudget?: string | null;
+  experience?: string;
+  workType?: string;
+  duration?: string;
+  japanese?: string;
+  priority?: string;
+  manager?: string | null;
+  managerEmail?: string | null;
+  processes?: string[];
+  interviewCount?: string;
+  detailDescription?: string | null;
+  registeredAt?: string;
 }
 
 export interface EmailSenderProps {
