@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { EngineerSearchDialog } from './email/search/EngineerSearchDialog';
 import { MailCase } from './email/types';
@@ -94,7 +95,7 @@ export function EmailSender({
         filteredEngineersLength={engineerData.filteredEngineers.length}
         engineerCompanyFilter={engineerState.engineerCompanyFilter}
         setEngineerCompanyFilter={engineerState.setEngineerCompanyFilter}
-        showCompanyType={isOtherCompanyMode} // 他社モードの場合のみ会社區分を表示
+        showCompanyType={isOtherCompanyMode}
       />
     </>
   );

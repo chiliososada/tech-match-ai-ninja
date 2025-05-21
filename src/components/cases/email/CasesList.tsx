@@ -10,7 +10,7 @@ import { useSenderMapper } from './components/SenderMapper';
 interface CasesListProps {
   paginatedCases: MailCase[];
   selectedCases: MailCase[]; 
-  handleSelectCase: (id: string, rowId: string) => void; // Update to include rowId
+  handleSelectCase: (id: string, rowId: string) => void; // Updated to include rowId
   selectAll: boolean;
   handleSelectAll: () => void;
   currentPage: number;
@@ -42,7 +42,7 @@ export const CasesList: React.FC<CasesListProps> = ({
   console.log('CasesList rendering with showCompanyInfo:', showCompanyInfo);
   console.log('Number of cases to display:', paginatedCases.length);
   console.log('Current page:', currentPage, 'Total pages:', totalPages);
-  console.log('Selected cases:', selectedCases.map(c => c.id));
+  console.log('Selected cases:', selectedCases.map(c => ({ id: c.id, rowId: c.selectedRowId })));
 
   // Use the custom hook to get flattened senders
   const { flattenedSenders } = useSenderMapper({ paginatedCases });
