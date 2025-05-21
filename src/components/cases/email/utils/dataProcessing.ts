@@ -36,9 +36,13 @@ export const processCaseData = (
   const companyList = Array.from(
     new Set(
       cases
-        .map(item => item.company)
+        .map(item => item.company || "未分類会社")  // Always provide a default company name
         // Filter out null, undefined or empty companies
-        .filter(company => company !== null && company !== undefined && company !== '')
+        .filter(company => 
+          company !== null && 
+          company !== undefined && 
+          company !== ''
+        )
     )
   );
   

@@ -48,7 +48,7 @@ ${caseItem.id.includes('2') ? '- チームリーダーとしてのタスク管�
 開発環境：${caseItem.skills[0]}、${caseItem.skills.length > 1 ? caseItem.skills[1] : 'JavaScript'}
 ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）' : '原則常駐（リモート応相談）'}`;
 
-      // Make sure company is not empty or undefined - use a default if necessary
+      // Always ensure we have a valid company name
       const safeCompany = caseItem.company || "未分類会社";
 
       // Add multiple senders to some cases based on their ID to ensure consistency
@@ -120,7 +120,10 @@ ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）
     console.log("- Limited mailCases count:", enhancedMailCases.length);
     console.log("- Current page:", emailState.currentPage);
     console.log("- Total pages:", caseData.totalPages);
-  }, [isOtherCompanyMode, mailCases.length, enhancedMailCases.length, emailState.currentPage, caseData.totalPages]);
+    
+    // Debug company list
+    console.log("- Company list:", caseData.companyList);
+  }, [isOtherCompanyMode, mailCases.length, enhancedMailCases.length, emailState.currentPage, caseData.totalPages, caseData.companyList]);
 
   return (
     <EmailSender 
