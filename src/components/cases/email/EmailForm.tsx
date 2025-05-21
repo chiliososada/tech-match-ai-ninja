@@ -45,6 +45,9 @@ export function EmailForm({
   selectedCasesCount,
   hideOptimizationSection = false
 }: EmailFormProps) {
+  // Ensure selectedTemplate is never undefined or null
+  const safeSelectedTemplate = selectedTemplate || "";
+  
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow duration-300 border-primary/10 overflow-hidden">
       <div className="bg-gradient-to-r from-custom-blue-600/80 to-custom-blue-400/70 h-1"></div>
@@ -66,14 +69,14 @@ export function EmailForm({
               <div className="flex justify-between items-center">
                 <Label htmlFor="email-template" className="japanese-text">テンプレート選択</Label>
               </div>
-              <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+              <Select value={safeSelectedTemplate} onValueChange={handleTemplateChange}>
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="テンプレートを選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">テンプレートなし</SelectItem>
+                  <SelectItem value="no-template">テンプレートなし</SelectItem>
                   {emailTemplates.map(template => (
-                    <SelectItem key={template.id} value={template.id}>
+                    <SelectItem key={template.id} value={template.id || `template-${template.id}`}>
                       {template.name}
                     </SelectItem>
                   ))}

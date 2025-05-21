@@ -1,27 +1,54 @@
 
-import { useState } from 'react';
-import { MailCase, EMAIL_TEMPLATES } from '../types';
+import { useState, useEffect, useCallback } from 'react';
+import { MailCase } from '../types';
 
 export const useEmailState = (mailCases: MailCase[]) => {
-  // Limit data to 14 entries for email functionality
-  const limitedMailCases = mailCases.slice(0, 14);
-
-  // Select/filter state
   const [selectAll, setSelectAll] = useState(false);
   const [selectedCases, setSelectedCases] = useState<MailCase[]>([]);
-  const [companyFilter, setCompanyFilter] = useState("all");
-  const [techFilter, setTechFilter] = useState("");
+  const [companyFilter, setCompanyFilter] = useState('all');
+  const [techFilter, setTechFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTemplate, setSelectedTemplate] = useState('default'); // Changed from empty string to 'default'
+  const [subject, setSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [signature, setSignature] = useState(`
 
-  // Email composition state
-  const [selectedTemplate, setSelectedTemplate] = useState(EMAIL_TEMPLATES[0].id);
-  const [subject, setSubject] = useState(EMAIL_TEMPLATES[0].subject);
-  const [emailBody, setEmailBody] = useState(EMAIL_TEMPLATES[0].body);
+--
+テックリクルーターAI
+担当：AI採用部
+Tel: 03-1234-5678
+Email: contact@techrecruiter.ai
+`);
   const [sending, setSending] = useState(false);
-  const [signature, setSignature] = useState("山田 太郎\n株式会社テックサーチ\nTel: 03-0000-0000\nEmail: yamada@techsearch.co.jp");
+  
+  // For demonstration, we'll limit the number of cases displayed
+  const [limitedMailCases, setLimitedMailCases] = useState<MailCase[] | null>(null);
+
+  // Effect to initialize limited data for demonstration
+  useEffect(() => {
+    if (mailCases.length > 0) {
+      setLimitedMailCases(mailCases.slice(0, 14));
+    }
+  }, [mailCases]);
+
+  // Effect to reset current page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [companyFilter, techFilter]);
+
+  // Effect to deselect all when changing pages or filters
+  useEffect(() => {
+    setSelectAll(false);
+  }, [currentPage, companyFilter, techFilter]);
+
+  // Handle unselect case with specific rowId
+  const handleUnselectCase = useCallback((caseId: string, rowId: string) => {
+    setSelectedCases(prevSelected => 
+      prevSelected.filter(c => !(c.id === caseId && c.selectedRowId === rowId))
+    );
+  }, []);
 
   return {
-    limitedMailCases,
     selectAll,
     setSelectAll,
     selectedCases,
@@ -41,6 +68,8 @@ export const useEmailState = (mailCases: MailCase[]) => {
     sending,
     setSending,
     signature,
-    setSignature
+    setSignature,
+    limitedMailCases,
+    handleUnselectCase
   };
 };
