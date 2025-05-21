@@ -5,10 +5,10 @@ import { Badge } from '@/components/ui/badge';
 export const StatusLegend: React.FC = () => {
   // Define status types with their Japanese names and badge variants
   const statusTypes = [
-    { name: '稼働可能', variant: 'success' },
-    { name: '条件付き', variant: 'warning' },
-    { name: '稼働中', variant: 'info' },
-    { name: '予約済み', variant: 'secondary' },
+    { name: '稼働可能', variant: 'success', description: '稼働可能なエンジニア' },
+    { name: '条件付き', variant: 'warning', description: '条件付きで稼働可能' },
+    { name: '稼働中', variant: 'info', description: '現在稼働中' },
+    { name: '予約済み', variant: 'secondary', description: '予約済みのエンジニア' },
   ];
 
   return (
@@ -23,6 +23,9 @@ export const StatusLegend: React.FC = () => {
             >
               {status.name}
             </Badge>
+            <span className="text-xs text-muted-foreground japanese-text hidden sm:inline">
+              {status.description}
+            </span>
           </div>
         ))}
       </div>
