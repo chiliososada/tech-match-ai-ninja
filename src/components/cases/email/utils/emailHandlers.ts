@@ -1,4 +1,3 @@
-
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
 import { toast } from 'sonner';
 
@@ -128,18 +127,14 @@ export const handleTemplateChange = (
 ) => {
   setSelectedTemplate(templateId);
   
-  // テンプレートに応じた件名と本文を設定
+  // Get the selected template from the EMAIL_TEMPLATES array
   const template = EMAIL_TEMPLATES.find(t => t.id === templateId);
   
   if (template) {
     console.log("Applying template:", template.name);
-    
-    // 状態更新を確実にするために少し長めの遅延を設定
-    setTimeout(() => {
-      setSubject(template.subject || "");
-      setEmailBody(template.body || "");
-      console.log("Template applied:", template.subject, template.body);
-    }, 50);
+    setSubject(template.subject || "");
+    setEmailBody(template.body || "");
+    console.log("Template applied with subject:", template.subject, "and body:", template.body);
   } else {
     console.log("Template not found for ID:", templateId);
   }

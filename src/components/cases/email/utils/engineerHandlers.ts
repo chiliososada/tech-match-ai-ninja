@@ -50,22 +50,23 @@ export const applyEngineerToTemplate = (
   setEmailBody: (body: string) => void
 ) => {
   if (selectedEngineers.length === 0 || selectedCases.length === 0) {
+    console.log("Cannot apply engineers - no engineers or cases selected");
+    toast.error("技術者または案件が選択されていません");
     return;
   }
   
-  // 最初に選択された技術者の情報を取得
-  const engineer = selectedEngineers[0];
-  
-  // 最初に選択された案件の情報を取得
+  // Get the first selected case
   const caseData = selectedCases[0];
+  console.log("Using case for template:", caseData);
   
-  // テンプレート1を選択
+  // Set template1 as default
   setSelectedTemplate("template1");
   
-  // テンプレート内の変数を置き換え
-  setSubject(`【案件紹介】${caseData.title}のご提案`);
+  // Build the subject line
+  const subject = `【案件紹介】${caseData.title}のご提案`;
+  setSubject(subject);
   
-  // メール本文内のプレースホルダーを置き換え
+  // Start with the base email body
   let emailBody = `お世話になっております。
 株式会社テックマッチングの田中です。
 
@@ -77,13 +78,24 @@ export const applyEngineerToTemplate = (
 ・スキル要件：${caseData.skills?.join(', ') || '{スキル}'}
 ・単価：${caseData.budget || '{単価}'}
 
-【技術者情報】
+`;
+
+  // Add information about all selected engineers
+  if (selectedEngineers.length > 0) {
+    // Add information for each selected engineer
+    selectedEngineers.forEach((engineer, index) => {
+      emailBody += `【技術者情報 ${index + 1}】
 ・氏名：${engineer.name || '{技術者名}'}
 ・スキル：${engineer.skills?.join(', ') || '{技術者スキル}'}
 ・経験年数：${engineer.experience || '{経験年数}'}
 ・稼働開始可能日：即日
 
-詳細な経歴書を添付しておりますので、ご確認いただければ幸いです。
+`;
+    });
+  }
+
+  // Add closing text
+  emailBody += `詳細な経歴書を添付しておりますので、ご確認いただければ幸いです。
 ご興味をお持ちいただけましたら、面談のセッティングをさせていただきます。
 
 ご検討のほど、よろしくお願いいたします。
@@ -94,4 +106,6 @@ TEL: 03-XXXX-XXXX
 Email: tanaka@techmatch.co.jp`;
 
   setEmailBody(emailBody);
+  console.log("Applied engineers to template, email body updated");
+  toast.success("技術者情報をメール本文に反映しました");
 };

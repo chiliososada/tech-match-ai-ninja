@@ -69,12 +69,15 @@ export const useEmailHandlerBindings = ({
     emailState.setSelectAll
   );
 
-  const templateHandleChange = (templateId: string) => handleTemplateChange(
-    templateId,
-    emailState.setSelectedTemplate,
-    emailState.setSubject,
-    emailState.setEmailBody
-  );
+  const templateHandleChange = (templateId: string) => {
+    console.log("Template change requested for ID:", templateId);
+    handleTemplateChange(
+      templateId,
+      emailState.setSelectedTemplate,
+      emailState.setSubject,
+      emailState.setEmailBody
+    );
+  };
 
   const emailHandleEnhance = () => handleEnhanceEmail(
     emailState.emailBody,
@@ -116,13 +119,16 @@ export const useEmailHandlerBindings = ({
     engineerState.setSelectedEngineers
   );
 
-  const engineerHandleApply = () => applyEngineerToTemplate(
-    engineerState.selectedEngineers,
-    emailState.selectedCases,
-    emailState.setSelectedTemplate,
-    emailState.setSubject,
-    emailState.setEmailBody
-  );
+  const engineerHandleApply = () => {
+    console.log("Applying engineers to template:", engineerState.selectedEngineers.length, "engineers");
+    applyEngineerToTemplate(
+      engineerState.selectedEngineers,
+      emailState.selectedCases,
+      emailState.setSelectedTemplate,
+      emailState.setSubject,
+      emailState.setEmailBody
+    );
+  };
 
   // Updated to handle unselecting a specific row using rowId
   const handleUnselectCase = (caseId: string, rowId: string) => {

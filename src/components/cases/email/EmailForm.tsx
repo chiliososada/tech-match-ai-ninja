@@ -43,19 +43,30 @@ export const EmailForm: React.FC<EmailFormProps> = ({
   selectedCasesCount,
   hideOptimizationSection = false
 }) => {
+  // Use effect to log template selection for debugging
+  React.useEffect(() => {
+    console.log("Current selected template:", selectedTemplate);
+  }, [selectedTemplate]);
+
   return (
     <>
       <Card className="p-4 shadow-sm">
         <div className="space-y-4">
           <div>
             <Label htmlFor="template" className="japanese-text">メールテンプレート</Label>
-            <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+            <Select 
+              value={selectedTemplate} 
+              onValueChange={(value) => {
+                console.log("Template selected:", value);
+                handleTemplateChange(value);
+              }}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="テンプレートを選択" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(emailTemplates).map(([id, template]) => (
-                  <SelectItem key={id} value={id}>
+                {emailTemplates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
                     {template.name}
                   </SelectItem>
                 ))}
@@ -134,4 +145,3 @@ export const EmailForm: React.FC<EmailFormProps> = ({
     </>
   );
 };
-
