@@ -1,81 +1,107 @@
 
-import { MailCase, Engineer, SAMPLE_ENGINEERS } from '../types';
+import { MailCase } from '../types';
 
+/**
+ * Processes case data for display
+ */
 export const processCaseData = (
-  mailCases: MailCase[],
+  cases: MailCase[],
   companyFilter: string,
   techFilter: string,
-  currentPage: number,
+  page: number,
   itemsPerPage: number
 ) => {
-  // 会社のリストを取得
-  const companyList = Array.from(new Set(mailCases.filter(item => item.company).map(item => item.company)));
+  // Start with all cases
+  let filteredCases = [...cases];
   
-  // フィルタリングされた案件を取得
-  const filteredCases = mailCases.filter(item => {
-    const matchesCompany = companyFilter === "all" || item.company === companyFilter;
-    const matchesTech = techFilter === "" || 
-                       (item.keyTechnologies && item.keyTechnologies.toLowerCase().includes(techFilter.toLowerCase()));
-    return matchesCompany && matchesTech;
-  });
+  // Filter by company if not "all"
+  if (companyFilter && companyFilter !== "all") {
+    filteredCases = filteredCases.filter(caseItem => 
+      caseItem.company && caseItem.company.toLowerCase() === companyFilter.toLowerCase()
+    );
+  }
   
-  // ページネーションで表示するケース
-  const paginatedCases = filteredCases.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  // Filter by tech keywords
+  if (techFilter && techFilter.trim() !== "") {
+    const keywords = techFilter.toLowerCase().split(/\s+/);
+    filteredCases = filteredCases.filter(caseItem => 
+      keywords.some(keyword => 
+        (caseItem.skills && caseItem.skills.some(skill => skill.toLowerCase().includes(keyword))) ||
+        (caseItem.title && caseItem.title.toLowerCase().includes(keyword))
+      )
+    );
+  }
+  
+  // Get a unique list of companies
+  const companyList = Array.from(
+    new Set(
+      cases
+        .map(item => item.company)
+        // Filter out null, undefined or empty companies
+        .filter(company => company !== null && company !== undefined && company.trim() !== "")
+    )
   );
   
-  const totalPages = Math.ceil(filteredCases.length / itemsPerPage) || 1; // Ensure at least 1 page
-
-  // Add debug logs
-  console.log(`Processing case data:
-    - Total cases: ${mailCases.length}
-    - Filtered cases: ${filteredCases.length}
-    - Current page: ${currentPage}
-    - Items per page: ${itemsPerPage}
-    - Paginated cases: ${paginatedCases.length}
-    - Total pages: ${totalPages}
-  `);
-
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
+  const startIndex = (page - 1) * itemsPerPage;
+  const paginatedCases = filteredCases.slice(startIndex, startIndex + itemsPerPage);
+  
   return {
-    companyList,
-    filteredCases,
     paginatedCases,
-    totalPages
+    totalPages,
+    companyList
   };
 };
 
+/**
+ * Processes engineer data for display
+ */
 export const processEngineerData = (
   engineerFilter: string,
   engineerCompanyFilter: string,
-  engineerCurrentPage: number,
-  engineerItemsPerPage: number
+  currentPage: number,
+  itemsPerPage: number
 ) => {
-  // エンジニアのフィルタリング
-  const filteredEngineers = SAMPLE_ENGINEERS.filter(engineer => {
-    const searchTerm = engineerFilter.toLowerCase();
-    const matchesCompanyType = engineerCompanyFilter === "all" || 
-                              (engineerCompanyFilter === "own" && engineer.companyType === '自社') || 
-                              (engineerCompanyFilter === "other" && engineer.companyType === '他社');
-    
-    return (
-      (engineer.name.toLowerCase().includes(searchTerm) ||
-       engineer.skills.some(skill => skill.toLowerCase().includes(searchTerm))) &&
-      matchesCompanyType
+  // Mock data for engineers
+  const mockEngineers = Array(20).fill(null).map((_, index) => ({
+    id: `eng-${index + 1}`,
+    name: `エンジニア${index + 1}`,
+    skills: [`JavaScript`, `React`, `Node.js`].map(skill => `${skill}${index % 3}`),
+    company: index % 2 === 0 ? '自社' : '他社',
+    experience: `${3 + index % 5}年`,
+    avatar: `/avatar-${(index % 5) + 1}.png`,
+    email: `engineer${index + 1}@example.com`
+  }));
+  
+  // Filter engineers based on criteria
+  let filteredEngineers = [...mockEngineers];
+  
+  if (engineerFilter && engineerFilter.trim() !== "") {
+    const keywords = engineerFilter.toLowerCase().split(/\s+/);
+    filteredEngineers = filteredEngineers.filter(engineer => 
+      keywords.some(keyword => 
+        engineer.name.toLowerCase().includes(keyword) ||
+        engineer.skills.some(skill => skill.toLowerCase().includes(keyword))
+      )
     );
-  });
-
-  // エンジニアのページネーション
-  const paginatedEngineers = filteredEngineers.slice(
-    (engineerCurrentPage - 1) * engineerItemsPerPage,
-    engineerCurrentPage * engineerItemsPerPage
-  );
-
-  const totalEngineerPages = Math.ceil(filteredEngineers.length / engineerItemsPerPage) || 1; // Ensure at least 1 page
-
+  }
+  
+  // Filter by company type if not "all"
+  if (engineerCompanyFilter && engineerCompanyFilter !== "all") {
+    filteredEngineers = filteredEngineers.filter(engineer => 
+      engineer.company.toLowerCase() === engineerCompanyFilter.toLowerCase()
+    );
+  }
+  
+  // Calculate pagination
+  const totalEngineerPages = Math.ceil(filteredEngineers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEngineers = filteredEngineers.slice(startIndex, startIndex + itemsPerPage);
+  
   return {
-    filteredEngineers,
     paginatedEngineers,
-    totalEngineerPages
+    totalEngineerPages,
+    filteredEngineers
   };
 };

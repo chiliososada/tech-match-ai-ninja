@@ -71,9 +71,9 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
   const [selectedCase, setSelectedCase] = React.useState<MailCase | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = React.useState(false);
   
-  // Filter company list based on search term and ensure no null or empty string values
+  // Filter company list based on search term with more thorough validation
   const filteredCompanyList = React.useMemo(() => {
-    // First filter out null, empty strings, or non-string values
+    // First filter out null, empty strings, and non-string values
     const validCompanies = caseData.companyList.filter(company => 
       company !== null && 
       company !== "" && 

@@ -20,7 +20,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 }) => {
   // Filter out null or empty string values from companyList and ensure they're unique
   const validCompanyList = React.useMemo(() => {
-    // Filter out nulls and empty strings
+    // Filter out nulls, empty strings, and ensure they are strings
     const filtered = companyList.filter(company => 
       company !== null && 
       company !== "" && 
@@ -39,7 +39,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </SelectTrigger>
         <SelectContent className="max-h-[300px] overflow-y-auto">
           <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-          {validCompanyList.map((company, index) => (
+          {validCompanyList.length > 0 && validCompanyList.map((company, index) => (
             <SelectItem key={`${company}-${index}`} value={company} className="japanese-text">
               {company}
             </SelectItem>
