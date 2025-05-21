@@ -25,7 +25,17 @@ export const processCaseData = (
     currentPage * itemsPerPage
   );
   
-  const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredCases.length / itemsPerPage) || 1; // Ensure at least 1 page
+
+  // Add debug logs
+  console.log(`Processing case data:
+    - Total cases: ${mailCases.length}
+    - Filtered cases: ${filteredCases.length}
+    - Current page: ${currentPage}
+    - Items per page: ${itemsPerPage}
+    - Paginated cases: ${paginatedCases.length}
+    - Total pages: ${totalPages}
+  `);
 
   return {
     companyList,
@@ -61,7 +71,7 @@ export const processEngineerData = (
     engineerCurrentPage * engineerItemsPerPage
   );
 
-  const totalEngineerPages = Math.ceil(filteredEngineers.length / engineerItemsPerPage);
+  const totalEngineerPages = Math.ceil(filteredEngineers.length / engineerItemsPerPage) || 1; // Ensure at least 1 page
 
   return {
     filteredEngineers,

@@ -38,21 +38,16 @@ export const CasesList: React.FC<CasesListProps> = ({
   totalPages,
   showCompanyInfo = false
 }) => {
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  // Function to handle page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0); // Scroll to top when changing pages
   };
 
   // Add logging to help debug
   console.log('CasesList rendering with showCompanyInfo:', showCompanyInfo);
   console.log('Number of cases to display:', paginatedCases.length);
+  console.log('Current page:', currentPage, 'Total pages:', totalPages);
 
   return (
     <div className="space-y-4">
@@ -119,13 +114,13 @@ export const CasesList: React.FC<CasesListProps> = ({
         </TableBody>
       </Table>
       
-      {/* Pagination */}
+      {/* Enhanced pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-6">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)}
+            onPageChange={handlePageChange}
           />
         </div>
       )}

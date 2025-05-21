@@ -15,14 +15,14 @@ import { processCaseData, processEngineerData } from './email/utils/dataProcessi
 export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
   const location = useLocation();
   const isOtherCompanyMode = location.pathname.includes('/company/other');
-  const itemsPerPage = 10;
-  const engineerItemsPerPage = 6;
+  const itemsPerPage = 10; // Number of cases per page
+  const engineerItemsPerPage = 6; // Number of engineers per page
   
   // Use custom hooks for state management
   const emailState = useEmailState(mailCases);
   const engineerState = useEngineerState();
   
-  // Process data
+  // Process data with improved pagination
   const caseData = processCaseData(
     mailCases,
     emailState.companyFilter,
@@ -31,13 +31,22 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
     itemsPerPage
   );
 
-  // 使用正确的参数调用 processEngineerData
+  // Process engineer data with improved pagination
   const engineerData = processEngineerData(
     engineerState.engineerFilter,
     engineerState.engineerCompanyFilter,
     engineerState.engineerCurrentPage,
     engineerItemsPerPage
   );
+
+  // Add debug logs for better troubleshooting
+  React.useEffect(() => {
+    console.log("EmailSenderContainer rendered:");
+    console.log("- isOtherCompanyMode:", isOtherCompanyMode);
+    console.log("- mailCases count:", mailCases.length);
+    console.log("- Current page:", emailState.currentPage);
+    console.log("- Total pages:", caseData.totalPages);
+  }, [isOtherCompanyMode, mailCases.length, emailState.currentPage, caseData.totalPages]);
 
   return (
     <EmailSender 
