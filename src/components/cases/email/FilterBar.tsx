@@ -23,6 +23,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     // Filter out nulls, empty strings, and ensure they are strings
     const filtered = companyList.filter(company => 
       company !== null && 
+      company !== undefined && 
       company !== "" && 
       typeof company === 'string'
     );
@@ -40,7 +41,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <SelectContent className="max-h-[300px] overflow-y-auto">
           <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
           {validCompanyList.length > 0 && validCompanyList.map((company, index) => (
-            <SelectItem key={`${company}-${index}`} value={company} className="japanese-text">
+            <SelectItem key={`${company}-${index}`} value={company || `company-${index}`} className="japanese-text">
               {company}
             </SelectItem>
           ))}

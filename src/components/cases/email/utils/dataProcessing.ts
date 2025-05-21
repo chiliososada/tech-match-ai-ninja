@@ -32,13 +32,13 @@ export const processCaseData = (
     );
   }
   
-  // Get a unique list of companies
+  // Get a unique list of companies - ensure non-empty values
   const companyList = Array.from(
     new Set(
       cases
         .map(item => item.company)
         // Filter out null, undefined or empty companies
-        .filter(company => company !== null && company !== undefined && company.trim() !== "")
+        .filter(company => company !== null && company !== undefined && company !== '')
     )
   );
   

@@ -76,6 +76,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
     // First filter out null, empty strings, and non-string values
     const validCompanies = caseData.companyList.filter(company => 
       company !== null && 
+      company !== undefined &&
       company !== "" && 
       typeof company === 'string'
     );
