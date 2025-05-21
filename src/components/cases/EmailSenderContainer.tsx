@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -21,13 +22,33 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
   const emailState = useEmailState(mailCases);
   const engineerState = useEngineerState();
   
-  // Add multiple senders to some cases for demonstration
+  // Add multiple senders to some cases for demonstration and add detail descriptions
   const enhancedMailCases = React.useMemo(() => {
     return mailCases.map(caseItem => {
+      // Generate a detailed description based on case ID to ensure consistency
+      const detailDescription = `【案件概要】
+${caseItem.title}は、${caseItem.location}での${caseItem.skills.join('、')}を活用した案件です。
+
+【業務内容】
+- ${caseItem.skills[0]}を使用したアプリケーション開発
+- 既存システムの保守・運用
+- 技術設計書の作成
+${caseItem.id.includes('2') ? '- チームリーダーとしてのタスク管理' : '- 開発チームとの連携'}
+
+【求めるスキル】
+- ${caseItem.skills.join('の経験\n- ')}の経験
+- チームでの開発経験
+- コミュニケーション能力
+
+【環境】
+開発環境：${caseItem.skills[0]}、${caseItem.skills.length > 1 ? caseItem.skills[1] : 'JavaScript'}
+${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）' : '原則常駐（リモート応相談）'}`;
+
       // Add multiple senders to some cases based on their ID to ensure consistency
       if (caseItem.id.includes('1') || caseItem.id.includes('3') || caseItem.id.includes('5')) {
         return {
           ...caseItem,
+          detailDescription,
           senders: [
             {
               name: caseItem.sender || '山田 太郎',
@@ -46,6 +67,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
       else if (caseItem.sender) {
         return {
           ...caseItem,
+          detailDescription,
           senders: [
             {
               name: caseItem.sender,
@@ -54,7 +76,10 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
           ]
         };
       }
-      return caseItem;
+      return {
+        ...caseItem,
+        detailDescription
+      };
     });
   }, [mailCases]);
   

@@ -81,6 +81,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
 
   // Handle viewing a case
   const handleViewCase = (caseItem: MailCase) => {
+    console.log("Viewing case details:", caseItem);
     setSelectedCase(caseItem);
     setIsDetailDialogOpen(true);
   };

@@ -25,6 +25,8 @@ export const CaseViewDialog: React.FC<CaseViewDialogProps> = ({
 }) => {
   if (!caseItem) return null;
 
+  console.log("Showing case detail dialog with data:", caseItem);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -96,7 +98,7 @@ export const CaseViewDialog: React.FC<CaseViewDialogProps> = ({
             </div>
           </div>
 
-          {/* Add case detail description section */}
+          {/* Case detail description section */}
           {caseItem.detailDescription && (
             <div>
               <div className="font-medium mb-1 japanese-text">案件詳細</div>
