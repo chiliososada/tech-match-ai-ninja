@@ -15,17 +15,20 @@ import { processCaseData, processEngineerData } from './email/utils/dataProcessi
 export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
   const location = useLocation();
   const isOtherCompanyMode = location.pathname.includes('/company/other');
-  const itemsPerPage = 5; // Changed from 10 to 5 to show pagination effect more easily
+  const itemsPerPage = 5; // Changed from 10 to 5 to show fewer items per page
   const engineerItemsPerPage = 6; // Number of engineers per page
   
   // Use custom hooks for state management
   const emailState = useEmailState(mailCases);
   const engineerState = useEngineerState();
   
+  // Use only the limited set of mail cases
+  const limitedData = emailState.limitedMailCases || mailCases.slice(0, 14);
+  
   // Add multiple senders to some cases for demonstration and add detail descriptions
   const enhancedMailCases = React.useMemo(() => {
     // Process the mail cases to organize by company and sender
-    const processedCases = mailCases.map(caseItem => {
+    const processedCases = limitedData.map(caseItem => {
       // Generate a detailed description based on case ID to ensure consistency
       const detailDescription = `【案件概要】
 ${caseItem.title}は、${caseItem.location}での${caseItem.skills.join('、')}を活用した案件です。
@@ -84,7 +87,7 @@ ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）
     });
 
     return processedCases;
-  }, [mailCases]);
+  }, [limitedData]);
   
   // Process data with improved pagination
   const caseData = processCaseData(
@@ -107,10 +110,11 @@ ${caseItem.id.includes('3') ? 'リモートワーク可（週3日程度出社）
   React.useEffect(() => {
     console.log("EmailSenderContainer rendered:");
     console.log("- isOtherCompanyMode:", isOtherCompanyMode);
-    console.log("- mailCases count:", mailCases.length);
+    console.log("- Total mailCases count:", mailCases.length);
+    console.log("- Limited mailCases count:", enhancedMailCases.length);
     console.log("- Current page:", emailState.currentPage);
     console.log("- Total pages:", caseData.totalPages);
-  }, [isOtherCompanyMode, mailCases.length, emailState.currentPage, caseData.totalPages]);
+  }, [isOtherCompanyMode, mailCases.length, enhancedMailCases.length, emailState.currentPage, caseData.totalPages]);
 
   return (
     <EmailSender 

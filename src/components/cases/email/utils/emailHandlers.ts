@@ -2,7 +2,7 @@
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
 import { toast } from 'sonner';
 
-// 案件一覧の全選択処理
+// 案件一覧の全選択処理 - Fixed to work with the flattened sender rows
 export const handleSelectAll = (
   paginatedCases: MailCase[],
   selectAll: boolean,
@@ -13,7 +13,39 @@ export const handleSelectAll = (
   setSelectAll(newSelectAll);
   
   if (newSelectAll) {
-    setSelectedCases(paginatedCases);
+    // Create proper selected cases with rowId from all visible cases
+    // This ensures each visible row gets selected, not just one row per case
+    const selectedCasesWithRowIds = paginatedCases.reduce((acc: MailCase[], caseItem: MailCase) => {
+      // If the case has senders array
+      if (caseItem.senders && caseItem.senders.length > 0) {
+        // Create a selected case object for each sender
+        return [...acc, ...caseItem.senders.map((sender, index) => {
+          const rowId = `${caseItem.id}-${sender.email}-${index}`;
+          return {
+            ...caseItem,
+            selectedRowId: rowId
+          };
+        })];
+      } 
+      // For cases without senders array but with sender property
+      else if (caseItem.sender) {
+        const rowId = `${caseItem.id}-${caseItem.senderEmail || 'default'}-0`;
+        return [...acc, {
+          ...caseItem,
+          selectedRowId: rowId
+        }];
+      }
+      // For cases without any sender info
+      else {
+        return [...acc, {
+          ...caseItem,
+          selectedRowId: `${caseItem.id}-default-0`
+        }];
+      }
+    }, []);
+    
+    console.log('Selected all cases with rowIds:', selectedCasesWithRowIds);
+    setSelectedCases(selectedCasesWithRowIds);
   } else {
     setSelectedCases([]);
   }

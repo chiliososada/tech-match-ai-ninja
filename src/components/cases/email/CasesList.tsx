@@ -38,14 +38,15 @@ export const CasesList: React.FC<CasesListProps> = ({
     window.scrollTo(0, 0); // Scroll to top when changing pages
   };
 
+  // Use the custom hook to get flattened senders
+  const { flattenedSenders } = useSenderMapper({ paginatedCases });
+
   // Add logging to help debug
   console.log('CasesList rendering with showCompanyInfo:', showCompanyInfo);
   console.log('Number of cases to display:', paginatedCases.length);
   console.log('Current page:', currentPage, 'Total pages:', totalPages);
   console.log('Selected cases:', selectedCases.map(c => ({ id: c.id, rowId: c.selectedRowId })));
-
-  // Use the custom hook to get flattened senders
-  const { flattenedSenders } = useSenderMapper({ paginatedCases });
+  console.log('Flattened senders:', flattenedSenders);
 
   return (
     <div className="space-y-4">
