@@ -12,7 +12,7 @@ interface CandidateItem {
   id: number;
   name: string;
   skills: string;
-  companyType?: string; // Add companyType field
+  companyType?: string; 
 }
 
 interface CandidateSelectionDialogProps {
@@ -20,16 +20,19 @@ interface CandidateSelectionDialogProps {
 }
 
 export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogProps) {
-  // Add state for company type filter
   const [companyTypeFilter, setCompanyTypeFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   
-  // Dummy data for existing candidates with company type
+  // Expanded dummy data for candidates from both company types
   const existingCandidates = [
     { id: 1, name: '鈴木太郎', skills: 'Java, Spring, AWS', companyType: '自社' },
     { id: 2, name: '田中花子', skills: 'React, TypeScript, Node.js', companyType: '他社' },
     { id: 3, name: '佐藤一郎', skills: 'AWS, Docker, Kubernetes', companyType: '自社' },
-    { id: 4, name: '山田健太', skills: 'Python, Django, MySQL', companyType: '他社' }
+    { id: 4, name: '山田健太', skills: 'Python, Django, MySQL', companyType: '他社' },
+    { id: 5, name: '伊藤誠', skills: 'iOS, Android, Flutter', companyType: '自社' },
+    { id: 6, name: '高橋直樹', skills: 'Python, 機械学習, データ分析', companyType: '他社' },
+    { id: 7, name: '中村美咲', skills: 'Ruby, Rails, PostgreSQL', companyType: '自社' },
+    { id: 8, name: '小林隆', skills: 'PHP, Laravel, MySQL', companyType: '他社' }
   ];
   
   // Filter candidates based on company type and search query
@@ -52,7 +55,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full mb-6 japanese-text">
+        <Button variant="outline" className="w-full japanese-text">
           <Users className="mr-2 h-4 w-4" />
           既存人材から選択
         </Button>

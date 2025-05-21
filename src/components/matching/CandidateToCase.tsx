@@ -8,11 +8,9 @@ import { Button } from '@/components/ui/button';
 import { CandidateSelectionDialog } from './CandidateSelectionDialog';
 import { MatchingResultsCard } from './MatchingResultsCard';
 import { MatchingProgressCard } from './MatchingProgressCard';
-import { CandidateTextInput } from './CandidateTextInput';
 import { toast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { Loader } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface CandidateItem {
   id: number;
@@ -62,22 +60,6 @@ export function CandidateToCase() {
     toast({
       title: "候補者を選択しました",
       description: `${candidate.name}が選択されました`,
-    });
-  };
-
-  // Handle structured data from text input
-  const handleStructuredData = (data: any) => {
-    // Update form with extracted data
-    candidateForm.setValue('skills', data.skills);
-    candidateForm.setValue('experience', data.experience);
-    candidateForm.setValue('preferredRate', data.rate);
-    candidateForm.setValue('preferredLocation', data.location);
-    candidateForm.setValue('workType', data.workType);
-    candidateForm.setValue('availability', data.availability);
-    
-    toast({
-      title: "データを抽出しました",
-      description: "候補者情報からデータを抽出してフォームに適用しました",
     });
   };
 
@@ -164,25 +146,34 @@ export function CandidateToCase() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-2 mb-6">
+            {/* Show only the candidate selection dialog */}
+            <div className="mb-4">
               <CandidateSelectionDialog onSelect={handleCandidateSelect} />
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full japanese-text">
-                    候補者テキスト検索
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
-                  <DialogHeader>
-                    <DialogTitle className="japanese-text">候補者テキスト検索</DialogTitle>
-                    <DialogDescription className="japanese-text">
-                      候補者のテキスト情報を入力して構造化データに変換します。
-                    </DialogDescription>
-                  </DialogHeader>
-                  <CandidateTextInput onStructuredData={handleStructuredData} />
-                </DialogContent>
-              </Dialog>
             </div>
+
+            {/* Display selected candidate info */}
+            {selectedCandidate && (
+              <Card className="mb-4 bg-muted/50">
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-sm font-medium japanese-text">氏名:</p>
+                        <p className="japanese-text">{selectedCandidate.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium japanese-text">所属:</p>
+                        <p className="japanese-text">{selectedCandidate.companyType || '自社'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium japanese-text">スキル:</p>
+                      <p className="japanese-text">{selectedCandidate.skills}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <Form {...candidateForm}>
               <form onSubmit={candidateForm.handleSubmit(startMatching)} className="space-y-6">
