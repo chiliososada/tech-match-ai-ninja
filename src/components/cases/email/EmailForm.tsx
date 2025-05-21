@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -47,6 +47,35 @@ export function EmailForm({
 }: EmailFormProps) {
   // Ensure selectedTemplate is never undefined or null
   const safeSelectedTemplate = selectedTemplate || "";
+  
+  // Effect to append signature to email body when signature changes
+  useEffect(() => {
+    // Check if signature is already in the email body
+    if (signature && !emailBody.includes(signature)) {
+      // Only update if there's a body and signature to avoid unnecessary updates
+      if (emailBody.trim() || signature.trim()) {
+        const bodyWithoutSignature = removeSignatureFromBody(emailBody, signature);
+        setEmailBody(bodyWithoutSignature + (bodyWithoutSignature ? '\n\n' : '') + signature);
+      }
+    }
+  }, [signature]);
+
+  // Helper function to remove old signature from email body
+  const removeSignatureFromBody = (body: string, sig: string) => {
+    // If signature is empty or body doesn't contain the signature, return the original body
+    if (!sig.trim() || !body.includes(sig)) {
+      return body;
+    }
+    
+    // Remove signature and any extra newlines before it
+    return body.substring(0, body.indexOf(sig)).replace(/\n+$/, '');
+  };
+
+  // Handle signature changes
+  const handleSignatureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newSignature = e.target.value;
+    setSignature(newSignature);
+  };
   
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow duration-300 border-primary/10 overflow-hidden">
@@ -128,7 +157,7 @@ export function EmailForm({
               <Textarea 
                 id="signature" 
                 value={signature} 
-                onChange={(e) => setSignature(e.target.value)} 
+                onChange={handleSignatureChange} 
                 className="min-h-[200px] japanese-text resize-y"
                 placeholder="メール署名を入力してください。すべてのメールの末尾に追加されます。" 
               />

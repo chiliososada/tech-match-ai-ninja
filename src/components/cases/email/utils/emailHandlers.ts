@@ -122,8 +122,6 @@ export const sendTestEmail = async (
   });
 };
 
-// Add the missing exported functions with the exact names expected in EmailHandlerBindings.tsx
-
 // Handle select all functionality
 export const handleSelectAll = (
   paginatedCases: MailCase[],
