@@ -2,7 +2,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { EmailSenderProps } from './email/types';
+import { EmailSenderProps, MailCase } from './email/types';
 import { EmailSender } from './EmailSender';
 
 // Import custom hooks

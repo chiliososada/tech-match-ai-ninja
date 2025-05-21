@@ -19,6 +19,27 @@ export interface MailCase {
   selectedSenderName?: string;
   selectedSenderEmail?: string;
   selectedRowId?: string;
+  // Added properties for type compatibility
+  budget?: string;
+  status?: string;
+  source?: string;
+  createdAt?: string;
+  receivedDate?: string;
+  senderName?: string;
+  keyTechnologies?: string;
+  registrationType?: string;
+  manager?: string;
+  managerEmail?: string;
+  experience?: string;
+  workType?: string;
+  duration?: string;
+  japanese?: string;
+  priority?: string;
+  foreignerAccepted?: boolean;
+  freelancerAccepted?: boolean;
+  desiredBudget?: string;
+  interviewCount?: string;
+  processes?: string[];
 }
 
 export interface EmailTemplate {
@@ -26,6 +47,11 @@ export interface EmailTemplate {
   name: string;
   subject: string;
   body: string;
+}
+
+// Add the EmailSenderProps interface that was missing
+export interface EmailSenderProps {
+  mailCases: MailCase[];
 }
 
 export const EMAIL_TEMPLATES: EmailTemplate[] = [
