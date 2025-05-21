@@ -19,7 +19,7 @@ export const handleSelectAll = (
   }
 };
 
-// 案件個別の選択処理 - 修正: 送信者単位での選択に変更
+// 案件個別の選択処理 - 修正: 個別の送信者だけを選択できるようにする
 export const handleSelectCase = (
   id: string,
   selectedCases: MailCase[],
@@ -37,10 +37,10 @@ export const handleSelectCase = (
   let newSelectedCases: MailCase[];
   
   if (isSelected) {
-    // 選択解除
+    // 選択解除 - この案件のみ削除
     newSelectedCases = selectedCases.filter(item => item.id !== id);
   } else {
-    // 追加選択 - 既存の選択ケースとマージ
+    // 追加選択 - 選択した案件のみを追加、同じ会社の他案件は追加しない
     newSelectedCases = [...selectedCases, caseItem];
   }
   
@@ -53,7 +53,7 @@ export const handleSelectCase = (
   setSelectAll(allSelected);
 };
 
-// テンプレート変更時の処理 - 修正: テンプレート適用を確実に行う
+// テンプレート変更時の処理 - 修正: テンプレート適用をより確実に行う
 export const handleTemplateChange = (
   templateId: string,
   setSelectedTemplate: (template: string) => void,
@@ -67,11 +67,13 @@ export const handleTemplateChange = (
   
   if (template) {
     console.log("Applying template:", template.name);
-    // 少し遅延を入れて確実に状態が更新されるようにする
+    
+    // 状態更新を確実にするために少し長めの遅延を設定
     setTimeout(() => {
       setSubject(template.subject || "");
       setEmailBody(template.body || "");
-    }, 0);
+      console.log("Template applied:", template.subject, template.body);
+    }, 50);
   } else {
     console.log("Template not found for ID:", templateId);
   }
