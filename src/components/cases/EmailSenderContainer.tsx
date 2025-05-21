@@ -15,7 +15,7 @@ import { processCaseData, processEngineerData } from './email/utils/dataProcessi
 export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
   const location = useLocation();
   const isOtherCompanyMode = location.pathname.includes('/company/other');
-  const itemsPerPage = 10; // Number of cases per page
+  const itemsPerPage = 5; // Changed from 10 to 5 to show pagination effect more easily
   const engineerItemsPerPage = 6; // Number of engineers per page
   
   // Use custom hooks for state management
