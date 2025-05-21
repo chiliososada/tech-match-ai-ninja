@@ -114,13 +114,13 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
               <Badge variant="secondary" className="ml-2">{totalSelectedSenders}人</Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2 flex-1">
+          <CardContent className="pt-2 flex-1 flex flex-col">
             {totalSelectedSenders === 0 ? (
               <div className="text-sm text-muted-foreground japanese-text py-4 text-center border border-dashed rounded-md h-full flex items-center justify-center">
                 送信者が選択されていません
               </div>
             ) : (
-              <ScrollArea className="h-full min-h-[500px] pr-4">
+              <ScrollArea className="flex-1 pr-4" style={{ minHeight: '500px', height: '100%' }}>
                 {Object.entries(selectedSendersByCompany).map(([company, senders]) => (
                   <div key={company} className="mb-4">
                     <h4 className="font-semibold text-sm bg-muted px-2 py-1 rounded mb-2 japanese-text">
