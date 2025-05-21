@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EngineerSearchDialog } from './email/search/EngineerSearchDialog';
 import { MailCase } from './email/types';
@@ -33,8 +32,6 @@ export interface EmailSenderComponentProps {
     setSubject: (subject: string) => void;
     emailBody: string;
     setEmailBody: (body: string) => void;
-    ccEmails: string;
-    setCcEmails: (emails: string) => void;
     sending: boolean;
     setSending: (sending: boolean) => void;
     setSelectedCases: (cases: MailCase[]) => void;

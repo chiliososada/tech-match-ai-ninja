@@ -1,4 +1,3 @@
-
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
 import { toast } from 'sonner';
 
@@ -105,7 +104,6 @@ export const handleSendEmail = (
   setSubject: (subject: string) => void,
   setEmailBody: (body: string) => void,
   setSelectedEngineers: (engineers: any[]) => void,
-  ccEmails?: string
 ) => {
   if (selectedCases.length === 0) {
     toast.error("送信する案件を選択してください");
@@ -122,18 +120,6 @@ export const handleSendEmail = (
     return;
   }
   
-  // CCメールのバリデーション
-  if (ccEmails && ccEmails.trim() !== '') {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const emails = ccEmails.split(',').map(email => email.trim());
-    const invalidEmails = emails.filter(email => !emailRegex.test(email));
-    
-    if (invalidEmails.length > 0) {
-      toast.error(`無効なメールアドレス: ${invalidEmails.join(', ')}`);
-      return;
-    }
-  }
-  
   // 送信中状態にする
   setSending(true);
   
@@ -142,11 +128,7 @@ export const handleSendEmail = (
     setSending(false);
     
     // 送信成功メッセージ
-    const ccMessage = ccEmails && ccEmails.trim() !== '' 
-      ? `、CC: ${ccEmails}` 
-      : '';
-    
-    toast.success(`${selectedCases.length}件の案件情報を送信しました${ccMessage}`);
+    toast.success(`${selectedCases.length}件の案件情報を送信しました`);
     
     // 状態をリセット
     setSelectedCases([]);

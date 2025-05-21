@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -33,8 +32,6 @@ interface EmailSenderContentProps {
     setSubject: (subject: string) => void;
     emailBody: string;
     setEmailBody: (body: string) => void;
-    ccEmails: string;
-    setCcEmails: (emails: string) => void;
     sending: boolean;
     setSending: (sending: boolean) => void;
     signature: string;

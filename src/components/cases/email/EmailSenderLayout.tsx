@@ -12,8 +12,6 @@ interface EmailSenderLayoutProps {
     setSubject: (subject: string) => void;
     emailBody: string;
     setEmailBody: (body: string) => void;
-    ccEmails: string;
-    setCcEmails: (emails: string) => void;
     sending: boolean;
     selectedCases: any[];
     signature: string;
@@ -54,8 +52,6 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
           setSubject={emailState.setSubject}
           emailBody={emailState.emailBody}
           setEmailBody={emailState.setEmailBody}
-          ccEmails={emailState.ccEmails}
-          setCcEmails={emailState.setCcEmails}
           signature={emailState.signature}
           setSignature={emailState.setSignature}
           handleEnhanceEmail={handleEnhanceEmail}
