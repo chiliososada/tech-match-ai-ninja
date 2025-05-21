@@ -33,6 +33,9 @@ interface EmailHandlerBindingsProps {
     setSending: (sending: boolean) => void;
     setSelectedCases: (cases: MailCase[]) => void;
     setSelectAll: (value: boolean) => void;
+    signature: string;
+    setSignature: (signature: string) => void;
+    ccEmails?: string;
   };
   engineerState: {
     selectedEngineers: any[];
@@ -89,11 +92,12 @@ export const useEmailHandlerBindings = ({
     emailState.setSelectAll,
     emailState.setSubject,
     emailState.setEmailBody,
-    engineerState.setSelectedEngineers
+    engineerState.setSelectedEngineers,
+    emailState.ccEmails
   );
 
   const engineerHandleOpen = () => {
-    // 确保此函数正确执行
+    // 確保此函數正確執行
     openEngineerDialog(
       engineerState.setIsEngineerDialogOpen,
       engineerState.setEngineerCurrentPage,
