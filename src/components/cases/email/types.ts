@@ -44,6 +44,13 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
   }
 ];
 
+// Define the Sender interface
+export interface Sender {
+  name: string;
+  email: string;
+  position?: string;
+}
+
 export interface MailCase {
   id: string;
   title: string;
@@ -60,6 +67,9 @@ export interface MailCase {
   receivedDate?: string | null;
   sender?: string | null;
   senderName?: string | null;
+  senderEmail?: string | null;
+  // New field for multiple senders
+  senders?: Sender[];
   keyTechnologies?: string;
   skills: string[];
   location: string;

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -22,9 +21,46 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
   const emailState = useEmailState(mailCases);
   const engineerState = useEngineerState();
   
+  // Add multiple senders to some cases for demonstration
+  const enhancedMailCases = React.useMemo(() => {
+    return mailCases.map(caseItem => {
+      // Add multiple senders to some cases based on their ID to ensure consistency
+      if (caseItem.id.includes('1') || caseItem.id.includes('3') || caseItem.id.includes('5')) {
+        return {
+          ...caseItem,
+          senders: [
+            {
+              name: caseItem.sender || '山田 太郎',
+              email: caseItem.senderEmail || 'yamada@example.com',
+              position: '営業担当'
+            },
+            {
+              name: '佐藤 次郎',
+              email: 'sato@example.com',
+              position: '技術担当'
+            }
+          ]
+        };
+      }
+      // For other cases, keep the existing sender info but convert to the new format
+      else if (caseItem.sender) {
+        return {
+          ...caseItem,
+          senders: [
+            {
+              name: caseItem.sender,
+              email: caseItem.senderEmail || `${caseItem.sender.replace(/\s+/g, '').toLowerCase()}@example.com`
+            }
+          ]
+        };
+      }
+      return caseItem;
+    });
+  }, [mailCases]);
+  
   // Process data with improved pagination
   const caseData = processCaseData(
-    mailCases,
+    enhancedMailCases,
     emailState.companyFilter,
     emailState.techFilter,
     emailState.currentPage,
@@ -50,7 +86,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderProps) {
 
   return (
     <EmailSender 
-      mailCases={mailCases}
+      mailCases={enhancedMailCases}
       isOtherCompanyMode={isOtherCompanyMode}
       caseData={caseData}
       engineerData={engineerData}

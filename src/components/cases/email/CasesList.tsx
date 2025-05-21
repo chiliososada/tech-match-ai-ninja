@@ -14,6 +14,8 @@ import {
   Pagination
 } from '@/components/ui/pagination';
 import { MailCase } from './types';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
 
 interface CasesListProps {
   paginatedCases: MailCase[];
@@ -25,6 +27,7 @@ interface CasesListProps {
   setCurrentPage: (page: number) => void;
   totalPages: number;
   showCompanyInfo?: boolean;
+  onViewCase?: (caseItem: MailCase) => void;
 }
 
 export const CasesList: React.FC<CasesListProps> = ({
@@ -36,7 +39,8 @@ export const CasesList: React.FC<CasesListProps> = ({
   currentPage,
   setCurrentPage,
   totalPages,
-  showCompanyInfo = false
+  showCompanyInfo = false,
+  onViewCase
 }) => {
   // Function to handle page changes
   const handlePageChange = (page: number) => {
@@ -73,12 +77,13 @@ export const CasesList: React.FC<CasesListProps> = ({
                 <div className="text-xs text-muted-foreground">登録時間</div>
               </TableHead>
             )}
+            <TableHead className="japanese-text w-20">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedCases.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={showCompanyInfo ? 6 : 4} className="text-center text-muted-foreground japanese-text">
+              <TableCell colSpan={showCompanyInfo ? 7 : 5} className="text-center text-muted-foreground japanese-text">
                 表示できる案件がありません
               </TableCell>
             </TableRow>
@@ -96,7 +101,20 @@ export const CasesList: React.FC<CasesListProps> = ({
                   <TableCell className="japanese-text">{item.company}</TableCell>
                 )}
                 <TableCell className="japanese-text">{item.keyTechnologies}</TableCell>
-                <TableCell className="japanese-text">{item.sender}</TableCell>
+                <TableCell className="japanese-text">
+                  {/* Show multiple senders with comma separation if they exist */}
+                  {item.senders ? (
+                    <div>
+                      {item.senders.map((sender, index) => (
+                        <div key={index} className="text-sm">
+                          {sender.name} <span className="text-xs text-muted-foreground">({sender.email})</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    item.sender || '-'
+                  )}
+                </TableCell>
                 {showCompanyInfo && (
                   <TableCell className="japanese-text">
                     <div className={`px-2 py-0.5 rounded text-xs inline-flex 
@@ -108,6 +126,20 @@ export const CasesList: React.FC<CasesListProps> = ({
                     </div>
                   </TableCell>
                 )}
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onViewCase) onViewCase(item);
+                    }}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="sr-only">詳細を見る</span>
+                  </Button>
+                </TableCell>
               </TableRow>
             ))
           )}
@@ -127,3 +159,4 @@ export const CasesList: React.FC<CasesListProps> = ({
     </div>
   );
 };
+

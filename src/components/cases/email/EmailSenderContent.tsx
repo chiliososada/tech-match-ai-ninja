@@ -14,6 +14,7 @@ import { FilterBar } from './FilterBar';
 import { MailCase } from './types';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import CaseDetailDialog from './CaseDetailDialog';
 
 interface EmailSenderContentProps {
   isOtherCompanyMode: boolean;
@@ -67,6 +68,8 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
   handlers
 }) => {
   const [companySearchTerm, setCompanySearchTerm] = React.useState('');
+  const [selectedCase, setSelectedCase] = React.useState<MailCase | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = React.useState(false);
   
   // Filter company list based on search term
   const filteredCompanyList = React.useMemo(() => {
@@ -75,6 +78,12 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
       company && company.toLowerCase().includes(companySearchTerm.toLowerCase())
     );
   }, [caseData.companyList, companySearchTerm]);
+
+  // Handle viewing a case
+  const handleViewCase = (caseItem: MailCase) => {
+    setSelectedCase(caseItem);
+    setIsDetailDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -118,6 +127,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             setCurrentPage={emailState.setCurrentPage}
             totalPages={caseData.totalPages}
             showCompanyInfo={isOtherCompanyMode} // 他社モードの場合のみ会社情報を表示
+            onViewCase={handleViewCase}
           />
           
           <EmailSenderLayout
@@ -133,6 +143,13 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
           />
         </CardContent>
       </Card>
+
+      {/* Case detail dialog */}
+      <CaseDetailDialog
+        isOpen={isDetailDialogOpen}
+        setIsOpen={setIsDetailDialogOpen}
+        caseItem={selectedCase}
+      />
     </div>
   );
 };
