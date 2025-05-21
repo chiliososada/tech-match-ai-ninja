@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MailCase } from './types';
 import { 
@@ -6,7 +5,8 @@ import {
   handleSelectCase, 
   handleTemplateChange, 
   handleEnhanceEmail, 
-  handleSendEmail 
+  handleSendEmail,
+  handleTestEmail
 } from './utils/emailHandlers';
 import { 
   openEngineerDialog, 
@@ -98,6 +98,13 @@ export const useEmailHandlerBindings = ({
     engineerState.setSelectedEngineers
   );
 
+  const emailHandleTest = () => handleTestEmail(
+    emailState.subject,
+    emailState.emailBody,
+    emailState.signature,
+    emailState.setSending,
+  );
+
   const engineerHandleOpen = () => {
     openEngineerDialog(
       engineerState.setIsEngineerDialogOpen,
@@ -150,6 +157,7 @@ export const useEmailHandlerBindings = ({
     templateHandleChange,
     emailHandleEnhance,
     emailHandleSend,
+    emailHandleTest,
     engineerHandleOpen,
     engineerHandleToggle,
     engineerHandleRemove,

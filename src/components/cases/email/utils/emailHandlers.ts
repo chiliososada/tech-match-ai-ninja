@@ -1,5 +1,5 @@
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 // 案件一覧の全選択処理 - Fixed to work with the flattened sender rows
 export const handleSelectAll = (
@@ -208,6 +208,52 @@ export const handleSendEmail = (
     setEmailBody("");
     setSelectedEngineers([]);
   }, 2000);
+};
+
+// テストメールの送信処理
+export const handleTestEmail = (
+  subject: string,
+  emailBody: string,
+  signature: string,
+  setSending: (sending: boolean) => void,
+) => {
+  if (!subject.trim()) {
+    toast({
+      title: "エラー",
+      description: "件名を入力してください",
+      variant: "destructive"
+    });
+    return;
+  }
+  
+  if (!emailBody.trim()) {
+    toast({
+      title: "エラー",
+      description: "メール本文を入力してください",
+      variant: "destructive"
+    });
+    return;
+  }
+  
+  // 送信中状態にする
+  setSending(true);
+  
+  // 自分のメールアドレスを取得（実際のアプリではユーザーのメールを使用）
+  const userEmail = "current_user@example.com"; // 実装時はログインユーザーのメールを使用
+  
+  // 送信処理をシミュレーション（実際にはAPIを呼び出す）
+  console.log("Sending test email to:", userEmail);
+  console.log("Subject:", subject);
+  console.log("Email body:", emailBody);
+  console.log("Signature:", signature);
+  
+  setTimeout(() => {
+    setSending(false);
+    toast({
+      title: "テストメール送信完了",
+      description: "自分宛にテストメールを送信しました"
+    });
+  }, 1500);
 };
 
 // AIによるテキスト改善のサンプル実装

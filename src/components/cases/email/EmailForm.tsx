@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EmailOptimizationCard } from '../tabs/EmailOptimizationCard';
 import { EMAIL_TEMPLATES } from './types';
-import { SendHorizontal } from 'lucide-react';
+import { SendHorizontal, TestTube } from 'lucide-react';
 
 interface EmailFormProps {
   emailTemplates: typeof EMAIL_TEMPLATES;
@@ -22,6 +22,7 @@ interface EmailFormProps {
   setSignature: (signature: string) => void;
   handleEnhanceEmail: () => void;
   handleSendEmail: () => void;
+  handleTestEmail?: () => void; // Add new prop for test email
   sending: boolean;
   selectedCasesCount: number;
   hideOptimizationSection?: boolean;
@@ -39,6 +40,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
   setSignature,
   handleEnhanceEmail,
   handleSendEmail,
+  handleTestEmail, // Add handler for test email
   sending,
   selectedCasesCount,
   hideOptimizationSection = false
@@ -113,7 +115,21 @@ export const EmailForm: React.FC<EmailFormProps> = ({
             />
           )}
 
-          <div className="pt-4">
+          <div className="pt-4 space-y-2">
+            {/* Add test email button */}
+            {handleTestEmail && (
+              <Button 
+                className="w-full japanese-text bg-secondary" 
+                onClick={handleTestEmail}
+                disabled={sending || subject.trim() === '' || emailBody.trim() === ''}
+              >
+                <span className="flex items-center">
+                  <TestTube className="mr-2 h-5 w-5" /> 
+                  テストメールを自分に送信
+                </span>
+              </Button>
+            )}
+
             <Button 
               className="w-full japanese-text bg-primary" 
               onClick={handleSendEmail}

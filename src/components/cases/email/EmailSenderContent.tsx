@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -52,6 +51,7 @@ interface EmailSenderContentProps {
     templateHandleChange: (templateId: string) => void;
     emailHandleEnhance: () => void;
     emailHandleSend: () => void;
+    emailHandleTest?: () => void;
     engineerHandleOpen: () => void;
     engineerHandleRemove: (engineerId: string) => void;
     engineerHandleApply: () => void;
@@ -141,6 +141,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             handleTemplateChange={handlers.templateHandleChange}
             handleEnhanceEmail={handlers.emailHandleEnhance}
             handleSendEmail={handlers.emailHandleSend}
+            handleTestEmail={handlers.emailHandleTest}
             openEngineerDialog={handlers.engineerHandleOpen}
             removeSelectedEngineer={handlers.engineerHandleRemove}
             applyEngineerToTemplate={handlers.engineerHandleApply}

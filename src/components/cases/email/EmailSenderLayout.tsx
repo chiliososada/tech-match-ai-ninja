@@ -28,6 +28,7 @@ interface EmailSenderLayoutProps {
   handleTemplateChange: (templateId: string) => void;
   handleEnhanceEmail: () => void;
   handleSendEmail: () => void;
+  handleTestEmail?: () => void; // Add new handler for test email
   openEngineerDialog: () => void;
   removeSelectedEngineer: (engineerId: string) => void;
   applyEngineerToTemplate: () => void;
@@ -41,6 +42,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
   handleTemplateChange,
   handleEnhanceEmail,
   handleSendEmail,
+  handleTestEmail, // Add test email handler
   openEngineerDialog,
   removeSelectedEngineer,
   applyEngineerToTemplate,
@@ -151,6 +153,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
           setSignature={emailState.setSignature}
           handleEnhanceEmail={handleEnhanceEmail}
           handleSendEmail={handleSendEmail}
+          handleTestEmail={handleTestEmail} // Pass the test email handler
           sending={emailState.sending}
           selectedCasesCount={totalSelectedSenders}
           hideOptimizationSection={isOtherCompanyMode}
