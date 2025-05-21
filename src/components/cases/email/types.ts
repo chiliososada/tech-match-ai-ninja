@@ -20,6 +20,27 @@ export interface MailCase {
   selectedSenderEmail?: string;
   selectedSenderPosition?: string;
   startDate?: string;
+  
+  // Add the missing properties used in the codebase
+  status?: string;
+  location?: string;
+  budget?: string;
+  desiredBudget?: string;
+  interviewCount?: string;
+  foreignerAccepted?: boolean;
+  freelancerAccepted?: boolean;
+  processes?: string[];
+  detailDescription?: string;
+  createdAt?: string;
+  manager?: string;
+  managerEmail?: string;
+  experience?: string;
+  workType?: string;
+  duration?: string;
+  japanese?: string;
+  priority?: string;
+  source?: string;
+  receivedDate?: string;
 }
 
 export interface Engineer {
