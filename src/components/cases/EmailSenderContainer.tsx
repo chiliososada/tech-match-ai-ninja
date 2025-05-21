@@ -12,8 +12,8 @@ interface EmailSenderContainerProps {
 
 export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   // Use custom hooks
-  const emailState = useEmailState();
-  const engineerState = useEngineerState(mailCases); // Explicitly passing mailCases to useEngineerState
+  const emailState = useEmailState(mailCases); // Pass mailCases to useEmailState
+  const engineerState = useEngineerState(mailCases);
   
   // Get paginated cases based on filters and pagination
   const { paginatedCases, totalPages, companyList } = processCaseData(
@@ -196,7 +196,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     );
   };
   
-  // Define the missing engineerHandleApply function
+  // Define the engineerHandleApply function
   const engineerHandleApply = () => {
     if (engineerState.selectedEngineers.length === 0) {
       toast.error('技術者が選択されていません');

@@ -2,13 +2,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MailCase } from '../types';
 
-export const useEmailState = (mailCases: MailCase[]) => {
+export const useEmailState = (mailCases: MailCase[] = []) => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedCases, setSelectedCases] = useState<MailCase[]>([]);
   const [companyFilter, setCompanyFilter] = useState('all');
   const [techFilter, setTechFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedTemplate, setSelectedTemplate] = useState('default'); // Changed from empty string to 'default'
+  const [selectedTemplate, setSelectedTemplate] = useState('default');
   const [subject, setSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [signature, setSignature] = useState(`
