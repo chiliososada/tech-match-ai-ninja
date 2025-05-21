@@ -50,7 +50,7 @@ export const EngineerList: React.FC<EngineerListProps> = ({
                 <span className="japanese-text mr-2">経験:</span>
                 <span className="japanese-text">{engineer.experience}</span>
                 <span className="mx-2">|</span>
-                <Badge variant={badgeVariant} className="japanese-text text-xs font-medium">
+                <Badge variant={badgeVariant as any} className="japanese-text text-xs font-medium">
                   {engineer.status}
                 </Badge>
               </div>
