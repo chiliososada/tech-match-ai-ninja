@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmailTemplate } from './types';
 import { MailCheck, Send, Sparkles, MailPlus } from 'lucide-react';
-import { updateSignatureInBody } from './utils/emailHandlers';
+import { updateSignatureInBody } from './utils/signature/signatureHandlers';
 
 interface EmailFormProps {
   emailTemplates: EmailTemplate[];
