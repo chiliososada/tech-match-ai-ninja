@@ -2,6 +2,21 @@
 import { toast } from 'sonner';
 import { MailCase } from '../../types';
 
+// Helper to count the total flattened senders in paginated cases
+const countTotalFlattenedSenders = (paginatedCases: MailCase[]): number => {
+  let totalCount = 0;
+  
+  paginatedCases.forEach(caseItem => {
+    if (caseItem.senders && Array.isArray(caseItem.senders)) {
+      totalCount += caseItem.senders.length;
+    } else {
+      totalCount += 1;
+    }
+  });
+  
+  return totalCount;
+};
+
 // Handle select all functionality
 export const handleSelectAll = (
   paginatedCases: MailCase[],
@@ -15,13 +30,13 @@ export const handleSelectAll = (
     setSelectAll(false);
     toast("全ての送信者の選択を解除しました");
   } else {
-    // Get all flattened senders from the console logs
+    // Get all flattened senders from the cases
     const flattenedSenders: any[] = [];
     
     // Process each case to extract all senders with proper rowIds
     paginatedCases.forEach(caseItem => {
       // Check if the case has senders array
-      if (caseItem.senders && Array.isArray(caseItem.senders)) {
+      if (caseItem.senders && Array.isArray(caseItem.senders) && caseItem.senders.length > 0) {
         // Add each sender as a separate selection with the correct rowId
         caseItem.senders.forEach((sender, index) => {
           const senderEmail = sender.email || `${sender.name?.replace(/\s+/g, '').toLowerCase()}@example.com`;
@@ -40,14 +55,19 @@ export const handleSelectAll = (
         const rowId = `${caseItem.id}-${caseItem.senderEmail || 'default'}-0`;
         flattenedSenders.push({
           ...caseItem,
-          selectedRowId: rowId
+          selectedRowId: rowId,
+          selectedSenderName: caseItem.sender || caseItem.senderName || '',
+          selectedSenderEmail: caseItem.senderEmail || '',
+          selectedSenderPosition: ''
         });
       }
     });
     
     setSelectedCases(flattenedSenders);
     setSelectAll(true);
-    toast(`${flattenedSenders.length}名の送信者を選択しました`);
+    
+    const totalSenders = countTotalFlattenedSenders(paginatedCases);
+    toast(`${totalSenders}名の送信者を選択しました`);
   }
 };
 
@@ -96,7 +116,7 @@ export const handleSelectCase = (
       selectedSenderPosition = sender.position || '';
     } else {
       // Fallback to the case's sender information
-      selectedSenderName = caseToToggle.sender || '';
+      selectedSenderName = caseToToggle.sender || caseToToggle.senderName || '';
       selectedSenderEmail = caseToToggle.senderEmail || '';
     }
     
@@ -113,14 +133,7 @@ export const handleSelectCase = (
     toast("送信者を選択しました");
     
     // Get the total number of flattened senders in the paginated cases
-    let totalFlattenedSenders = 0;
-    paginatedCases.forEach(caseItem => {
-      if (caseItem.senders && Array.isArray(caseItem.senders)) {
-        totalFlattenedSenders += caseItem.senders.length;
-      } else {
-        totalFlattenedSenders += 1;
-      }
-    });
+    const totalFlattenedSenders = countTotalFlattenedSenders(paginatedCases);
     
     // Check if all senders are now selected
     if (selectedCases.length + 1 === totalFlattenedSenders) {

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -8,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmailTemplate } from './types';
-import { MailCheck, Send, Sparkles, MailPlus, Pencil } from 'lucide-react';
+import { MailCheck, Send, Sparkles, MailPlus, Pencil, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EmailFormProps {
@@ -50,7 +49,7 @@ export function EmailForm({
   const safeSelectedTemplate = selectedTemplate || "";
   
   // State to track if signature is visible in the preview
-  const [showSignature, setShowSignature] = React.useState(false);
+  const [showSignature, setShowSignature] = React.useState(true);
   // State to store draft signature before applying it
   const [draftSignature, setDraftSignature] = React.useState(signature);
   
@@ -136,8 +135,8 @@ export function EmailForm({
               />
             </div>
 
-            {/* Signature Preview */}
-            {showSignature && signature && (
+            {/* Signature Preview with improved toggle */}
+            {signature && (
               <div className="mt-4 pt-2 border-t border-dashed border-muted-foreground/30">
                 <div className="flex justify-between items-center mb-1">
                   <Label className="text-sm text-muted-foreground japanese-text flex items-center gap-1">
@@ -147,15 +146,27 @@ export function EmailForm({
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-6 text-xs japanese-text"
+                    className="h-6 text-xs japanese-text flex items-center gap-1"
                     onClick={toggleSignatureVisibility}
                   >
-                    {showSignature ? '非表示' : '表示'}
+                    {showSignature ? (
+                      <>
+                        <EyeOff className="h-3 w-3 mr-1" />
+                        非表示
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-3 w-3 mr-1" />
+                        表示
+                      </>
+                    )}
                   </Button>
                 </div>
-                <div className="bg-muted/30 rounded p-2 text-sm font-mono whitespace-pre-wrap text-muted-foreground">
-                  {signature}
-                </div>
+                {showSignature && (
+                  <div className="bg-muted/30 rounded p-2 text-sm font-mono whitespace-pre-wrap text-muted-foreground">
+                    {signature}
+                  </div>
+                )}
               </div>
             )}
 
