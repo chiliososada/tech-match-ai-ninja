@@ -14,7 +14,7 @@ import { FilterBar } from './FilterBar';
 import { MailCase } from './types';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import CaseDetailDialog from './CaseDetailDialog';
+import { CaseViewDialog } from '../detail/CaseViewDialog';
 
 interface EmailSenderContentProps {
   isOtherCompanyMode: boolean;
@@ -145,9 +145,9 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
       </Card>
 
       {/* Case detail dialog */}
-      <CaseDetailDialog
+      <CaseViewDialog
         isOpen={isDetailDialogOpen}
-        setIsOpen={setIsDetailDialogOpen}
+        onClose={() => setIsDetailDialogOpen(false)}
         caseItem={selectedCase}
       />
     </div>

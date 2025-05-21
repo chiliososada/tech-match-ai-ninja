@@ -96,6 +96,7 @@ export const CaseViewDialog: React.FC<CaseViewDialogProps> = ({
             </div>
           </div>
 
+          {/* Add case detail description section */}
           {caseItem.detailDescription && (
             <div>
               <div className="font-medium mb-1 japanese-text">案件詳細</div>
