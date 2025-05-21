@@ -14,7 +14,7 @@ interface EmailSenderContainerProps {
 export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   // Use custom hooks
   const emailState = useEmailState();
-  const engineerState = useEngineerState(mailCases); // Properly passing mailCases to the hook
+  const engineerState = useEngineerState(mailCases); // Explicitly passing mailCases to useEngineerState
   
   // Get paginated cases based on filters and pagination
   const { paginatedCases, totalPages, companyList } = processCaseData(
@@ -248,7 +248,18 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
           totalPages,
           companyList
         }}
-        handlers={handlers}
+        handlers={{
+          casesHandleSelectAll: handleSelectAll,
+          casesHandleSelectCase: handleSelectCase,
+          templateHandleChange: handleTemplateChange,
+          emailHandleEnhance: handleEnhanceEmail,
+          emailHandleSend: handleSendEmail,
+          emailHandleTest: handleTestEmail,
+          engineerHandleOpen: engineerState.openEngineerDialog,
+          engineerHandleRemove: engineerState.removeEngineer,
+          engineerHandleApply: engineerHandleApply,
+          handleUnselectCase: handleUnselectCase
+        }}
       />
       
       {/* Add the EngineerSelectionDialog component */}

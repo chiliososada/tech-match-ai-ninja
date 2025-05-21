@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Engineer } from '../types';
 
-export const useEngineerState = (mailCases?: any[]) => {
+export const useEngineerState = (mailCases: any[] = []) => {
   const [selectedEngineers, setSelectedEngineers] = useState<Engineer[]>([]);
   const [isEngineerDialogOpen, setIsEngineerDialogOpen] = useState(false);
   const [engineerCurrentPage, setEngineerCurrentPage] = useState(1);
