@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { EmailSenderContent } from './email/EmailSenderContent';
 import { useEmailState } from './email/hooks/useEmailState';
@@ -24,7 +25,7 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     10
   );
   
-  // Create handlers for different actions
+  // Handle selecting all cases
   const handleSelectAll = () => {
     if (emailState.selectAll) {
       // Deselect all
