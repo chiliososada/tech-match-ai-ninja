@@ -12,6 +12,7 @@ interface FilterBarProps {
   companyList: string[];
   startDateFilter?: string;
   setStartDateFilter?: (value: string) => void;
+  startDateOptions?: string[]; // Add custom start date options
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -21,13 +22,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setTechFilter,
   companyList,
   startDateFilter,
-  setStartDateFilter
+  setStartDateFilter,
+  startDateOptions = [] // Default to empty array if not provided
 }) => {
-  // Get unique start dates from the filterable cases
+  // Get unique start dates from the filterable cases or use provided options
   const standardDates = React.useMemo(() => {
-    const dates = ['2025-06-01', '2025-06-15', '2025-07-01'];
+    // Use provided options if available, otherwise default dates
+    const dates = startDateOptions.length > 0 
+      ? startDateOptions 
+      : ['2025-06-01', '2025-06-15', '2025-07-01'];
+    
     return ['all', ...dates];
-  }, []);
+  }, [startDateOptions]);
 
   return (
     <div className="flex flex-wrap gap-4 items-center justify-between">

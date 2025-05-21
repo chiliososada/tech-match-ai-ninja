@@ -39,6 +39,7 @@ interface EmailSenderContentProps {
     setSignature: (signature: string) => void;
     startDateFilter?: string;
     setStartDateFilter?: (value: string) => void;
+    startDateOptions?: string[]; // Add start date options
   };
   engineerState: {
     selectedEngineers: any[];
@@ -163,6 +164,7 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
             companyList={filteredCompanyList}
             startDateFilter={emailState.startDateFilter}
             setStartDateFilter={emailState.setStartDateFilter}
+            startDateOptions={emailState.startDateOptions}
           />
         </CardHeader>
         <CardContent className="pt-6">

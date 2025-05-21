@@ -8,7 +8,7 @@ import { processCaseData } from './email/utils/dataProcessing';
 import { MailCase } from './email/types';
 
 interface EmailSenderContainerProps {
-  mailCases: MailCase[];  // This now receives filtered cases from the parent component
+  mailCases: MailCase[];  // This receives filtered cases from the parent component
 }
 
 export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
@@ -22,17 +22,17 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
   
   // Log the incoming mailCases to debug
   useEffect(() => {
-    console.log("EmailSenderContainer received mailCases:", 
-      mailCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
+    console.log("EmailSenderContainer received filtered cases:", 
+      mailCases.length, "cases");
   }, [mailCases]);
   
-  // Apply sorting to cases (filtering is already done in parent component)
-  const sortedCases = React.useMemo(() => {
+  // Apply filtering based on start date and sorting
+  const filteredAndSortedCases = React.useMemo(() => {
     let sorted = [...mailCases];
     
     // Apply start date filter
-    if (emailState.startDateFilter) {
-      console.log("Filtering by startDate:", emailState.startDateFilter);
+    if (emailState.startDateFilter && emailState.startDateFilter !== 'all') {
+      console.log("Applying startDate filter:", emailState.startDateFilter);
       sorted = sorted.filter(item => {
         return item.startDate === emailState.startDateFilter;
       });
@@ -40,7 +40,6 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     
     // Apply sorting if requested
     if (sortField === 'startDate') {
-      console.log("Sorting by startDate, direction:", sortDirection);
       sorted.sort((a, b) => {
         const dateA = a.startDate || '';
         const dateB = b.startDate || '';
@@ -59,22 +58,25 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     return sorted;
   }, [mailCases, emailState.startDateFilter, sortField, sortDirection]);
   
-  // Get paginated cases based on sorting and pagination
+  // Process case data for display
   const { paginatedCases, totalPages, companyList } = processCaseData(
-    sortedCases,
+    filteredAndSortedCases,
     emailState.companyFilter,
     emailState.techFilter,
     emailState.currentPage,
     10
   );
   
-  // Log the sorted and paginated cases
-  useEffect(() => {
-    console.log("Sorted cases:", 
-      sortedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
-    console.log("Paginated cases:", 
-      paginatedCases.map(c => ({id: c.id, title: c.title, startDate: c.startDate})));
-  }, [sortedCases, paginatedCases]);
+  // Extract all unique start dates for the filter dropdown
+  const startDateOptions = React.useMemo(() => {
+    const uniqueDates = new Set<string>();
+    mailCases.forEach(caseItem => {
+      if (caseItem.startDate) {
+        uniqueDates.add(caseItem.startDate);
+      }
+    });
+    return Array.from(uniqueDates).sort();
+  }, [mailCases]);
   
   // Handle sorting
   const handleSort = (field: string, direction: 'asc' | 'desc') => {
@@ -294,7 +296,10 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     emailHandleTest: handleTestEmail,
     engineerHandleOpen: engineerState.openEngineerDialog,
     engineerHandleRemove: engineerState.removeEngineer,
-    engineerHandleApply: engineerHandleApply,
+    engineerHandleApply: engineerState.engineerHandleApply || (() => {
+      // Default implementation if not provided
+      toast.error('技術者が選択されていません');
+    }),
     handleUnselectCase: emailState.handleUnselectCase,
     handleSort: handleSort
   };
@@ -303,7 +308,10 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
     <>
       <EmailSenderContent
         isOtherCompanyMode={true}
-        emailState={emailState}
+        emailState={{
+          ...emailState,
+          startDateOptions: startDateOptions
+        }}
         engineerState={engineerState}
         caseData={{
           paginatedCases,
@@ -313,7 +321,6 @@ export function EmailSenderContainer({ mailCases }: EmailSenderContainerProps) {
         handlers={handlers}
       />
       
-      {/* Add the EngineerSelectionDialog component */}
       <EngineerSelectionDialog
         isOpen={engineerState.isEngineerDialogOpen}
         onClose={engineerState.closeEngineerDialog}

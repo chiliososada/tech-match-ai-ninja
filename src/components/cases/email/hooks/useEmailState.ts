@@ -8,6 +8,7 @@ export const useEmailState = (initialCases: MailCase[] = []) => {
   const [companyFilter, setCompanyFilter] = useState('all');
   const [techFilter, setTechFilter] = useState('');
   const [startDateFilter, setStartDateFilter] = useState('all');
+  const [startDateOptions, setStartDateOptions] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [subject, setSubject] = useState('');
@@ -33,6 +34,8 @@ export const useEmailState = (initialCases: MailCase[] = []) => {
     setTechFilter,
     startDateFilter,
     setStartDateFilter,
+    startDateOptions,
+    setStartDateOptions,
     currentPage,
     setCurrentPage,
     selectedTemplate,

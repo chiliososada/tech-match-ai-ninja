@@ -38,6 +38,9 @@ interface CaseListProps {
   setEditingCaseData: (caseItem: MailCase | null) => void;
   handleEditChange: (field: string, value: any) => void;
   handleSaveEdit: () => void;
+  onSort?: (field: string, direction: 'asc' | 'desc') => void; // Add sort handlers from parent
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export const CaseList: React.FC<CaseListProps> = ({
@@ -61,15 +64,15 @@ export const CaseList: React.FC<CaseListProps> = ({
   editingCaseData,
   setEditingCaseData,
   handleEditChange,
-  handleSaveEdit
+  handleSaveEdit,
+  onSort,
+  sortField = "startDate",
+  sortDirection = "asc"
 }) => {
   const itemsPerPage = 10;
   
   // New state for date filter option
   const [dateFilterOption, setDateFilterOption] = useState<string>("none");
-  // Add state for sorting
-  const [sortField, setSortField] = useState<string>("startDate");
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
   // Handle date filter option change
   const handleDateFilterOptionChange = (value: string) => {
@@ -105,77 +108,12 @@ export const CaseList: React.FC<CaseListProps> = ({
     }
   }, [dateRange]);
 
-  // Handle sorting 
+  // Handle sorting - forward to parent component
   const handleSort = (field: string, direction: 'asc' | 'desc') => {
-    setSortField(field);
-    setSortDirection(direction);
-  };
-
-  // Apply sorting to the filtered cases
-  const sortCases = (cases: MailCase[]): MailCase[] => {
-    // Create a copy to avoid mutating the original array
-    const sortedCases = [...cases];
-    
-    // Sort by startDate
-    if (sortField === 'startDate') {
-      sortedCases.sort((a, b) => {
-        // Helper function to determine if a date is "本月" (this month)
-        const isThisMonth = (date: string) => {
-          if (!date) return false;
-          try {
-            const dateObj = parse(date, 'yyyy-MM-dd', new Date());
-            return isValid(dateObj) && isSameMonth(dateObj, new Date());
-          } catch {
-            return false;
-          }
-        };
-
-        // Helper function to determine if a date is "即日" (today)
-        const isImmediate = (date: string) => {
-          if (!date) return false;
-          try {
-            const dateObj = parse(date, 'yyyy-MM-dd', new Date());
-            return isValid(dateObj) && isToday(dateObj);
-          } catch {
-            return false;
-          }
-        };
-
-        // Prioritize "即日" (today)
-        const aIsToday = isImmediate(a.startDate);
-        const bIsToday = isImmediate(b.startDate);
-        
-        if (aIsToday && !bIsToday) return -1;
-        if (!aIsToday && bIsToday) return 1;
-        
-        // Then prioritize "本月" (this month)
-        const aIsThisMonth = isThisMonth(a.startDate);
-        const bIsThisMonth = isThisMonth(b.startDate);
-        
-        if (aIsThisMonth && !bIsThisMonth) return -1;
-        if (!aIsThisMonth && bIsThisMonth) return 1;
-        
-        // For non-priority dates, sort normally
-        if (!a.startDate) return 1;
-        if (!b.startDate) return -1;
-        
-        // Direction-aware comparison
-        const comparison = a.startDate.localeCompare(b.startDate);
-        return sortDirection === 'asc' ? comparison : -comparison;
-      });
+    if (onSort) {
+      onSort(field, direction);
     }
-    
-    return sortedCases;
   };
-  
-  // Apply sorting before pagination
-  const sortedCases = sortCases(filteredCases);
-  
-  // Paginated cases based on current page
-  const paginatedCases = sortedCases.slice(
-    (casesCurrentPage - 1) * itemsPerPage,
-    casesCurrentPage * itemsPerPage
-  );
 
   return (
     <Card className="shadow-sm">
@@ -311,7 +249,7 @@ export const CaseList: React.FC<CaseListProps> = ({
           <div className="lg:w-1/2">
             <div className="bg-white rounded-md h-full flex flex-col">
               <CaseListTable 
-                paginatedCases={paginatedCases} 
+                paginatedCases={filteredCases} 
                 selectedCase={selectedCase} 
                 onSelectCase={setSelectedCase}
                 onSort={handleSort}

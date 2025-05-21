@@ -67,6 +67,10 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     itemsPerPage
   } = usePagination();
 
+  // Add state for sorting
+  const [sortField, setSortField] = React.useState("startDate");
+  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
+
   // Normalize case statuses in the data
   const normalizedCaseData = React.useMemo(() => {
     return caseData.map(item => ({
@@ -104,23 +108,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   // Get company list
   const companyList = getCompanyList();
   
-  // Filtered cases for the list view
-  const filteredCases = filterCases(
-    normalizedCaseData,
-    effectiveCompanyType,
-    statusFilter,
-    searchTerm,
-    dateRange,
-    foreignerFilter
-  );
-
-  const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
-
-  // Filtered mail cases for the email-related tabs
-  // Important: Use the same filtering logic as filteredCases to ensure consistency
-  const filteredMailCases = React.useMemo(() => {
-    // First apply the same filtering as the case list 
-    const baseCases = filterCases(
+  // Filtered cases for the list view - this is our MAIN source of truth
+  const filteredCases = React.useMemo(() => {
+    return filterCases(
       normalizedCaseData,
       effectiveCompanyType,
       statusFilter,
@@ -128,10 +118,48 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       dateRange,
       foreignerFilter
     );
+  }, [
+    normalizedCaseData,
+    effectiveCompanyType,
+    statusFilter,
+    searchTerm,
+    dateRange,
+    foreignerFilter
+  ]);
+
+  // Handle sorting
+  const handleSort = (field: string, direction: 'asc' | 'desc') => {
+    setSortField(field);
+    setSortDirection(direction);
+  };
+
+  // Apply sorting to the filtered cases
+  const sortedCases = React.useMemo(() => {
+    if (sortField !== "startDate") return filteredCases;
     
-    // Then apply any additional email-specific filters
+    return [...filteredCases].sort((a, b) => {
+      const dateA = a.startDate || '';
+      const dateB = b.startDate || '';
+      
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      
+      const comparison = dateA.localeCompare(dateB);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [filteredCases, sortField, sortDirection]);
+
+  const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
+
+  // Paginated cases for the list view
+  const paginatedCases = getPaginatedData(sortedCases, casesCurrentPage, itemsPerPage);
+  
+  // For email sender and stats - use the same filteredCases as the main source of truth
+  // but apply additional email-specific filters
+  const filteredMailCases = React.useMemo(() => {
     return filterMailCases(
-      baseCases, // Use already filtered cases as the base
+      filteredCases, // Use already filtered cases as the base
       effectiveCompanyType,
       companyFilter,
       techKeyword,
@@ -139,24 +167,27 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       emailDateTo
     );
   }, [
-    normalizedCaseData, 
+    filteredCases, 
     effectiveCompanyType, 
-    statusFilter, 
-    searchTerm, 
-    dateRange, 
-    foreignerFilter,
     companyFilter, 
     techKeyword, 
     emailDateFrom, 
     emailDateTo
   ]);
   
-  // Paginated mail cases for display
-  const paginatedMailCases = getPaginatedData(filteredMailCases, currentPage, itemsPerPage);
-  const totalPages = calculateTotalPages(filteredMailCases.length, itemsPerPage);
-  
   // Email stats for visualization
   const emailStats = processEmailStats(filteredMailCases);
+
+  // Get all unique start dates for filtering
+  const uniqueStartDates = React.useMemo(() => {
+    const dates = new Set<string>();
+    filteredCases.forEach(item => {
+      if (item.startDate) {
+        dates.add(item.startDate);
+      }
+    });
+    return Array.from(dates).sort();
+  }, [filteredCases]);
 
   return (
     <MainLayout>
@@ -172,7 +203,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               <TabsTrigger contextId={effectiveCompanyType} value="archive" className="japanese-text">案件アーカイブ</TabsTrigger>
             </TabsList>
           ) : (
-            /* For other company, show all tabs including the new archive tab */
+            /* For other company, show all tabs including email tabs */
             <TabsList>
               <TabsTrigger contextId={effectiveCompanyType} value="list" className="japanese-text">案件一覧</TabsTrigger>
               <TabsTrigger contextId={effectiveCompanyType} value="upload" className="japanese-text">案件アップロード</TabsTrigger>
@@ -184,7 +215,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
           
           <TabsContent contextId={effectiveCompanyType} value="list" className="space-y-6">
             <CaseList 
-              filteredCases={filteredCases}
+              filteredCases={paginatedCases}
               selectedCase={selectedCase}
               setSelectedCase={setSelectedCase}
               searchTerm={searchTerm}
@@ -205,6 +236,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               setEditingCaseData={setEditingCaseData}
               handleEditChange={handleEditChange}
               handleSaveEdit={handleSaveEdit}
+              onSort={handleSort}
+              sortField={sortField}
+              sortDirection={sortDirection}
             />
           </TabsContent>
           
@@ -223,7 +257,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
               <TabsContent contextId={effectiveCompanyType} value="stats" className="space-y-6">
                 <EmailStatsTab 
                   filteredMailCases={filteredMailCases}
-                  paginatedMailCases={paginatedMailCases}
+                  paginatedMailCases={getPaginatedData(filteredMailCases, currentPage, itemsPerPage)}
                   companyFilter={companyFilter}
                   setCompanyFilter={setCompanyFilter}
                   techKeyword={techKeyword}
@@ -235,14 +269,16 @@ export function Cases({ companyType = 'own' }: CasesProps) {
                   resetDateFilters={resetDateFilters}
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
-                  totalPages={totalPages}
+                  totalPages={calculateTotalPages(filteredMailCases.length, itemsPerPage)}
                   emailStats={emailStats}
                   companyList={companyList}
                 />
               </TabsContent>
 
               <TabsContent contextId={effectiveCompanyType} value="send" className="space-y-6">
-                <EmailSenderContainer mailCases={filteredCases} />
+                <EmailSenderContainer 
+                  mailCases={filteredCases} // Pass the same filtered cases as the source of truth
+                />
               </TabsContent>
             </>
           )}
