@@ -28,10 +28,10 @@ interface EmailSenderLayoutProps {
   handleTemplateChange: (templateId: string) => void;
   handleEnhanceEmail: () => void;
   handleSendEmail: () => void;
-  handleTestEmail?: () => void; // Add new handler for test email
+  handleTestEmail?: () => void;
   openEngineerDialog: () => void;
   removeSelectedEngineer: (engineerId: string) => void;
-  applyEngineerToTemplate: () => void;
+  applyEngineerToTemplate: () => void; // Changed to match the required signature
   isOtherCompanyMode: boolean;
   handleUnselectCase: (caseId: string, rowId: string) => void;
 }

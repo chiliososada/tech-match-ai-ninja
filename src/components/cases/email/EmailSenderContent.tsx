@@ -58,7 +58,7 @@ interface EmailSenderContentProps {
     emailHandleTest?: () => void;
     engineerHandleOpen: () => void;
     engineerHandleRemove: (engineerId: string) => void;
-    engineerHandleApply: () => void;
+    engineerHandleApply: () => void; // This now expects no parameters
     handleUnselectCase: (caseId: string, rowId: string) => void;
     handleSort?: (field: string, direction: 'asc' | 'desc') => void;
   };
