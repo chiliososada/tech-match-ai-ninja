@@ -35,7 +35,6 @@ interface EmailHandlerBindingsProps {
     setSelectAll: (value: boolean) => void;
     signature: string;
     setSignature: (signature: string) => void;
-    ccEmails?: string;
   };
   engineerState: {
     selectedEngineers: any[];
@@ -92,8 +91,7 @@ export const useEmailHandlerBindings = ({
     emailState.setSelectAll,
     emailState.setSubject,
     emailState.setEmailBody,
-    engineerState.setSelectedEngineers,
-    emailState.ccEmails
+    engineerState.setSelectedEngineers
   );
 
   const engineerHandleOpen = () => {
