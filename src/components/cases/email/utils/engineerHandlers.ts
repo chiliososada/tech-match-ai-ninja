@@ -54,7 +54,11 @@ export const applyEngineerToTemplate = (
 ) => {
   if (selectedEngineers.length === 0 || selectedCases.length === 0) {
     console.log("Cannot apply engineers - no engineers or cases selected");
-    toast.error("技術者または案件が選択されていません");
+    toast({
+      title: "エラー",
+      description: "技術者または案件が選択されていません",
+      variant: "destructive"
+    });
     return;
   }
   
@@ -110,6 +114,8 @@ Email: tanaka@techmatch.co.jp`;
 
   setEmailBody(emailBody);
   console.log("Applied engineers to template, email body updated");
-  toast.success("技術者情報をメール本文に反映しました");
+  toast({
+    title: "成功",
+    description: "技術者情報をメール本文に反映しました",
+  });
 };
-
