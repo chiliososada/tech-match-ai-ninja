@@ -68,8 +68,7 @@ export function EmailForm({
   const handleApplySignature = () => {
     setSignature(draftSignature);
     setShowSignature(true);
-    toast({
-      title: "署名設定が完了しました",
+    toast("署名設定が完了しました", {
       description: "メール送信時に署名が適用されます",
     });
   };
