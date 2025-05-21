@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { useForm } from 'react-hook-form';
 import { toast } from '@/hooks/use-toast';
 import { FileText, Loader } from 'lucide-react';
 import { CaseSelectionDialog } from './CaseSelectionDialog';
@@ -141,18 +137,6 @@ export function CaseToCandidate() {
     }
   ]);
 
-  // Form
-  const caseForm = useForm({
-    defaultValues: {
-      skills: 'Java, Python, React',
-      experience: '3',
-      budget: '50~80',
-      location: '東京',
-      workType: 'リモート可',
-      priority: 'high'
-    }
-  });
-
   // Handle Case to Candidate matching
   const startMatching = () => {
     if (!selectedCase) {
@@ -201,34 +185,9 @@ export function CaseToCandidate() {
   const handleCaseSelect = (caseItem: CaseItem) => {
     setSelectedCase(caseItem);
     
-    // Update form with the selected case data
-    if (caseItem.skills) {
-      caseForm.setValue('skills', Array.isArray(caseItem.skills) ? caseItem.skills.join(', ') : caseItem.skills);
-    }
-    
-    if (caseItem.experience) {
-      caseForm.setValue('experience', caseItem.experience);
-    }
-    
-    if (caseItem.budget) {
-      caseForm.setValue('budget', caseItem.budget);
-    }
-    
-    if (caseItem.location) {
-      caseForm.setValue('location', caseItem.location);
-    }
-    
-    if (caseItem.workType) {
-      caseForm.setValue('workType', caseItem.workType);
-    }
-    
-    if (caseItem.priority) {
-      caseForm.setValue('priority', caseItem.priority);
-    }
-    
     toast({
       title: "案件を選択しました",
-      description: `${caseItem.title}の情報をフォームに反映しました`,
+      description: `${caseItem.title}を選択しました`,
     });
   };
 
@@ -250,16 +209,9 @@ export function CaseToCandidate() {
     
     setSelectedCase(extractedCase);
     
-    // Update form with extracted data
-    caseForm.setValue('skills', data.skills);
-    caseForm.setValue('experience', data.experience);
-    caseForm.setValue('budget', data.budget);
-    caseForm.setValue('location', data.location);
-    caseForm.setValue('workType', data.workType);
-    
     toast({
       title: "データを抽出しました",
-      description: "案件テキストからデータを抽出してフォームに適用しました",
+      description: "案件テキストからデータを抽出しました",
     });
   };
 
@@ -330,148 +282,67 @@ export function CaseToCandidate() {
                         </div>
                       </div>
                     )}
+                    
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      {selectedCase.experience && (
+                        <div>
+                          <p className="text-sm font-medium japanese-text">必要経験年数:</p>
+                          <p className="japanese-text">{selectedCase.experience}年以上</p>
+                        </div>
+                      )}
+                      
+                      {selectedCase.budget && (
+                        <div>
+                          <p className="text-sm font-medium japanese-text">予算範囲:</p>
+                          <p className="japanese-text">{selectedCase.budget}万円</p>
+                        </div>
+                      )}
+                      
+                      {selectedCase.location && (
+                        <div>
+                          <p className="text-sm font-medium japanese-text">勤務地:</p>
+                          <p className="japanese-text">{selectedCase.location}</p>
+                        </div>
+                      )}
+                      
+                      {selectedCase.workType && (
+                        <div>
+                          <p className="text-sm font-medium japanese-text">勤務形態:</p>
+                          <p className="japanese-text">{selectedCase.workType}</p>
+                        </div>
+                      )}
+                      
+                      {selectedCase.priority && (
+                        <div>
+                          <p className="text-sm font-medium japanese-text">優先度:</p>
+                          <p className="japanese-text">
+                            {selectedCase.priority === 'low' && '低'}
+                            {selectedCase.priority === 'medium' && '中'}
+                            {selectedCase.priority === 'high' && '高'}
+                            {selectedCase.priority === 'urgent' && '緊急'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             )}
-
-            <Form {...caseForm}>
-              <form onSubmit={caseForm.handleSubmit(startMatching)} className="space-y-6">
-                <FormField
-                  control={caseForm.control}
-                  name="skills"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="japanese-text">必要スキル</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Java, Python, React など" {...field} className="japanese-text" />
-                      </FormControl>
-                      <FormDescription className="japanese-text">
-                        カンマ区切りでスキルを入力してください
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={caseForm.control}
-                  name="experience"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="japanese-text">必要経験年数</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="japanese-text">
-                            <SelectValue placeholder="経験年数を選択" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1" className="japanese-text">1年以上</SelectItem>
-                          <SelectItem value="3" className="japanese-text">3年以上</SelectItem>
-                          <SelectItem value="5" className="japanese-text">5年以上</SelectItem>
-                          <SelectItem value="10" className="japanese-text">10年以上</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={caseForm.control}
-                  name="budget"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="japanese-text">予算範囲（万円）</FormLabel>
-                      <FormControl>
-                        <Input placeholder="50~80" {...field} className="japanese-text" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={caseForm.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="japanese-text">勤務地</FormLabel>
-                      <FormControl>
-                        <Input placeholder="東京" {...field} className="japanese-text" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={caseForm.control}
-                  name="workType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="japanese-text">勤務形態</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="japanese-text">
-                            <SelectValue placeholder="勤務形態を選択" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="オンサイト" className="japanese-text">オンサイト</SelectItem>
-                          <SelectItem value="リモート可" className="japanese-text">リモート可</SelectItem>
-                          <SelectItem value="フルリモート" className="japanese-text">フルリモート</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={caseForm.control}
-                  name="priority"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="japanese-text">優先度</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="japanese-text">
-                            <SelectValue placeholder="優先度を選択" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="low" className="japanese-text">低</SelectItem>
-                          <SelectItem value="medium" className="japanese-text">中</SelectItem>
-                          <SelectItem value="high" className="japanese-text">高</SelectItem>
-                          <SelectItem value="urgent" className="japanese-text">緊急</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                
-                <Button 
-                  type="submit" 
-                  className="w-full japanese-text" 
-                  disabled={matchingInProgress}
-                >
-                  {matchingInProgress ? (
-                    <>
-                      <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      <span className="japanese-text">マッチング処理中...</span>
-                    </>
-                  ) : (
-                    <span className="japanese-text">マッチングを開始</span>
-                  )}
-                </Button>
-              </form>
-            </Form>
+            
+            <Button 
+              onClick={startMatching} 
+              className="w-full japanese-text" 
+              disabled={matchingInProgress || !selectedCase}
+            >
+              {matchingInProgress ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  <span className="japanese-text">マッチング処理中...</span>
+                </>
+              ) : (
+                <span className="japanese-text">マッチングを開始</span>
+              )}
+            </Button>
           </CardContent>
         </Card>
 
