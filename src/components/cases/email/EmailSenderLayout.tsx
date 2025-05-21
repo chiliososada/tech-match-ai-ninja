@@ -5,8 +5,23 @@ import { EngineerSelection } from './EngineerSelection';
 import { EMAIL_TEMPLATES } from './types';
 
 interface EmailSenderLayoutProps {
-  emailState: any;
-  engineerState: any;
+  emailState: {
+    selectedTemplate: string;
+    setSelectedTemplate: (template: string) => void;
+    subject: string;
+    setSubject: (subject: string) => void;
+    emailBody: string;
+    setEmailBody: (body: string) => void;
+    ccEmails: string;
+    setCcEmails: (emails: string) => void;
+    sending: boolean;
+    selectedCases: any[];
+    signature: string;
+    setSignature: (signature: string) => void;
+  };
+  engineerState: {
+    selectedEngineers: any[];
+  };
   handleTemplateChange: (templateId: string) => void;
   handleEnhanceEmail: () => void;
   handleSendEmail: () => void;
@@ -39,6 +54,8 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
           setSubject={emailState.setSubject}
           emailBody={emailState.emailBody}
           setEmailBody={emailState.setEmailBody}
+          ccEmails={emailState.ccEmails}
+          setCcEmails={emailState.setCcEmails}
           signature={emailState.signature}
           setSignature={emailState.setSignature}
           handleEnhanceEmail={handleEnhanceEmail}

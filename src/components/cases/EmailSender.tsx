@@ -33,6 +33,8 @@ export interface EmailSenderComponentProps {
     setSubject: (subject: string) => void;
     emailBody: string;
     setEmailBody: (body: string) => void;
+    ccEmails: string;
+    setCcEmails: (emails: string) => void;
     sending: boolean;
     setSending: (sending: boolean) => void;
     setSelectedCases: (cases: MailCase[]) => void;
@@ -78,7 +80,7 @@ export function EmailSender({
         handlers={handlers}
       />
 
-      {/* 技术者検索ダイアログ */}
+      {/* 技術者検索ダイアログ */}
       <EngineerSearchDialog 
         isOpen={engineerState.isEngineerDialogOpen}
         setIsOpen={engineerState.setIsEngineerDialogOpen}

@@ -12,6 +12,8 @@ import { CasesList } from './CasesList';
 import { EmailSenderLayout } from './EmailSenderLayout';
 import { FilterBar } from './FilterBar';
 import { MailCase } from './types';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 interface EmailSenderContentProps {
   isOtherCompanyMode: boolean;
@@ -30,6 +32,8 @@ interface EmailSenderContentProps {
     setSubject: (subject: string) => void;
     emailBody: string;
     setEmailBody: (body: string) => void;
+    ccEmails: string;
+    setCcEmails: (emails: string) => void;
     sending: boolean;
     setSending: (sending: boolean) => void;
   };
@@ -60,23 +64,47 @@ export const EmailSenderContent: React.FC<EmailSenderContentProps> = ({
   caseData,
   handlers
 }) => {
+  const [companySearchTerm, setCompanySearchTerm] = React.useState('');
+  
+  // Filter company list based on search term
+  const filteredCompanyList = React.useMemo(() => {
+    if (!companySearchTerm) return caseData.companyList;
+    return caseData.companyList.filter((company) => 
+      company && company.toLowerCase().includes(companySearchTerm.toLowerCase())
+    );
+  }, [caseData.companyList, companySearchTerm]);
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="japanese-text">一括メール送信</CardTitle>
-          <CardDescription className="japanese-text">
+    <div className="space-y-6 animate-fade-in">
+      <Card className="shadow-md border-primary/10">
+        <CardHeader className="pb-3 bg-muted/30">
+          <CardTitle className="japanese-text text-xl font-bold text-primary">一括メール送信</CardTitle>
+          <CardDescription className="japanese-text text-md mt-2">
             メール案件の送信者に一括でメールを送信します
           </CardDescription>
+          
+          {/* Company search input */}
+          <div className="mt-4 mb-2">
+            <div className="flex items-center border rounded-md border-input bg-background px-3">
+              <Search className="h-4 w-4 text-muted-foreground mr-2" />
+              <Input 
+                placeholder="会社名で検索..." 
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 japanese-text"
+                value={companySearchTerm}
+                onChange={(e) => setCompanySearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          
           <FilterBar 
             companyFilter={emailState.companyFilter}
             setCompanyFilter={emailState.setCompanyFilter}
             techFilter={emailState.techFilter}
             setTechFilter={emailState.setTechFilter}
-            companyList={caseData.companyList}
+            companyList={filteredCompanyList}
           />
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {/* 案件一覧 - 他社モードの場合は会社名と登録方法も表示 */}
           <CasesList
             paginatedCases={caseData.paginatedCases}

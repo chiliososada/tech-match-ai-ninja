@@ -1,23 +1,25 @@
-import { MailCase } from "../types";
-import { toast } from "@/hooks/toast";
 
-// Handle select all cases for email
+import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
+import { toast } from 'sonner';
+
+// 案件一覧の全選択処理
 export const handleSelectAll = (
   paginatedCases: MailCase[],
   selectAll: boolean,
   setSelectedCases: (cases: MailCase[]) => void,
   setSelectAll: (value: boolean) => void
 ) => {
-  if (selectAll) {
-    setSelectedCases([]);
-    setSelectAll(false);
+  const newSelectAll = !selectAll;
+  setSelectAll(newSelectAll);
+  
+  if (newSelectAll) {
+    setSelectedCases(paginatedCases);
   } else {
-    setSelectedCases([...paginatedCases]);
-    setSelectAll(true);
+    setSelectedCases([]);
   }
 };
 
-// Handle selecting a single case
+// 案件個別の選択処理
 export const handleSelectCase = (
   id: string,
   selectedCases: MailCase[],
@@ -25,27 +27,33 @@ export const handleSelectCase = (
   setSelectedCases: (cases: MailCase[]) => void,
   setSelectAll: (value: boolean) => void
 ) => {
-  const isSelected = selectedCases.some(caseItem => caseItem.id === id);
+  // 既に選択されているかチェック
+  const isSelected = selectedCases.some(item => item.id === id);
+  let newSelectedCases: MailCase[];
   
   if (isSelected) {
-    // 削除
-    setSelectedCases(selectedCases.filter(caseItem => caseItem.id !== id));
-    setSelectAll(false);
+    // 選択解除
+    newSelectedCases = selectedCases.filter(item => item.id !== id);
   } else {
-    // 追加
-    const caseToAdd = paginatedCases.find(caseItem => caseItem.id === id);
+    // 追加選択
+    const caseToAdd = paginatedCases.find(item => item.id === id);
     if (caseToAdd) {
-      setSelectedCases([...selectedCases, caseToAdd]);
-      
-      // すべて選択されているかチェック
-      if (selectedCases.length + 1 === paginatedCases.length) {
-        setSelectAll(true);
-      }
+      newSelectedCases = [...selectedCases, caseToAdd];
+    } else {
+      return; // 見つからない場合は処理終了
     }
   }
+  
+  setSelectedCases(newSelectedCases);
+  
+  // 全部選択されているかチェック
+  const allSelected = paginatedCases.length > 0 && 
+    paginatedCases.every(item => newSelectedCases.some(selected => selected.id === item.id));
+  
+  setSelectAll(allSelected);
 };
 
-// Handle template selection change
+// テンプレート変更時の処理
 export const handleTemplateChange = (
   templateId: string,
   setSelectedTemplate: (template: string) => void,
@@ -54,122 +62,41 @@ export const handleTemplateChange = (
 ) => {
   setSelectedTemplate(templateId);
   
-  // テンプレートに基づいて件名と本文を設定
-  switch (templateId) {
-    case "template1":
-      setSubject("【案件紹介】貴社の募集案件についてのご連絡");
-      setEmailBody(`お世話になっております。
-株式会社テックマッチングの田中です。
-
-先日は案件情報をご共有いただき、誠にありがとうございました。
-ご連絡いただいた案件について、弊社の技術者をご紹介させていただきます。
-
-【案件概要】
-・案件名：{案件名}
-・スキル要件：{スキル}
-・単価：{単価}
-
-【技術者情報】
-・氏名：{技術者名}
-・スキル：{技術者スキル}
-・経験年数：{経験年数}
-・稼働開始可能日：{稼働開始日}
-
-詳細な経歴書を添付しておりますので、ご確認いただければ幸いです。
-ご興味をお持ちいただけましたら、面談のセッティングをさせていただきます。
-
-ご検討のほど、よろしくお願いいたします。
-
-株式会社テックマッチング
-営業部 田中太郎
-TEL: 03-XXXX-XXXX
-Email: tanaka@techmatch.co.jp`);
-      break;
-    case "template2":
-      setSubject("【技術者紹介】新規技術者のご提案");
-      setEmailBody(`お世話になっております。
-株式会社テックマッチングの鈴木です。
-
-貴社の募集案件に最適な技術者が新たに参画可能となりましたので、
-ご提案させていただきます。
-
-【技術者情報】
-・氏名：{技術者名}
-・スキル：{技術者スキル}
-・経験年数：{経験年数}
-・単価：{単価}
-・稼働開始可能日：{稼働開始日}
-
-【得意領域】
-{技術者の得意領域や実績など}
-
-ご興味をお持ちいただけましたら、詳細な経歴書をお送りいたします。
-ご検討のほど、よろしくお願いいたします。
-
-株式会社テックマッチング
-営業部 鈴木一郎
-TEL: 03-XXXX-YYYY
-Email: suzuki@techmatch.co.jp`);
-      break;
-    case "template3":
-      setSubject("【ご連絡】案件ご成約のお礼");
-      setEmailBody(`お世話になっております。
-株式会社テックマッチングの佐藤です。
-
-先日は弊社の技術者をご採用いただき、誠にありがとうございました。
-技術者も貴社での業務に大変意欲を持っております。
-
-【決定案件情報】
-・案件名：{案件名}
-・技術者名：{技術者名}
-・開始日：{開始日}
-・契約期間：{契約期間}
-
-今後とも良好な関係を続けられますよう、誠心誠意サポートして参ります。
-何かございましたら、いつでもご連絡ください。
-
-株式会社テックマッチング
-営業部 佐藤花子
-TEL: 03-XXXX-ZZZZ
-Email: sato@techmatch.co.jp`);
-      break;
-    default:
-      setSubject("");
-      setEmailBody("");
+  // テンプレートに応じた件名と本文を設定
+  const template = EMAIL_TEMPLATES.find(t => t.id === templateId);
+  if (template) {
+    setSubject(template.subject || "");
+    setEmailBody(template.body || "");
   }
 };
 
-// Handle email enhancement with AI
+// AIによるメール最適化処理
 export const handleEnhanceEmail = (
-  currentEmailBody: string,
+  emailBody: string,
   setSending: (sending: boolean) => void,
   setEmailBody: (body: string) => void
 ) => {
-  // AIによるメール内容の最適化をシミュレート
+  if (!emailBody.trim()) {
+    toast.error("メール本文を入力してください");
+    return;
+  }
+  
+  // 送信中状態にする
   setSending(true);
   
+  // AIによる最適化をシミュレーション（実際にはAPIを呼び出す）
   setTimeout(() => {
-    // 元のメール内容を整形する簡易的な処理
-    const enhancedEmail = currentEmailBody
-      .replace(/。/g, "。\n")
-      .replace(/、/g, "、")
-      .replace(/\n\n\n+/g, "\n\n");
-      
-    setEmailBody(enhancedEmail);
+    const enhancedBody = improveEmailText(emailBody);
+    setEmailBody(enhancedBody);
     setSending(false);
-    
-    // 最適化完了の通知
-    toast({
-      title: "メールの最適化が完了しました",
-      description: "AIがメールの文章を改善しました"
-    });
+    toast.success("メール本文をAIで最適化しました");
   }, 1500);
 };
 
-// Handle sending email - Fixed the type issue with selectedCases parameter
+// メール送信処理
 export const handleSendEmail = (
   selectedCases: MailCase[],
-  mailCases: MailCase[],
+  allCases: MailCase[],
   subject: string,
   emailBody: string,
   setSending: (sending: boolean) => void,
@@ -177,43 +104,73 @@ export const handleSendEmail = (
   setSelectAll: (value: boolean) => void,
   setSubject: (subject: string) => void,
   setEmailBody: (body: string) => void,
-  setSelectedEngineers: (engineers: any[]) => void
+  setSelectedEngineers: (engineers: any[]) => void,
+  ccEmails?: string
 ) => {
   if (selectedCases.length === 0) {
-    toast({
-      title: "エラー",
-      description: "送信する案件が選択されていません",
-      variant: "destructive"
-    });
+    toast.error("送信する案件を選択してください");
     return;
   }
   
-  if (!subject || !emailBody) {
-    toast({
-      title: "エラー",
-      description: "件名または本文が入力されていません",
-      variant: "destructive"
-    });
+  if (!subject.trim()) {
+    toast.error("件名を入力してください");
     return;
   }
   
-  // 送信中状態をセット
+  if (!emailBody.trim()) {
+    toast.error("メール本文を入力してください");
+    return;
+  }
+  
+  // CCメールのバリデーション
+  if (ccEmails && ccEmails.trim() !== '') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emails = ccEmails.split(',').map(email => email.trim());
+    const invalidEmails = emails.filter(email => !emailRegex.test(email));
+    
+    if (invalidEmails.length > 0) {
+      toast.error(`無効なメールアドレス: ${invalidEmails.join(', ')}`);
+      return;
+    }
+  }
+  
+  // 送信中状態にする
   setSending(true);
   
-  // メール送信をシミュレート
+  // 送信処理をシミュレーション（実際にはAPIを呼び出す）
   setTimeout(() => {
-    // 送信完了後の状態リセット
+    setSending(false);
+    
+    // 送信成功メッセージ
+    const ccMessage = ccEmails && ccEmails.trim() !== '' 
+      ? `、CC: ${ccEmails}` 
+      : '';
+    
+    toast.success(`${selectedCases.length}件の案件情報を送信しました${ccMessage}`);
+    
+    // 状態をリセット
     setSelectedCases([]);
     setSelectAll(false);
     setSubject("");
     setEmailBody("");
     setSelectedEngineers([]);
-    setSending(false);
-    
-    // 送信成功の通知
-    toast({
-      title: "メール送信完了",
-      description: `${selectedCases.length}件の案件担当者にメールを送信しました`
-    });
   }, 2000);
 };
+
+// AIによるテキスト改善のサンプル実装
+function improveEmailText(text: string): string {
+  // 実際のアプリケーションではAIサービスを呼び出す
+  // このサンプルでは簡単な変換を行う
+  
+  // 文末に敬語がない場合は追加
+  if (!text.includes('よろしくお願いいたします')) {
+    text += "\n\nご検討のほど、よろしくお願いいたします。";
+  }
+  
+  // 冒頭に挨拶がない場合は追加
+  if (!text.trim().startsWith('お世話になっております')) {
+    text = "お世話になっております。\n\n" + text;
+  }
+  
+  return text;
+}

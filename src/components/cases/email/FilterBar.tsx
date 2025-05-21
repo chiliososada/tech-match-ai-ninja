@@ -21,13 +21,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   return (
     <div className="mt-4 flex flex-col sm:flex-row gap-4">
       <Select value={companyFilter} onValueChange={setCompanyFilter}>
-        <SelectTrigger className="japanese-text w-full sm:w-[200px]">
+        <SelectTrigger className="japanese-text w-full sm:w-[200px] bg-white">
           <SelectValue placeholder="会社でフィルター" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-[300px] overflow-y-auto">
           <SelectItem value="all" className="japanese-text">すべての会社</SelectItem>
-          {companyList.map((company) => (
-            <SelectItem key={company as string} value={company as string} className="japanese-text">
+          {companyList.map((company, index) => (
+            <SelectItem key={`${company}-${index}`} value={company as string} className="japanese-text">
               {company as string}
             </SelectItem>
           ))}
@@ -38,7 +38,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         placeholder="技術キーワードでフィルター" 
         value={techFilter}
         onChange={(e) => setTechFilter(e.target.value)}
-        className="japanese-text"
+        className="japanese-text bg-white"
       />
     </div>
   );

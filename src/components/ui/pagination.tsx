@@ -119,7 +119,7 @@ export const PaginationPrevious = React.forwardRef<
   <button
     ref={ref}
     aria-label="Go to previous page"
-    className={cn("gap-1 pl-2.5", props.disabled ? "pointer-events-none opacity-50" : "", className)}
+    className={cn("gap-1 pl-2.5 hover:bg-muted rounded-md px-3 py-2", props.disabled ? "pointer-events-none opacity-50" : "", className)}
     {...props}
   >
     <span className="sr-only">Previous</span>
@@ -150,7 +150,7 @@ export const PaginationNext = React.forwardRef<
   <button
     ref={ref}
     aria-label="Go to next page"
-    className={cn("gap-1 pr-2.5", props.disabled ? "pointer-events-none opacity-50" : "", className)}
+    className={cn("gap-1 pr-2.5 hover:bg-muted rounded-md px-3 py-2", props.disabled ? "pointer-events-none opacity-50" : "", className)}
     {...props}
   >
     <span>次へ</span>
