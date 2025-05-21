@@ -91,11 +91,14 @@ export const applyEngineerToTemplate = (
   if (selectedEngineers.length > 0) {
     // Add information for each selected engineer
     selectedEngineers.forEach((engineer, index) => {
+      const companyText = engineer.companyType === '自社' ? '弊社' : '協力会社';
+      
       emailBody += `【技術者情報 ${index + 1}】
 ・氏名：${engineer.name || '{技術者名}'}
 ・スキル：${engineer.skills?.join(', ') || '{技術者スキル}'}
 ・経験年数：${engineer.experience || '{経験年数}'}
-・稼働開始可能日：即日
+・所属：${companyText}
+・稼働開始可能日：${engineer.availability || '即日'}
 
 `;
     });

@@ -53,6 +53,12 @@ export const EngineerList: React.FC<EngineerListProps> = ({
                 <Badge variant={badgeVariant as any} className="japanese-text text-xs font-medium">
                   {engineer.status}
                 </Badge>
+                {engineer.companyType && (
+                  <>
+                    <span className="mx-2">|</span>
+                    <span className="japanese-text">{engineer.companyType}</span>
+                  </>
+                )}
               </div>
             </div>
             

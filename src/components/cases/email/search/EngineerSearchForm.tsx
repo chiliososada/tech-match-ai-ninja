@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { CompanyTypeDropdown } from '../CompanyTypeDropdown';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EngineerSearchFormProps {
   engineerFilter: string;
@@ -12,32 +12,44 @@ interface EngineerSearchFormProps {
   showCompanyType?: boolean;
 }
 
-export const EngineerSearchForm: React.FC<EngineerSearchFormProps> = ({
-  engineerFilter,
+export const EngineerSearchForm: React.FC<EngineerSearchFormProps> = ({ 
+  engineerFilter, 
   setEngineerFilter,
   engineerCompanyFilter = 'all',
   setEngineerCompanyFilter,
-  showCompanyType = false
+  showCompanyType = true
 }) => {
   return (
-    <div className="flex flex-col space-y-4 mb-4">
-      <div className="flex items-center space-x-2">
-        <Search className="h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="名前やスキルで検索" 
+    <div className="space-y-4 mb-4">
+      <div>
+        <Label htmlFor="engineer-search" className="japanese-text mb-2 block">技術者を検索</Label>
+        <Input
+          id="engineer-search"
+          className="japanese-text"
+          placeholder="名前、スキルで検索..."
           value={engineerFilter}
           onChange={(e) => setEngineerFilter(e.target.value)}
-          className="japanese-text"
         />
       </div>
       
       {showCompanyType && setEngineerCompanyFilter && (
-        <CompanyTypeDropdown 
-          value={engineerCompanyFilter}
-          onChange={setEngineerCompanyFilter}
-        />
+        <div>
+          <Label htmlFor="company-type" className="japanese-text mb-2 block">所属会社</Label>
+          <Select 
+            value={engineerCompanyFilter} 
+            onValueChange={setEngineerCompanyFilter}
+          >
+            <SelectTrigger id="company-type" className="w-full japanese-text">
+              <SelectValue placeholder="所属会社を選択" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="japanese-text">全て</SelectItem>
+              <SelectItem value="自社" className="japanese-text">自社</SelectItem>
+              <SelectItem value="他社" className="japanese-text">他社</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       )}
     </div>
   );
 };
-

@@ -58,13 +58,24 @@ export interface EmailSenderProps {
 export interface Engineer {
   id: string;
   name: string;
-  skills: string[];
-  experience: number | string;
-  company: string;
-  position: string;
-  availability: string;
-  email: string;
+  skills?: string[];
+  japaneseLevel?: string;
+  experience?: string;
+  availability?: string;
   status?: string; // Add status property
+  remarks?: string;
+  companyType?: string;
+  companyName?: string;
+  source?: string;
+  registeredAt?: string;
+  updatedAt?: string;
+  nationality?: string;
+  age?: string;
+  gender?: string;
+  nearestStation?: string;
+  email?: string;
+  avatar?: string;
+  company?: string;
 }
 
 export const EMAIL_TEMPLATES: EmailTemplate[] = [
