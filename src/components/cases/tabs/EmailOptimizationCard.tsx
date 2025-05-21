@@ -4,7 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-export const EmailOptimizationCard: React.FC = () => {
+interface EmailOptimizationCardProps {
+  handleEnhanceEmail: () => void;
+}
+
+export const EmailOptimizationCard: React.FC<EmailOptimizationCardProps> = ({ 
+  handleEnhanceEmail 
+}) => {
   return (
     <Card>
       <CardHeader>
@@ -37,9 +43,10 @@ export const EmailOptimizationCard: React.FC = () => {
             </p>
           </div>
           
-          <Button className="mt-2 japanese-text">設定を保存</Button>
+          <Button className="mt-2 japanese-text" onClick={handleEnhanceEmail}>設定を保存</Button>
         </div>
       </CardContent>
     </Card>
   );
 };
+

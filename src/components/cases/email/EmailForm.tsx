@@ -18,8 +18,6 @@ interface EmailFormProps {
   setSubject: (subject: string) => void;
   emailBody: string;
   setEmailBody: (body: string) => void;
-  ccEmails: string;
-  setCcEmails: (emails: string) => void;
   signature: string;
   setSignature: (signature: string) => void;
   handleEnhanceEmail: () => void;
@@ -136,3 +134,4 @@ export const EmailForm: React.FC<EmailFormProps> = ({
     </>
   );
 };
+
