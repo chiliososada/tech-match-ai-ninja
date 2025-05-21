@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
@@ -155,7 +154,16 @@ export function CaseToCandidate() {
   });
 
   // Handle Case to Candidate matching
-  const startMatching = (data: any) => {
+  const startMatching = () => {
+    if (!selectedCase) {
+      toast({
+        title: "エラー",
+        description: "案件を選択してください",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Start the matching process
     setMatchingInProgress(true);
     setProgress(0);
