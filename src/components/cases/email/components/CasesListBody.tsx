@@ -30,7 +30,7 @@ export const CasesListBody: React.FC<CasesListBodyProps> = ({
   showCompanyInfo,
   onViewCase
 }) => {
-  // Check if a case is selected
+  // Check if a case is selected - compare by exact ID match
   const isCaseSelected = (caseId: string) => {
     return selectedCases.some(c => c.id === caseId);
   };

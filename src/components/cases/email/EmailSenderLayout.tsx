@@ -97,12 +97,6 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
     return count;
   }, [selectedSendersByCompany]);
 
-  // Log template changes for debugging
-  React.useEffect(() => {
-    console.log("Current selected template:", emailState.selectedTemplate);
-    console.log("Current email body:", emailState.emailBody);
-  }, [emailState.selectedTemplate, emailState.emailBody]);
-
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* 左カラム - 選択した送信者一覧 */}
@@ -120,7 +114,7 @@ export const EmailSenderLayout: React.FC<EmailSenderLayoutProps> = ({
                 送信者が選択されていません
               </div>
             ) : (
-              <ScrollArea className="flex-1 pr-4 h-full" style={{ minHeight: '500px' }}>
+              <ScrollArea className="flex-1 pr-4" style={{ height: '500px', maxHeight: 'calc(100vh - 400px)' }}>
                 {Object.entries(selectedSendersByCompany).map(([company, senders]) => (
                   <div key={company} className="mb-4">
                     <h4 className="font-semibold text-sm bg-muted px-2 py-1 rounded mb-2 japanese-text">

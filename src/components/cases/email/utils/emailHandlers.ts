@@ -19,7 +19,7 @@ export const handleSelectAll = (
   }
 };
 
-// 案件個別の選択処理 - 送信者ごとに個別選択するように修正
+// 案件個別の選択処理 - 個別ケースのみ選択するように修正
 export const handleSelectCase = (
   id: string,
   selectedCases: MailCase[],
@@ -41,7 +41,7 @@ export const handleSelectCase = (
     newSelectedCases = selectedCases.filter(item => item.id !== id);
   } else {
     // 追加選択 - 選択した案件のみを追加、他の案件は影響なし
-    // 同じ会社の他の案件は選択しない
+    // 同じ会社の他の案件も選択しない、厳密に1つの案件だけを追加
     newSelectedCases = [...selectedCases, caseItem];
   }
   

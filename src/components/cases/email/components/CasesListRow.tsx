@@ -35,12 +35,17 @@ export const CasesListRow: React.FC<CasesListRowProps> = ({
   onViewCase,
   index
 }) => {
+  // Handle direct selection of a single case by ID
+  const handleSelect = () => {
+    handleSelectCase(sender.caseId);
+  };
+
   return (
     <TableRow key={`${sender.caseId}-${sender.sender}-${index}`}>
       <TableCell>
         <Checkbox 
           checked={isSelected}
-          onCheckedChange={() => handleSelectCase(sender.caseId)}
+          onCheckedChange={handleSelect}
         />
       </TableCell>
       <TableCell className="font-medium japanese-text">
