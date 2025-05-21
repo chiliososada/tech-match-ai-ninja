@@ -1,4 +1,5 @@
 
+
 export interface MailCase {
   id: string;
   title: string;
@@ -116,3 +117,114 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
     `
   }
 ];
+
+// Add Engineer interface
+export interface Engineer {
+  id: string;
+  name: string;
+  skills: string[];
+  experience: string;
+  status: string;
+  companyType?: string; // 自社 or 他社
+}
+
+// Add sample engineers data
+export const SAMPLE_ENGINEERS: Engineer[] = [
+  {
+    id: "eng1",
+    name: "鈴木 一郎",
+    skills: ["Java", "Spring Boot", "React"],
+    experience: "10年",
+    status: "稼働可能",
+    companyType: "自社"
+  },
+  {
+    id: "eng2",
+    name: "田中 二郎",
+    skills: ["Python", "Django", "Vue.js"],
+    experience: "5年",
+    status: "稼働中",
+    companyType: "自社"
+  },
+  {
+    id: "eng3",
+    name: "佐藤 三郎",
+    skills: ["JavaScript", "TypeScript", "React", "Node.js"],
+    experience: "7年",
+    status: "稼働可能",
+    companyType: "自社"
+  },
+  {
+    id: "eng4",
+    name: "高橋 四郎",
+    skills: ["C#", ".NET", "Azure"],
+    experience: "8年",
+    status: "稼働中",
+    companyType: "自社"
+  },
+  {
+    id: "eng5",
+    name: "伊藤 五郎",
+    skills: ["PHP", "Laravel", "MySQL"],
+    experience: "6年",
+    status: "稼働可能",
+    companyType: "他社"
+  },
+  {
+    id: "eng6",
+    name: "渡辺 六郎",
+    skills: ["Ruby", "Ruby on Rails", "PostgreSQL"],
+    experience: "4年",
+    status: "稼働中",
+    companyType: "他社"
+  },
+  {
+    id: "eng7",
+    name: "小林 七郎",
+    skills: ["Go", "Docker", "Kubernetes"],
+    experience: "3年",
+    status: "稼働可能",
+    companyType: "他社"
+  },
+  {
+    id: "eng8",
+    name: "加藤 八郎",
+    skills: ["Swift", "iOS", "Objective-C"],
+    experience: "5年",
+    status: "稼働可能",
+    companyType: "他社"
+  },
+  {
+    id: "eng9",
+    name: "山本 九郎",
+    skills: ["Kotlin", "Android", "Firebase"],
+    experience: "4年",
+    status: "稼働中",
+    companyType: "自社"
+  },
+  {
+    id: "eng10",
+    name: "中村 十郎",
+    skills: ["AWS", "Terraform", "DevOps"],
+    experience: "7年",
+    status: "稼働可能",
+    companyType: "自社"
+  },
+  {
+    id: "eng11",
+    name: "斉藤 十一郎",
+    skills: ["React Native", "GraphQL", "MongoDB"],
+    experience: "5年",
+    status: "稼働中",
+    companyType: "他社"
+  },
+  {
+    id: "eng12",
+    name: "藤田 十二郎",
+    skills: ["Angular", "NGRX", "TypeScript"],
+    experience: "6年",
+    status: "稼働可能",
+    companyType: "他社"
+  }
+];
+
