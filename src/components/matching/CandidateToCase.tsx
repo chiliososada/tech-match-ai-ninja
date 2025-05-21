@@ -14,6 +14,7 @@ interface CandidateItem {
   name: string;
   skills: string;
   companyType?: string;
+  companyName?: string;
   nationality?: string;
   age?: string;
   gender?: string;
@@ -142,6 +143,13 @@ export function CandidateToCase() {
                         <p className="japanese-text">{selectedCandidate.companyType || '自社'}</p>
                       </div>
                     </div>
+                    
+                    {selectedCandidate.companyType === '他社' && (
+                      <div>
+                        <p className="text-sm font-medium japanese-text">会社名:</p>
+                        <p className="japanese-text">{selectedCandidate.companyName || '未設定'}</p>
+                      </div>
+                    )}
                     
                     <div className="grid grid-cols-2 gap-2">
                       <div>

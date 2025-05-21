@@ -13,6 +13,7 @@ interface CandidateItem {
   name: string;
   skills: string;
   companyType?: string;
+  companyName?: string;
   nationality?: string;
   age?: string;
   gender?: string;
@@ -37,6 +38,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '鈴木太郎', 
       skills: 'Java, Spring, AWS', 
       companyType: '自社',
+      companyName: '株式会社テックソリューション',
       nationality: '日本',
       age: '35歳',
       gender: '男性',
@@ -50,6 +52,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '田中花子', 
       skills: 'React, TypeScript, Node.js', 
       companyType: '他社',
+      companyName: 'フロントエンドパートナーズ株式会社',
       nationality: '日本',
       age: '28歳',
       gender: '女性',
@@ -63,6 +66,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '佐藤一郎', 
       skills: 'AWS, Docker, Kubernetes', 
       companyType: '自社',
+      companyName: '株式会社テックソリューション',
       nationality: '日本',
       age: '42歳',
       gender: '男性',
@@ -76,6 +80,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '山田健太', 
       skills: 'Python, Django, MySQL', 
       companyType: '他社',
+      companyName: 'テックイノベーション株式会社',
       nationality: '日本',
       age: '31歳',
       gender: '男性',
@@ -89,6 +94,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '伊藤誠', 
       skills: 'iOS, Android, Flutter', 
       companyType: '自社',
+      companyName: '株式会社テックソリューション',
       nationality: '日本',
       age: '33歳',
       gender: '男性',
@@ -102,6 +108,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '高橋直樹', 
       skills: 'Python, 機械学習, データ分析', 
       companyType: '他社',
+      companyName: 'クラウドシステムズ株式会社',
       nationality: '日本',
       age: '36歳',
       gender: '男性',
@@ -115,6 +122,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '中村美咲', 
       skills: 'Ruby, Rails, PostgreSQL', 
       companyType: '自社',
+      companyName: '株式会社テックソリューション',
       nationality: '日本',
       age: '29歳',
       gender: '女性',
@@ -128,6 +136,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
       name: '小林隆', 
       skills: 'PHP, Laravel, MySQL', 
       companyType: '他社',
+      companyName: 'ウェブソリューションズ株式会社',
       nationality: '日本',
       age: '34歳',
       gender: '男性',
@@ -204,6 +213,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
                 <TableHead className="japanese-text">氏名</TableHead>
                 <TableHead className="japanese-text">スキル</TableHead>
                 <TableHead className="japanese-text">所属</TableHead>
+                <TableHead className="japanese-text">会社名</TableHead>
                 <TableHead className="w-24 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -213,6 +223,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
                   <TableCell className="font-medium japanese-text">{candidate.name}</TableCell>
                   <TableCell className="japanese-text">{candidate.skills}</TableCell>
                   <TableCell className="japanese-text">{candidate.companyType}</TableCell>
+                  <TableCell className="japanese-text">{candidate.companyType === '他社' ? candidate.companyName : '-'}</TableCell>
                   <TableCell className="text-right">
                     <Button 
                       size="sm" 
