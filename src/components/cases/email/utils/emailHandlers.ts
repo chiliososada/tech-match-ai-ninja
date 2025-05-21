@@ -1,3 +1,4 @@
+
 import { MailCase, EmailTemplate, EMAIL_TEMPLATES } from '../types';
 import { toast } from '@/hooks/use-toast';
 
@@ -147,7 +148,11 @@ export const handleEnhanceEmail = (
   setEmailBody: (body: string) => void
 ) => {
   if (!emailBody.trim()) {
-    toast.error("メール本文を入力してください");
+    toast({
+      title: "エラー",
+      description: "メール本文を入力してください",
+      variant: "destructive"
+    });
     return;
   }
   
@@ -159,7 +164,10 @@ export const handleEnhanceEmail = (
     const enhancedBody = improveEmailText(emailBody);
     setEmailBody(enhancedBody);
     setSending(false);
-    toast.success("メール本文をAIで最適化しました");
+    toast({
+      title: "最適化完了",
+      description: "メール本文をAIで最適化しました"
+    });
   }, 1500);
 };
 
@@ -177,17 +185,29 @@ export const handleSendEmail = (
   setSelectedEngineers: (engineers: any[]) => void,
 ) => {
   if (selectedCases.length === 0) {
-    toast.error("送信する案件を選択してください");
+    toast({
+      title: "エラー",
+      description: "送信する案件を選択してください",
+      variant: "destructive"
+    });
     return;
   }
   
   if (!subject.trim()) {
-    toast.error("件名を入力してください");
+    toast({
+      title: "エラー",
+      description: "件名を入力してください",
+      variant: "destructive"
+    });
     return;
   }
   
   if (!emailBody.trim()) {
-    toast.error("メール本文を入力してください");
+    toast({
+      title: "エラー",
+      description: "メール本文を入力してください",
+      variant: "destructive"
+    });
     return;
   }
   
@@ -199,7 +219,10 @@ export const handleSendEmail = (
     setSending(false);
     
     // 送信成功メッセージ
-    toast.success(`${selectedCases.length}件の案件情報を送信しました`);
+    toast({
+      title: "送信完了",
+      description: `${selectedCases.length}件の案件情報を送信しました`
+    });
     
     // 状態をリセット
     setSelectedCases([]);
