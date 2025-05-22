@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,27 +6,12 @@ import { toast } from '@/hooks/use-toast';
 import { FileText, Loader } from 'lucide-react';
 import { CaseSelectionDialog } from './CaseSelectionDialog';
 import { MatchingProgressCard } from './MatchingProgressCard';
-import { MatchingResultsCard } from './MatchingResultsCard';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CaseTextInput } from './CaseTextInput';
 import { Badge } from '@/components/ui/badge';
 import { CaseDetailDisplay } from './CaseDetailDisplay';
-
-export interface CaseMatchingResult {
-  id: number;
-  candidate: string;
-  candidateCompany?: string;
-  candidateManager?: string;
-  candidateEmail?: string;
-  case: string;
-  caseCompany?: string;
-  caseManager?: string;
-  caseEmail?: string;
-  matchingRate: string;
-  matchingReason: string;
-  status: string;
-  statusClass: string;
-}
+import { EnhancedMatchingResultsTable } from './EnhancedMatchingResultsTable';
+import { EnhancedMatchingResult } from './types';
 
 interface CaseItem {
   id: number;
@@ -47,96 +33,83 @@ export function CaseToCandidate() {
   const [matchingInProgress, setMatchingInProgress] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedCase, setSelectedCase] = useState<CaseItem | null>(null);
-  const [matchingResults, setMatchingResults] = useState<CaseMatchingResult[]>([
+  const [matchingResults, setMatchingResults] = useState<EnhancedMatchingResult[]>([
     {
       id: 1,
-      candidate: '鈴木太郎',
-      candidateCompany: 'テック株式会社',
-      candidateManager: '佐藤部長',
-      candidateEmail: 'sato@tech.co.jp',
-      case: 'Java開発エンジニア',
-      caseCompany: 'システム開発株式会社',
-      caseManager: '田中課長',
-      caseEmail: 'tanaka@system.co.jp',
+      caseId: 'c101',
+      candidateId: 'u1',
+      caseName: 'Java開発エンジニア',
+      candidateName: '鈴木太郎',
       matchingRate: '92%',
       matchingReason: 'スキル・経験年数・単価が一致',
-      status: '提案済み',
-      statusClass: 'bg-blue-100 text-blue-800'
+      caseCompany: 'システム開発株式会社',
+      candidateCompany: 'テック株式会社',
+      caseManager: '田中課長',
+      memo: '希望単価70万円/月',
+      recommendationComment: 'コミュニケーション能力も高いため推薦します'
     },
     {
       id: 2,
-      candidate: '田中花子',
-      candidateCompany: 'エンジニア株式会社',
-      candidateManager: '高橋部長',
-      candidateEmail: 'takahashi@engineer.co.jp',
-      case: 'フロントエンドエンジニア',
-      caseCompany: 'ウェブ開発株式会社',
-      caseManager: '伊藤課長',
-      caseEmail: 'ito@web.co.jp',
+      caseId: 'c102',
+      candidateId: 'u2',
+      caseName: 'フロントエンドエンジニア',
+      candidateName: '田中花子',
       matchingRate: '89%',
       matchingReason: 'React経験が案件要件に一致',
-      status: '未提案',
-      statusClass: 'bg-gray-100 text-gray-800'
+      caseCompany: 'ウェブ開発株式会社',
+      candidateCompany: 'エンジニア株式会社',
+      caseManager: '伊藤課長',
     },
     {
       id: 3,
-      candidate: '佐藤一郎',
-      candidateCompany: 'ITソリューション株式会社',
-      candidateManager: '木村課長',
-      candidateEmail: 'kimura@itsolution.co.jp',
-      case: 'インフラエンジニア',
-      caseCompany: 'クラウドサービス株式会社',
-      caseManager: '小林部長',
-      caseEmail: 'kobayashi@cloud.co.jp',
+      caseId: 'c103',
+      candidateId: 'u3',
+      caseName: 'インフラエンジニア',
+      candidateName: '佐藤一郎',
       matchingRate: '94%',
       matchingReason: 'AWS/Dockerの経験が豊富',
-      status: '選考中',
-      statusClass: 'bg-amber-100 text-amber-800'
+      caseCompany: 'クラウドサービス株式会社',
+      candidateCompany: 'ITソリューション株式会社',
+      caseManager: '小林部長',
+      recommendationComment: '自動化スキルが高く、迅速な対応が可能',
     },
     {
       id: 4,
-      candidate: '山田健太',
-      candidateCompany: 'デベロップ株式会社',
-      candidateManager: '山本課長',
-      candidateEmail: 'yamamoto@develop.co.jp',
-      case: 'バックエンドエンジニア',
-      caseCompany: 'サーバー株式会社',
-      caseManager: '加藤部長',
-      caseEmail: 'kato@server.co.jp',
+      caseId: 'c104',
+      candidateId: 'u4',
+      caseName: 'バックエンドエンジニア',
+      candidateName: '山田健太',
       matchingRate: '75%',
       matchingReason: 'Python経験あるが、年数不足',
-      status: '未提案',
-      statusClass: 'bg-gray-100 text-gray-800'
+      caseCompany: 'サーバー株式会社',
+      candidateCompany: 'デベロップ株式会社',
+      caseManager: '加藤部長',
+      memo: '研修後に参画可能',
     },
     {
       id: 5,
-      candidate: '伊藤誠',
-      candidateCompany: 'モバイル株式会社',
-      candidateManager: '中村部長',
-      candidateEmail: 'nakamura@mobile.co.jp',
-      case: 'モバイルアプリ開発',
-      caseCompany: 'アプリケーション株式会社',
-      caseManager: '斎藤課長',
-      caseEmail: 'saito@application.co.jp',
+      caseId: 'c105',
+      candidateId: 'u5',
+      caseName: 'モバイルアプリ開発',
+      candidateName: '伊藤誠',
       matchingRate: '88%',
       matchingReason: 'iOSとAndroid両方の開発経験あり',
-      status: '提案済み',
-      statusClass: 'bg-blue-100 text-blue-800'
+      caseCompany: 'アプリケーション株式会社',
+      candidateCompany: 'モバイル株式会社',
+      caseManager: '斎藤課長',
     },
     {
       id: 6,
-      candidate: '高橋直樹',
-      candidateCompany: 'データ株式会社',
-      candidateManager: '藤田課長',
-      candidateEmail: 'fujita@data.co.jp',
-      case: 'データサイエンティスト',
-      caseCompany: '分析株式会社',
-      caseManager: '佐々木部長',
-      caseEmail: 'sasaki@analytics.co.jp',
+      caseId: 'c106',
+      candidateId: 'u6',
+      caseName: 'データサイエンティスト',
+      candidateName: '高橋直樹',
       matchingRate: '91%',
       matchingReason: 'Pythonと機械学習のスキルが一致',
-      status: '選考中',
-      statusClass: 'bg-amber-100 text-amber-800'
+      caseCompany: '分析株式会社',
+      candidateCompany: 'データ株式会社',
+      caseManager: '佐々木部長',
+      recommendationComment: 'デモ実績多数あり、即戦力として期待できる',
     }
   ]);
 
@@ -173,7 +146,7 @@ export function CaseToCandidate() {
           // Show completion toast
           toast({
             title: "マッチング完了",
-            description: "4人の候補者が見つかりました",
+            description: "6人の候補者が見つかりました",
           });
           
           return 100;
@@ -277,17 +250,25 @@ export function CaseToCandidate() {
         <MatchingProgressCard 
           progress={progress}
           isInProgress={matchingInProgress}
-          completionMessage="4人の候補者が見つかりました"
+          completionMessage="6人の候補者が見つかりました"
           processingMessage="候補者データを分析中..."
         />
       </div>
 
-      {/* Matching Results Card */}
-      <MatchingResultsCard 
-        results={matchingResults}
-        exportButtonText="CSV出力"
-        actionButtonText="一括提案"
-      />
+      {/* Enhanced Matching Results Table - replacing the MatchingResultsCard */}
+      {matchingResults.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="japanese-text">マッチング結果</CardTitle>
+            <CardDescription className="japanese-text">
+              {selectedCase?.title || '選択された案件'}に合う候補者が見つかりました
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EnhancedMatchingResultsTable results={matchingResults} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
