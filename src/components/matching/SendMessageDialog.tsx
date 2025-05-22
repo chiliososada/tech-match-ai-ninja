@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
   onClose,
   matchData,
 }) => {
+  // Initialize all state variables unconditionally
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -56,18 +57,22 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
   const [emailAddress, setEmailAddress] = useState('');
   const [isContactSelectOpen, setIsContactSelectOpen] = useState(false);
 
-  if (!matchData) return null;
-
-  const recipientCompany = matchData.caseCompany || '未設定';
-  
-  // Clear and set new recipient when the dialog is opened
-  React.useEffect(() => {
+  // This useEffect should run only when isOpen changes and matchData is not null
+  useEffect(() => {
     if (isOpen && matchData) {
       // Default to case manager email if available
       const managerEmail = matchData.caseManagerEmail || '';
       setEmailAddress(managerEmail);
     }
   }, [isOpen, matchData]);
+  
+  // Early return pattern - if matchData is null, return empty fragment
+  // IMPORTANT: This must come AFTER all hook calls
+  if (!matchData) {
+    return null;
+  }
+
+  const recipientCompany = matchData.caseCompany || '未設定';
   
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId);
