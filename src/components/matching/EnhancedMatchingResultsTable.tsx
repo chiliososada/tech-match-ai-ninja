@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { 
   Table, 
@@ -9,13 +8,14 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Eye, Send, ArrowUp, ArrowDown } from 'lucide-react';
+import { Eye, Send, ArrowUp, ArrowDown, FileText, Download } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 import { MatchDetailDialog } from './MatchDetailDialog';
 import { SendMessageDialog } from './SendMessageDialog';
 import { EnhancedMatchingResult, CaseDetailItem, CandidateItem } from './types';
 import { toast } from 'sonner';
 import { candidatesData } from '@/components/candidates/data/candidatesData';
+import { exportToCSV } from './utils/exportUtils';
 
 interface EnhancedMatchingResultsTableProps {
   results: EnhancedMatchingResult[];
@@ -147,6 +147,22 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
     });
   };
 
+  // Handle export to CSV
+  const handleExportCSV = () => {
+    if (sortedResults.length === 0) {
+      toast("エクスポートできるデータがありません", { 
+        description: "マッチング結果がありません",
+        type: "error"
+      });
+      return;
+    }
+    
+    exportToCSV(sortedResults, "matching-results");
+    toast("CSVエクスポート完了", {
+      description: "マッチング結果がエクスポートされました",
+    });
+  };
+
   // Get current case and candidate details
   const currentCaseDetail = selectedMatch?.caseId 
     ? getCaseDetails(selectedMatch.caseId)
@@ -158,6 +174,19 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
 
   return (
     <>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium japanese-text">マッチング結果</h3>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleExportCSV}
+          className="japanese-text"
+        >
+          <Download className="mr-2 h-4 w-4" />
+          CSVエクスポート
+        </Button>
+      </div>
+      
       <div className="rounded-md border">
         <Table>
           <TableHeader>
