@@ -47,7 +47,8 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
       experience: '3年',
       budget: '60-80万円',
       description: '金融系システムの開発案件です。React, TypeScriptを使用した画面開発が主な業務となります。',
-      detailDescription: '本案件は大手金融機関向けの新規システム開発プロジェクトです。React、TypeScriptを使用したフロントエンド開発を担当していただきます。アジャイル開発手法を採用しており、2週間単位でのスプリント開発を行います。チームは日本人エンジニア5名と外国籍エンジニア2名で構成されています。'
+      detailDescription: '本案件は大手金融機関向けの新規システム開発プロジェクトです。React、TypeScriptを使用したフロントエンド開発を担当していただきます。アジャイル開発手法を採用しており、2週間単位でのスプリント開発を行います。チームは日本人エンジニア5名と外国籍エンジニア2名で構成されています。',
+      manager: selectedMatch?.caseManager || '未設定'
     };
   };
 
@@ -230,6 +231,9 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               <TableHead>
                 <div className="japanese-text">会社</div>
               </TableHead>
+              <TableHead className="w-[150px]">
+                <div className="japanese-text">案件担当者</div>
+              </TableHead>
               <TableHead className="w-[200px]">
                 <div className="japanese-text">メモ</div>
               </TableHead>
@@ -262,6 +266,9 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                       )}
                     </div>
                   </TableCell>
+                  <TableCell className="japanese-text">
+                    {result.caseManager || '未設定'}
+                  </TableCell>
                   <TableCell className="whitespace-normal japanese-text">
                     {memos[result.id] || result.memo || ''}
                   </TableCell>
@@ -289,7 +296,7 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4 japanese-text">
+                <TableCell colSpan={8} className="text-center py-4 japanese-text">
                   マッチング結果がありません
                 </TableCell>
               </TableRow>

@@ -23,7 +23,7 @@ const EMAIL_TEMPLATES = [
     id: 'template-intro',
     name: '案件紹介テンプレート',
     subject: '【案件紹介】{{caseName}} - {{caseCompany}}',
-    body: `{{recipientName}} 様\n\n株式会社〇〇の〇〇でございます。\n\nこの度は、以下の案件をご紹介させていただきます。\n\n■案件名: {{caseName}}\n■クライアント: {{caseCompany}}\n■スキル: {{caseSkills}}\n\n{{caseDescription}}\n\nご興味がございましたら、ご連絡いただければ幸いです。\n\nよろしくお願い申し上げます。`
+    body: `{{recipientName}} 様\n\n株式会社〇〇の〇〇でございます。\n\nこの度は、以下の案件をご紹介させていただきます。\n\n■案件名: {{caseName}}\n■クライアント: {{caseCompany}}\n■スキル: {{caseSkills}}\n■担当者: {{caseManager}}\n\n{{caseDescription}}\n\nご興味がございましたら、ご連絡いただければ幸いです。\n\nよろしくお願い申し上げます。`
   },
   {
     id: 'template-candidate',
@@ -81,6 +81,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
     newBody = newBody.replace(/{{caseCompany}}/g, matchData.caseCompany || '');
     newBody = newBody.replace(/{{caseSkills}}/g, 'Java, Spring, React, TypeScript');
     newBody = newBody.replace(/{{caseDescription}}/g, '金融系システムの開発案件です。React, TypeScriptを使用した画面開発が主な業務となります。');
+    newBody = newBody.replace(/{{caseManager}}/g, matchData.caseManager || '未設定');
     
     // Replace candidate placeholders
     newBody = newBody.replace(/{{candidateName}}/g, matchData.candidateName || '');
@@ -93,9 +94,8 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
 
   const handleSend = () => {
     if (!subject.trim() || !message.trim()) {
-      toast("エラー", {
+      toast.error("エラー", {
         description: "件名とメッセージを入力してください",
-        style: { backgroundColor: 'hsl(var(--destructive))' },
       });
       return;
     }
@@ -105,7 +105,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
     // Simulate sending
     setTimeout(() => {
       setSending(false);
-      toast("送信完了", {
+      toast.success("送信完了", {
         description: "メッセージが正常に送信されました",
       });
       onClose();
@@ -119,7 +119,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
   const handleApplySignature = () => {
     setSignature(draftSignature);
     setShowSignature(true);
-    toast("署名設定が完了しました", {
+    toast.success("署名設定が完了しました", {
       description: "メール送信時に署名が適用されます",
     });
   };
@@ -142,6 +142,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
           </DialogTitle>
           <DialogDescription className="japanese-text">
             {recipientCompany}に{matchData.caseName}について連絡します
+            {matchData.caseManager && <span className="block mt-1 text-sm font-medium">案件担当者: {matchData.caseManager}</span>}
           </DialogDescription>
         </DialogHeader>
         

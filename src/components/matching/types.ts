@@ -1,31 +1,27 @@
-
 export interface EnhancedMatchingResult {
   id: number | string;
+  caseId: number | string;
+  candidateId: number | string;
   caseName: string;
   candidateName: string;
-  matchingRate: string;
+  matchingRate: string; // e.g. "85%"
   matchingReason: string;
-  recommendationComment?: string;
-  candidateCompany?: string;
   caseCompany?: string;
+  candidateCompany?: string;
+  caseManager?: string; // Added case manager property
   memo?: string;
-  candidateId?: number | string;
-  caseId?: number | string;
 }
 
 export interface CaseDetailItem {
   id: number | string;
   title: string;
   client: string;
-  skills?: string[];
-  experience?: string;
-  budget?: string;
-  location?: string;
-  workType?: string;
-  priority?: string;
-  description?: string;
-  detailDescription?: string;
-  companyType?: string;
+  skills: string[];
+  experience: string;
+  budget: string;
+  description: string;
+  detailDescription: string;
+  manager?: string; // Added manager property
 }
 
 export interface CandidateItem {
