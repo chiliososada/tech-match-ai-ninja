@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { CandidateSelectionDialog } from './CandidateSelectionDialog';
 import { MatchingResultsCard } from './MatchingResultsCard';
 import { MatchingProgressCard } from './MatchingProgressCard';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Loader } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { candidatesData } from '@/components/candidates/data/candidatesData';
 
 interface CandidateItem {
   id: number;

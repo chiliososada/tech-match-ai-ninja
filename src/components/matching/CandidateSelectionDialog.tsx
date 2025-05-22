@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { supabase } from "@/integrations/supabase/client";
+import { candidatesData } from '@/components/candidates/data/candidatesData';
 import { Engineer } from '@/components/candidates/types';
 
 interface CandidateItem {
@@ -32,69 +32,8 @@ interface CandidateSelectionDialogProps {
 export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogProps) {
   const [companyTypeFilter, setCompanyTypeFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [open, setOpen] = useState(false);
   
-  // Import engineers from Candidates.tsx - making sure to use the same data source
-  // as the "人材管理" page
-  const mockEngineers: Engineer[] = [
-    {
-      id: '1',
-      name: '山田太郎',
-      skills: ['JavaScript', 'React', 'Node.js'],
-      japaneseLevel: 'ネイティブレベル',
-      experience: '5年',
-      availability: '即日',
-      status: ['提案中', '事前面談'],  // Multiple statuses
-      remarks: '週4日勤務希望, 出張可, リモート可',
-      companyType: '自社',
-      companyName: 'テックイノベーション株式会社',
-      source: '直接応募',
-      registeredAt: '2023-01-15',
-      updatedAt: '2023-03-20',
-      nationality: '日本',
-      age: '32歳',
-      gender: '男性',
-      nearestStation: '品川駅',
-    },
-    {
-      id: '2',
-      name: '鈴木花子',
-      skills: ['Python', 'Django', 'AWS'],
-      japaneseLevel: 'ネイティブレベル',
-      experience: '3年',
-      availability: '1ヶ月後',
-      status: ['面談', '結果待ち'],  // Multiple statuses
-      remarks: 'リモート勤務希望, 週5日可',
-      companyType: '他社',
-      companyName: 'フロントエンドパートナーズ株式会社',
-      source: 'エージェント紹介',
-      registeredAt: '2023-02-20',
-      updatedAt: '2023-04-15',
-      nationality: '中国',
-      age: '28歳',
-      gender: '女性',
-      nearestStation: '東京駅',
-    },
-    {
-      id: '3',
-      name: '田中誠',
-      skills: ['Java', 'Spring Boot', 'Oracle'],
-      japaneseLevel: 'ビジネスレベル',
-      experience: '8年',
-      availability: '応相談',
-      status: ['営業終了'],
-      remarks: '大手企業での勤務経験豊富, 長期案件希望',
-      companyType: '自社',
-      companyName: 'テックイノベーション株式会社',
-      source: '直接応募',
-      registeredAt: '2023-03-05',
-      updatedAt: '2023-05-10',
-      nationality: 'インド',
-      age: '35歳',
-      gender: '男性',
-      nearestStation: '新宿駅',
-    }
-  ];
-
   // Convert Engineer objects to CandidateItem format
   const convertEngineerToCandidateItem = (engineer: Engineer): CandidateItem => {
     return {
@@ -114,7 +53,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
   };
 
   // Convert engineers to candidates
-  const candidates: CandidateItem[] = mockEngineers.map(convertEngineerToCandidateItem);
+  const candidates: CandidateItem[] = candidatesData.map(convertEngineerToCandidateItem);
   
   // Filter candidates based on company type and search query
   const filteredCandidates = candidates.filter(candidate => {
@@ -128,13 +67,14 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
 
   const handleSelect = (candidate: CandidateItem) => {
     onSelect(candidate);
-    // Close dialog by resetting state
+    setOpen(false); // Close dialog after selection
+    // Reset filters
     setSearchQuery("");
     setCompanyTypeFilter("all");
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full japanese-text">
           <Users className="mr-2 h-4 w-4" />
@@ -205,6 +145,13 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredCandidates.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center japanese-text">
+                    該当する人材が見つかりません
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

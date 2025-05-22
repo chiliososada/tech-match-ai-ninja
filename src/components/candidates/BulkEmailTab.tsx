@@ -20,74 +20,62 @@ import {
   generatePaginationRange
 } from '@/components/ui/pagination';
 import { toast } from 'sonner';
+import { candidatesData } from '../candidates/data/candidatesData';
 
-// 会社と件数のサンプルデータ (担当者情報を追加)
-const companiesData = [
-  { 
-    id: '1', 
-    name: 'テックイノベーション株式会社', 
-    count: 3, 
-    email: 'contact@techinnovation.co.jp', 
-    lastSent: '2024-04-05',
-    representatives: [
-      { id: '1-1', name: '佐藤 雄一', email: 'sato@techinnovation.co.jp', position: '技術部長' },
-      { id: '1-2', name: '田中 誠', email: 'tanaka@techinnovation.co.jp', position: '採用担当' }
-    ]
-  },
-  { 
-    id: '2', 
-    name: 'フロントエンドパートナーズ株式会社', 
-    count: 1, 
-    email: 'info@frontend-partners.co.jp', 
-    lastSent: '2024-03-20',
-    representatives: [
-      { id: '2-1', name: '山田 健太', email: 'yamada@frontend-partners.co.jp', position: '代表取締役' }
-    ]
-  },
-  { 
-    id: '3', 
-    name: 'クラウドシステムズ株式会社', 
-    count: 1, 
-    email: 'info@cloud-systems.co.jp', 
-    lastSent: '2024-05-01',
-    representatives: [
-      { id: '3-1', name: '鈴木 一郎', email: 'suzuki@cloud-systems.co.jp', position: '技術マネージャー' },
-      { id: '3-2', name: '伊藤 直子', email: 'ito@cloud-systems.co.jp', position: '人事部長' }
-    ]
-  },
-  { 
-    id: '4', 
-    name: 'ウェブソリューションズ株式会社', 
-    count: 1, 
-    email: 'contact@web-solutions.co.jp', 
-    lastSent: '2024-04-15',
-    representatives: [
-      { id: '4-1', name: '木村 大輔', email: 'kimura@web-solutions.co.jp', position: 'CTO' },
-      { id: '4-2', name: '中村 美咲', email: 'nakamura@web-solutions.co.jp', position: '人事担当' }
-    ]
-  },
-  { 
-    id: '5', 
-    name: 'デジタルフューチャー株式会社', 
-    count: 2, 
-    email: 'info@digital-future.co.jp', 
-    lastSent: '2024-05-10',
-    representatives: [
-      { id: '5-1', name: '高橋 誠', email: 'takahashi@digital-future.co.jp', position: '代表取締役' }
-    ]
-  },
-  { 
-    id: '6', 
-    name: 'テックサポート株式会社', 
-    count: 3, 
-    email: 'support@tech-support.co.jp', 
-    lastSent: '2024-04-20',
-    representatives: [
-      { id: '6-1', name: '加藤 健一', email: 'kato@tech-support.co.jp', position: '営業部長' },
-      { id: '6-2', name: '渡辺 真理', email: 'watanabe@tech-support.co.jp', position: '採用担当' }
-    ]
+// Group candidates by company to get count
+const generateCompaniesData = () => {
+  const companiesByName = candidatesData.reduce((acc, candidate) => {
+    const companyName = candidate.companyType === '他社' && candidate.companyName 
+      ? candidate.companyName 
+      : 'テックイノベーション株式会社'; // Default for 自社
+    
+    if (!acc[companyName]) {
+      acc[companyName] = {
+        id: companyName.replace(/\s/g, '-').toLowerCase(),
+        name: companyName,
+        count: 0,
+        email: `contact@${companyName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}.co.jp`,
+        lastSent: '',
+        representatives: []
+      };
+    }
+    
+    acc[companyName].count += 1;
+    
+    // Add representatives if they don't exist
+    if (candidate.companyType === '他社' && !acc[companyName].representatives.some(rep => rep.name === candidate.name)) {
+      acc[companyName].representatives.push({
+        id: `${acc[companyName].id}-${acc[companyName].representatives.length + 1}`,
+        name: candidate.name,
+        email: candidate.email || `${candidate.name.replace(/\s/g, '').toLowerCase()}@${companyName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}.co.jp`,
+        position: '技術者'
+      });
+    }
+    
+    return acc;
+  }, {});
+  
+  // For 自社, add some default representatives
+  if (companiesByName['テックイノベーション株式会社'] && companiesByName['テックイノベーション株式会社'].representatives.length === 0) {
+    companiesByName['テックイノベーション株式会社'].representatives = [
+      { id: 'tech-1', name: '佐藤 雄一', email: 'sato@techinnovation.co.jp', position: '技術部長' },
+      { id: 'tech-2', name: '田中 誠', email: 'tanaka@techinnovation.co.jp', position: '採用担当' }
+    ];
   }
-];
+  
+  // Add some mock dates for lastSent
+  const dates = ['2024-04-05', '2024-03-20', '2024-05-01', '2024-04-15', '2024-05-10'];
+  
+  return Object.values(companiesByName).map((company, index) => {
+    return {
+      ...company,
+      lastSent: dates[index % dates.length]
+    };
+  });
+};
+
+// Generate companies data based on candidatesData
+const companiesData = generateCompaniesData();
 
 // 案件のサンプルデータ
 const casesData = [
