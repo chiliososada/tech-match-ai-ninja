@@ -35,16 +35,14 @@ export function CandidateToCase() {
     setSelectedCandidate(candidate);
     console.log("Selected candidate:", candidate);
     
-    toast({
-      title: "候補者を選択しました",
+    toast("候補者を選択しました", {
       description: `${candidate.name}が選択されました`,
     });
   };
 
   const startMatching = () => {
     if (!selectedCandidate) {
-      toast({
-        title: "エラー",
+      toast("エラー", {
         description: "候補者を選択してください",
         variant: "destructive",
       });
@@ -55,8 +53,7 @@ export function CandidateToCase() {
     setProgress(0);
     
     // Show toast notification
-    toast({
-      title: "マッチング処理を開始しました",
+    toast("マッチング処理を開始しました", {
       description: "処理が完了するまでお待ちください",
     });
 
@@ -70,8 +67,7 @@ export function CandidateToCase() {
           setMatchingComplete(true);
           
           // Show completion toast
-          toast({
-            title: "マッチング完了",
+          toast("マッチング完了", {
             description: "5件の案件が見つかりました",
           });
           
