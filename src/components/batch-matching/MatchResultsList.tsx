@@ -24,32 +24,34 @@ export const MatchResultsList: React.FC<MatchResultsListProps> = ({
   onSendMessage
 }) => {
   return (
-    <Card>
-      <CardContent className="p-4">
-        <h3 className="text-lg font-medium mb-4 japanese-text">マッチング検索結果</h3>
-        
-        <div className="space-y-4">
-          {results.map(result => (
-            <MatchResultItem
-              key={result.id}
-              result={result}
-              onCaseDetail={onCaseDetail}
-              onCandidateDetail={onCandidateDetail}
-              onSendMessage={onSendMessage}
-            />
-          ))}
-        </div>
-        
-        {totalPages > 1 && (
-          <div className="mt-4 flex justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
+    <div className="w-full">
+      <Card className="border shadow-sm">
+        <CardContent className="p-4">
+          <h3 className="text-lg font-medium mb-4 japanese-text">マッチング検索結果</h3>
+          
+          <div className="space-y-4 max-h-[calc(100vh-250px)] overflow-auto pr-2">
+            {results.map(result => (
+              <MatchResultItem
+                key={result.id}
+                result={result}
+                onCaseDetail={onCaseDetail}
+                onCandidateDetail={onCandidateDetail}
+                onSendMessage={onSendMessage}
+              />
+            ))}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
