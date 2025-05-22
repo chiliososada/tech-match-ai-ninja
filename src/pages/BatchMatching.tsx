@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -55,7 +56,7 @@ export function BatchMatching() {
 
   // Enhanced matching results format similar to case matching
   const enhancedCaseResults = matchingCaseResults.map(item => ({
-    id: item.id,
+    id: item.id.toString(), // Convert ID to string
     caseName: item.caseName,
     candidateName: item.topCandidates.join('、'),
     matchingRate: "85%", // Example matching rate
@@ -67,15 +68,16 @@ export function BatchMatching() {
     statusClass: "bg-green-100 text-green-800",
   }));
 
+  // Update the candidate results to use string IDs
   const matchingCandidateResults = [
     {
-      id: 1,
+      id: "1", // String ID
       name: '田中 太郎',
       skills: ['React', 'TypeScript', 'AWS'],
       matchCount: 3,
     },
     {
-      id: 2,
+      id: "2", // String ID
       name: '佐藤 花子',
       skills: ['Java', 'Spring Boot', 'Oracle'],
       matchCount: 5,
@@ -84,7 +86,7 @@ export function BatchMatching() {
 
   // Enhanced candidate matching results
   const enhancedCandidateResults = matchingCandidateResults.map(item => ({
-    id: item.id,
+    id: item.id, // Already string ID
     candidateName: item.name,
     caseName: `マッチング案件 ${item.matchCount}件`,
     matchingRate: "92%", // Example matching rate
@@ -96,17 +98,17 @@ export function BatchMatching() {
     statusClass: "bg-blue-100 text-blue-800",
   }));
 
-  // Sample candidates details for modal
+  // Sample candidates details for modal - update IDs to strings
   const candidatesDetails = [
     {
-      id: 1,
+      id: "1", // String ID
       name: '山田太郎',
       skills: 'Java, AWS, Spring Boot',
       experience: '10年',
       matchScore: 92,
     },
     {
-      id: 2,
+      id: "2", // String ID
       name: '佐藤一郎',
       skills: 'Java, React, AWS',
       experience: '8年',
@@ -114,10 +116,10 @@ export function BatchMatching() {
     }
   ];
 
-  // Sample case details for modal
+  // Sample case details for modal - update IDs to strings 
   const caseDetails = [
     {
-      id: 1,
+      id: "1", // String ID
       name: 'ECサイト開発案件',
       company: '株式会社A',
       location: '東京（リモート可）',
@@ -126,7 +128,7 @@ export function BatchMatching() {
       matchScore: 95,
     },
     {
-      id: 2,
+      id: "2", // String ID
       name: 'コーポレートサイトリニューアル',
       company: '株式会社B',
       location: '大阪（リモート可）',
