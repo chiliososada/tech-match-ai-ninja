@@ -24,7 +24,7 @@ export const MatchResultsList: React.FC<MatchResultsListProps> = ({
   onSendMessage
 }) => {
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardContent className="p-4">
         <h3 className="text-lg font-medium mb-4 japanese-text">マッチング検索結果</h3>
         

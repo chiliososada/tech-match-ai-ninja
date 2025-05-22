@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Dialog,
@@ -95,7 +96,6 @@ export const CandidateDetailDialog: React.FC<CandidateDetailDialogProps> = ({
                 </Badge>
               )}
             </div>
-            
             
             <div className="grid grid-cols-2 gap-4">
               <div>
