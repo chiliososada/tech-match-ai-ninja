@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -221,7 +220,7 @@ export function Email() {
             </Card>
           </TabsContent>
 
-          {/* Tab 3: Connection and Security Settings */}
+          {/* Tab 3: Connection and Security Settings - Updated with detailed SMTP configuration */}
           <TabsContent value="security" className="space-y-6">
             <Card>
               <CardHeader>
@@ -233,7 +232,7 @@ export function Email() {
                   メールアカウントの接続とセキュリティ設定
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="email-provider" className="japanese-text">メールプロバイダー</Label>
                   <Select defaultValue="gmail">
@@ -248,17 +247,81 @@ export function Email() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="japanese-text">メールアドレス</Label>
-                  <Input type="email" id="email" placeholder="example@gmail.com" />
+                
+                {/* SMTP Server Configuration */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-medium mb-3 japanese-text">SMTP設定</h3>
+                  
+                  {/* SMTP Server */}
+                  <div className="space-y-2">
+                    <Label htmlFor="smtp-server" className="japanese-text">SMTPサーバー</Label>
+                    <Input id="smtp-server" placeholder="smtp.gmail.com" />
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      メールサービスプロバイダのSMTPサーバー名
+                    </p>
+                  </div>
+                  
+                  {/* Port Number */}
+                  <div className="space-y-2 mt-3">
+                    <Label htmlFor="port-number" className="japanese-text">ポート番号</Label>
+                    <Input type="number" id="port-number" placeholder="587" />
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      一般的に587（STARTTLS）または465（SSL）を使用
+                    </p>
+                  </div>
+                  
+                  {/* Encryption Type */}
+                  <div className="space-y-2 mt-3">
+                    <Label htmlFor="encryption-type" className="japanese-text">暗号化方式</Label>
+                    <Select defaultValue="starttls">
+                      <SelectTrigger id="encryption-type">
+                        <SelectValue placeholder="暗号化方式を選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="starttls">STARTTLS（推奨）</SelectItem>
+                        <SelectItem value="ssl">SSL</SelectItem>
+                        <SelectItem value="none">なし</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Authentication Username */}
+                  <div className="space-y-2 mt-3">
+                    <Label htmlFor="auth-username" className="japanese-text">認証ユーザー名</Label>
+                    <Input type="email" id="auth-username" placeholder="yourname@example.com" />
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      使用するメールアドレス
+                    </p>
+                  </div>
+                  
+                  {/* Authentication Password */}
+                  <div className="space-y-2 mt-3">
+                    <Label htmlFor="auth-password" className="japanese-text">認証パスワード</Label>
+                    <Input type="password" id="auth-password" placeholder="••••••••" />
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      通常のパスワード、またはアプリ用パスワード（Gmailなど）
+                    </p>
+                  </div>
+                  
+                  {/* Sender Email */}
+                  <div className="space-y-2 mt-3">
+                    <Label htmlFor="sender-email" className="japanese-text">送信元メール</Label>
+                    <Input type="email" id="sender-email" placeholder="yourname@example.com" />
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      通常は認証ユーザー名と同じ
+                    </p>
+                  </div>
+                  
+                  {/* Sender Name */}
+                  <div className="space-y-2 mt-3">
+                    <Label htmlFor="sender-name" className="japanese-text">送信者名（From）</Label>
+                    <Input id="sender-name" placeholder="AIマッチくん" />
+                    <p className="text-xs text-muted-foreground japanese-text">
+                      受信者に表示される名前
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="japanese-text">アプリパスワード</Label>
-                  <Input type="password" id="password" placeholder="••••••••" />
-                  <p className="text-xs text-muted-foreground japanese-text">
-                    メールプロバイダーで生成したアプリパスワードを入力してください。
-                  </p>
-                </div>
+                
                 <div className="pt-4">
                   <Button 
                     variant="outline"
