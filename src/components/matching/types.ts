@@ -1,3 +1,4 @@
+
 export interface EnhancedMatchingResult {
   id: number | string;
   caseId: number | string;
@@ -10,6 +11,7 @@ export interface EnhancedMatchingResult {
   candidateCompany?: string;
   caseManager?: string; // Added case manager property
   memo?: string;
+  recommendationComment?: string; // Added recommendation comment property
 }
 
 export interface CaseDetailItem {
