@@ -3,7 +3,6 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, List } from 'lucide-react';
 import { BatchMatchingTab3 } from '@/components/batch-matching/BatchMatchingTab3';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -16,20 +15,17 @@ import { EnhancedMatchingResult } from '@/components/matching/types';
 export function BatchMatching() {
   const [activeTab, setActiveTab] = useState<"combined-matching" | "matching-history">("combined-matching");
   
-  // Common filter states
-  const [filterCaseRegistrationDate, setFilterCaseRegistrationDate] = useState<string>('');
+  // Keep only the three required filter states
   const [filterCaseAffiliation, setFilterCaseAffiliation] = useState<string>('');
-  const [filterCaseStartDate, setFilterCaseStartDate] = useState<string>('');
-  const [filterCandidateStatus, setFilterCandidateStatus] = useState<string>('');
   const [filterCandidateAffiliation, setFilterCandidateAffiliation] = useState<string>('');
-  const [filterCandidateUpdateDate, setFilterCandidateUpdateDate] = useState<string>('');
+  const [filterCaseStartDate, setFilterCaseStartDate] = useState<string>('');
   
   // Search result states
   const [isSearched, setIsSearched] = useState<boolean>(false);
   const [showCandidates, setShowCandidates] = useState<boolean>(false);
   const [showCases, setShowCases] = useState<boolean>(false);
   
-  // Add SendMessageDialog state
+  // SendMessageDialog state
   const [isSendMessageDialogOpen, setIsSendMessageDialogOpen] = useState<boolean>(false);
   const [selectedMatch, setSelectedMatch] = useState<EnhancedMatchingResult | null>(null);
 
@@ -156,18 +152,10 @@ export function BatchMatching() {
           
           {/* Combined Tab for Case to Candidate and Candidate to Case */}
           <TabsContent value="combined-matching">
-            {/* Filter Area */}
+            {/* Filter Area - Simplified with only three filters */}
             <div className="p-6 bg-white rounded-lg shadow-sm border mb-6">
               <h3 className="text-lg font-medium mb-4 japanese-text">フィルター条件設定</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium japanese-text">案件の登録日</label>
-                  <Input 
-                    type="date"
-                    value={filterCaseRegistrationDate}
-                    onChange={(e) => setFilterCaseRegistrationDate(e.target.value)}
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text">案件の所属</label>
                   <Select value={filterCaseAffiliation} onValueChange={setFilterCaseAffiliation}>
@@ -179,22 +167,6 @@ export function BatchMatching() {
                       <SelectItem value="2">他社</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium japanese-text">案件の開始時期</label>
-                  <Input 
-                    type="month"
-                    value={filterCaseStartDate}
-                    onChange={(e) => setFilterCaseStartDate(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium japanese-text">技術者の状態</label>
-                  <Input 
-                    placeholder="例：案件探し中" 
-                    value={filterCandidateStatus}
-                    onChange={(e) => setFilterCandidateStatus(e.target.value)}
-                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium japanese-text">技術者の所属</label>
@@ -209,11 +181,12 @@ export function BatchMatching() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium japanese-text">技術者资料更新日</label>
-                  <Input 
-                    type="date"
-                    value={filterCandidateUpdateDate}
-                    onChange={(e) => setFilterCandidateUpdateDate(e.target.value)}
+                  <label className="text-sm font-medium japanese-text">案件の開始時期</label>
+                  <input 
+                    type="month"
+                    value={filterCaseStartDate}
+                    onChange={(e) => setFilterCaseStartDate(e.target.value)}
+                    className="w-full h-10 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input"
                   />
                 </div>
               </div>
