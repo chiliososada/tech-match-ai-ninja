@@ -3,27 +3,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CandidateSelectionDialog } from './CandidateSelectionDialog';
-import { MatchingResultsCard } from './MatchingResultsCard';
 import { MatchingProgressCard } from './MatchingProgressCard';
-import { toast } from 'sonner';
 import { Loader } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { candidatesData } from '@/components/candidates/data/candidatesData';
-
-interface CandidateItem {
-  id: number;
-  name: string;
-  skills: string;
-  companyType?: string;
-  companyName?: string;
-  nationality?: string;
-  age?: string;
-  gender?: string;
-  experience?: string;
-  japaneseLevel?: string;
-  availability?: string;
-  status?: string[];
-}
+import { toast } from 'sonner';
+import { CandidateItem, EnhancedMatchingResult } from './types';
+import { EnhancedMatchingResultsTable } from './EnhancedMatchingResultsTable';
 
 export function CandidateToCase() {
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateItem | null>(null);
@@ -80,32 +66,67 @@ export function CandidateToCase() {
     }, 500);
   };
 
-  // Mock matching results
-  const matchingResults = [
+  // Enhanced mock matching results
+  const enhancedResults: EnhancedMatchingResult[] = [
     {
       id: 1,
-      name: 'Java開発エンジニア',
-      skills: ['Java', 'Spring Boot', 'AWS']
+      caseName: 'Java開発エンジニア',
+      candidateName: selectedCandidate?.name || '候補者',
+      matchingRate: '92%',
+      matchingReason: 'スキル・経験年数・単価が一致しています。Java, Spring Boot, AWSの経験が豊富で、金融システム開発の実績があります。',
+      recommendationComment: '金融システムの開発経験があり、コミュニケーション能力も高いため推薦します。',
+      candidateCompany: selectedCandidate?.companyName || '自社',
+      caseCompany: '株式会社システム開発',
+      caseId: 101,
+      candidateId: selectedCandidate?.id || '1',
+      memo: '候補者の希望単価は70万円/月'
     },
     {
       id: 2,
-      name: 'フロントエンドエンジニア',
-      skills: ['React', 'TypeScript', 'Next.js']
+      caseName: 'フロントエンドエンジニア',
+      candidateName: selectedCandidate?.name || '候補者',
+      matchingRate: '89%',
+      matchingReason: 'React, TypeScriptの経験が豊富で、要件に合致しています。UI/UXの知識もあり、デザイナーとの協業経験もあります。',
+      candidateCompany: selectedCandidate?.companyName || '自社',
+      caseCompany: '株式会社ウェブシステム',
+      caseId: 102,
+      candidateId: selectedCandidate?.id || '1',
     },
     {
       id: 3,
-      name: 'インフラエンジニア',
-      skills: ['AWS', 'Docker', 'Kubernetes']
+      caseName: 'インフラエンジニア',
+      candidateName: selectedCandidate?.name || '候補者',
+      matchingRate: '85%',
+      matchingReason: 'AWSとDockerの経験が豊富で、クラウドインフラの構築・運用経験があります。自動化スクリプトの作成経験もあり。',
+      recommendationComment: 'インフラ自動化の経験が豊富で、CI/CDパイプラインの構築実績があります。',
+      candidateCompany: selectedCandidate?.companyName || '自社',
+      caseCompany: '株式会社クラウドソリューション',
+      caseId: 103,
+      candidateId: selectedCandidate?.id || '1',
+      memo: 'リモート勤務希望'
     },
     {
       id: 4,
-      name: 'バックエンドエンジニア',
-      skills: ['Python', 'Django', 'PostgreSQL']
+      caseName: 'バックエンドエンジニア',
+      candidateName: selectedCandidate?.name || '候補者',
+      matchingRate: '75%',
+      matchingReason: 'Python, Djangoの経験があるが、PostgreSQLの経験がやや不足しています。APIの設計・開発経験はあり。',
+      candidateCompany: selectedCandidate?.companyName || '自社',
+      caseCompany: '株式会社データシステム',
+      caseId: 104,
+      candidateId: selectedCandidate?.id || '1',
     },
     {
       id: 5,
-      name: 'モバイルアプリ開発',
-      skills: ['iOS', 'Android', 'Flutter']
+      caseName: 'モバイルアプリ開発',
+      candidateName: selectedCandidate?.name || '候補者',
+      matchingRate: '78%',
+      matchingReason: 'iOS開発の経験があるが、Androidの経験が少なめです。Flutter経験はマッチしています。',
+      candidateCompany: selectedCandidate?.companyName || '自社',
+      caseCompany: '株式会社モバイルアプリ',
+      caseId: 105,
+      candidateId: selectedCandidate?.id || '1',
+      memo: 'Flutter案件を優先的に検討'
     }
   ];
 
@@ -237,17 +258,19 @@ export function CandidateToCase() {
         />
       </div>
 
-      {/* Matching Results Card */}
+      {/* Enhanced Matching Results Table */}
       {matchingComplete && (
-        <MatchingResultsCard 
-          title="マッチング結果"
-          description={`${selectedCandidate?.name || '候補者'}に合う案件が見つかりました`}
-          matches={matchingResults.map(result => ({
-            id: String(result.id),
-            name: result.name,
-            skills: result.skills
-          }))}
-        />
+        <Card>
+          <CardHeader>
+            <CardTitle className="japanese-text">マッチング結果</CardTitle>
+            <CardDescription className="japanese-text">
+              {selectedCandidate?.name || '候補者'}に合う案件が見つかりました
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EnhancedMatchingResultsTable results={enhancedResults} />
+          </CardContent>
+        </Card>
       )}
     </div>
   );
