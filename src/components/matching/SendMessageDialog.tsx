@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -65,9 +66,8 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
     }
   }, [isOpen, matchData]);
   
-  // If matchData is null, return null instead of an early return
-  // This ensures hooks are always called in the same order
-  if (!matchData) {
+  // Early return if dialog shouldn't be shown
+  if (!isOpen || !matchData) {
     return null;
   }
 

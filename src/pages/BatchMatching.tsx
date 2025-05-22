@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Mail, File } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { SendMessageDialog } from '@/components/matching/SendMessageDialog';
+import { EnhancedMatchingResult } from '@/components/matching/types';
 
 export function BatchMatching() {
   const [activeTab, setActiveTab] = useState<"combined-matching" | "matching-history">("combined-matching");
@@ -27,6 +28,10 @@ export function BatchMatching() {
   const [isSearched, setIsSearched] = useState<boolean>(false);
   const [showCandidates, setShowCandidates] = useState<boolean>(false);
   const [showCases, setShowCases] = useState<boolean>(false);
+  
+  // Add SendMessageDialog state
+  const [isSendMessageDialogOpen, setIsSendMessageDialogOpen] = useState<boolean>(false);
+  const [selectedMatch, setSelectedMatch] = useState<EnhancedMatchingResult | null>(null);
 
   // Sample data for demonstrations
   const matchingCaseResults = [
@@ -103,6 +108,31 @@ export function BatchMatching() {
 
   const handleSearch = () => {
     setIsSearched(true);
+  };
+  
+  // Handle sending a message to a candidate
+  const handleSendMessage = (candidate: any) => {
+    // Create a match object with the necessary data
+    const matchData: EnhancedMatchingResult = {
+      id: candidate.id,
+      caseId: 'c101',
+      candidateId: `u${candidate.id}`,
+      caseName: 'XX証券向けシステム開発',
+      candidateName: candidate.name,
+      matchingRate: `${candidate.matchScore}%`,
+      matchingReason: 'スキル・経験年数が一致',
+      caseCompany: 'システム開発株式会社',
+      candidateCompany: 'テック株式会社',
+      caseManager: '田中課長',
+      caseManagerEmail: 'tanaka@system-dev.co.jp',
+      affiliationManager: '山本部長',
+      affiliationManagerEmail: 'yamamoto@tech-co.jp',
+      memo: `経験年数: ${candidate.experience}`,
+      recommendationComment: `${candidate.skills}のスキルが案件に適合`
+    };
+    
+    setSelectedMatch(matchData);
+    setIsSendMessageDialogOpen(true);
   };
 
   return (
@@ -190,7 +220,7 @@ export function BatchMatching() {
 
               <div className="mt-6 flex justify-end space-x-4">
                 <Button 
-                  onClick={() => handleSearch()} 
+                  onClick={handleSearch} 
                   className="japanese-text"
                 >
                   マッチング検索
@@ -319,7 +349,12 @@ export function BatchMatching() {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="icon" title="メールを送信">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              title="メールを送信" 
+                              onClick={() => handleSendMessage(candidate)}
+                            >
                               <Mail className="h-4 w-4" />
                             </Button>
                             <Button variant="outline" size="icon" title="履歴書を見る">
@@ -422,6 +457,13 @@ export function BatchMatching() {
                 </div>
               </DialogContent>
             </Dialog>
+            
+            {/* Send Message Dialog */}
+            <SendMessageDialog 
+              isOpen={isSendMessageDialogOpen}
+              onClose={() => setIsSendMessageDialogOpen(false)}
+              matchData={selectedMatch}
+            />
           </TabsContent>
           
           {/* Matching History Tab */}
