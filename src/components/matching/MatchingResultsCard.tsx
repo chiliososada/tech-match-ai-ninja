@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Pagination } from "@/components/ui/pagination"
-import { CaseMatchingResult } from './CaseToCandidate';
+import { EnhancedMatchingResult } from './types';
 
 interface MatchingResultsCardProps {
   title?: string;
   description?: string;
   matches?: { id: string; name: string; skills: string[] }[];
-  results?: CaseMatchingResult[];
+  results?: EnhancedMatchingResult[];
   currentPage?: number;
   itemsPerPage?: number;
   setCurrentPage?: (page: number) => void;
