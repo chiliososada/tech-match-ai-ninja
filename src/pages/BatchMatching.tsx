@@ -61,6 +61,9 @@ export function BatchMatching() {
       affiliationManagerEmail: 'suzuki@companyX.co.jp',
       memo: 'システム開発経験あり',
       matchingReason: 'JavaとSpring Boot経験が10年以上あり、案件に必要なスキルと経験年数が一致しています',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
     },
     {
       id: "2",
@@ -76,6 +79,10 @@ export function BatchMatching() {
       affiliationManager: '高橋課長',
       affiliationManagerEmail: 'takahashi@companyY.co.jp',
       memo: 'フロントエンド専門',
+      matchingReason: 'React、TypeScript経験が豊富で、ECサイト開発経験あり',
+      nationality: '中国',
+      age: '32歳',
+      gender: '女性',
     },
     {
       id: "3",
@@ -240,7 +247,7 @@ export function BatchMatching() {
     }
   ];
   
-  // Sample candidate details
+  // Sample candidate details with enhanced project information
   const candidateDetails = [
     {
       id: "u1",
@@ -256,9 +263,28 @@ export function BatchMatching() {
       manager: '鈴木課長',
       managerEmail: 'suzuki@companyX.co.jp',
       bio: 'バックエンド開発とクラウドインフラ構築を専門としています。金融系システムの開発経験が豊富です。',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
       projects: [
-        { name: '大手銀行システム統合', duration: '2年', role: 'バックエンドリード' },
-        { name: '証券取引プラットフォーム', duration: '1.5年', role: 'フルスタック開発者' }
+        { 
+          name: '大手銀行システム統合', 
+          duration: '2年', 
+          role: 'バックエンドリード',
+          startDate: '2022-04-01',
+          endDate: '2024-03-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装', 'テスト'],
+          nearestStation: '東京駅'
+        },
+        { 
+          name: '証券取引プラットフォーム', 
+          duration: '1.5年', 
+          role: 'フルスタック開発者',
+          startDate: '2020-10-01',
+          endDate: '2022-03-31',
+          workScope: ['詳細設計', '実装', 'テスト'],
+          nearestStation: '新宿駅'
+        }
       ]
     },
     {
@@ -275,9 +301,28 @@ export function BatchMatching() {
       manager: '高橋課長',
       managerEmail: 'takahashi@companyY.co.jp',
       bio: 'フロントエンド開発を専門としています。ECサイト開発経験が豊富です。',
+      nationality: '中国',
+      age: '32歳',
+      gender: '女性',
       projects: [
-        { name: 'ECサイトリニューアル', duration: '1年', role: 'フロントエンドリード' },
-        { name: 'AIコンサルティング', duration: '0.5年', role: 'フロントエンド開発者' }
+        { 
+          name: 'ECサイトリニューアル', 
+          duration: '1年', 
+          role: 'フロントエンドリード',
+          startDate: '2023-01-01',
+          endDate: '2023-12-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装'],
+          nearestStation: '梅田駅'
+        },
+        { 
+          name: 'AIコンサルティング', 
+          duration: '0.5年', 
+          role: 'フロントエンド開発者',
+          startDate: '2022-07-01',
+          endDate: '2022-12-31',
+          workScope: ['実装', 'テスト'],
+          nearestStation: '難波駅'
+        }
       ]
     },
     {
@@ -294,9 +339,28 @@ export function BatchMatching() {
       manager: '伊藤課長',
       managerEmail: 'ito@companyZ.co.jp',
       bio: 'バックエンド開発を専門としています。物流管理システムの開発経験が豊富です。',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
       projects: [
-        { name: '物流管理システム構築', duration: '2年', role: 'バックエンドリード' },
-        { name: 'AIコンサルティング', duration: '0.5年', role: 'バックエンド開発者' }
+        { 
+          name: '物流管理システム構築', 
+          duration: '2年', 
+          role: 'バックエンドリード',
+          startDate: '2022-04-01',
+          endDate: '2024-03-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装', 'テスト'],
+          nearestStation: '東京駅'
+        },
+        { 
+          name: 'AIコンサルティング', 
+          duration: '0.5年', 
+          role: 'バックエンド開発者',
+          startDate: '2022-07-01',
+          endDate: '2022-12-31',
+          workScope: ['実装', 'テスト'],
+          nearestStation: '難波駅'
+        }
       ]
     },
     {
@@ -313,9 +377,28 @@ export function BatchMatching() {
       manager: '中村課長',
       managerEmail: 'nakamura@companyW.co.jp',
       bio: 'クラウドインフラ構築を専門としています。クラウド移行プロジェクトの開発経験が豊富です。',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
       projects: [
-        { name: 'クラウド移行プロジェクト', duration: '2年', role: 'クラウドインフラリード' },
-        { name: 'AIコンサルティング', duration: '0.5年', role: 'クラウドインフラ開発者' }
+        { 
+          name: 'クラウド移行プロジェクト', 
+          duration: '2年', 
+          role: 'クラウドインフラリード',
+          startDate: '2022-04-01',
+          endDate: '2024-03-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装', 'テスト'],
+          nearestStation: '東京駅'
+        },
+        { 
+          name: 'AIコンサルティング', 
+          duration: '0.5年', 
+          role: 'クラウドインフラ開発者',
+          startDate: '2022-07-01',
+          endDate: '2022-12-31',
+          workScope: ['実装', 'テスト'],
+          nearestStation: '難波駅'
+        }
       ]
     },
     {
@@ -332,9 +415,28 @@ export function BatchMatching() {
       manager: '加藤課長',
       managerEmail: 'kato@companyV.co.jp',
       bio: 'AI開発を専門としています。AI推薦システムの開発経験が豊富です。',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
       projects: [
-        { name: 'AI推薦システム開発', duration: '2年', role: 'AI開発リード' },
-        { name: 'AIコンサルティング', duration: '0.5年', role: 'AI開発開発者' }
+        { 
+          name: 'AI推薦システム開発', 
+          duration: '2年', 
+          role: 'AI開発リード',
+          startDate: '2022-04-01',
+          endDate: '2024-03-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装', 'テスト'],
+          nearestStation: '東京駅'
+        },
+        { 
+          name: 'AIコンサルティング', 
+          duration: '0.5年', 
+          role: 'AI開発開発者',
+          startDate: '2022-07-01',
+          endDate: '2022-12-31',
+          workScope: ['実装', 'テスト'],
+          nearestStation: '難波駅'
+        }
       ]
     },
     {
@@ -351,9 +453,28 @@ export function BatchMatching() {
       manager: '吉田課長',
       managerEmail: 'yoshida@companyU.co.jp',
       bio: 'Java開発を専門としています。システム開発経験が豊富です。',
+      nationality: '日本',
+      age: '35歳',
+      gender: '男性',
       projects: [
-        { name: 'システム開発', duration: '2年', role: 'システム開発リード' },
-        { name: 'AIコンサルティング', duration: '0.5年', role: 'システム開発開発者' }
+        { 
+          name: 'システム開発', 
+          duration: '2年', 
+          role: 'システム開発リード',
+          startDate: '2022-04-01',
+          endDate: '2024-03-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装', 'テスト'],
+          nearestStation: '東京駅'
+        },
+        { 
+          name: 'AIコンサルティング', 
+          duration: '0.5年', 
+          role: 'システム開発開発者',
+          startDate: '2022-07-01',
+          endDate: '2022-12-31',
+          workScope: ['実装', 'テスト'],
+          nearestStation: '難波駅'
+        }
       ]
     },
     {
@@ -370,9 +491,28 @@ export function BatchMatching() {
       manager: '山田課長',
       managerEmail: 'yamada@companyT.co.jp',
       bio: 'フロントエンド開発を専門としています。ECサイト開発経験が豊富です。',
+      nationality: '中国',
+      age: '32歳',
+      gender: '女性',
       projects: [
-        { name: 'ECサイト開発案件', duration: '2年', role: 'フロントエンドリード' },
-        { name: 'AIコンサルティング', duration: '0.5年', role: 'フロントエンド開発者' }
+        { 
+          name: 'ECサイト開発案件', 
+          duration: '2年', 
+          role: 'フロントエンドリード',
+          startDate: '2023-01-01',
+          endDate: '2023-12-31',
+          workScope: ['要件定義', '基本設計', '詳細設計', '実装'],
+          nearestStation: '梅田駅'
+        },
+        { 
+          name: 'AIコンサルティング', 
+          duration: '0.5年', 
+          role: 'フロントエンド開発者',
+          startDate: '2022-07-01',
+          endDate: '2022-12-31',
+          workScope: ['実装', 'テスト'],
+          nearestStation: '難波駅'
+        }
       ]
     }
   ];
@@ -440,6 +580,9 @@ export function BatchMatching() {
       experience: result.experience,
       manager: result.affiliationManager,
       managerEmail: result.affiliationManagerEmail,
+      nationality: result.nationality,
+      age: result.age,
+      gender: result.gender,
       bio: '技術者の詳細情報が登録されていません。'
     };
     
@@ -547,6 +690,13 @@ export function BatchMatching() {
                                 <p className="text-sm text-gray-700 text-xs">{result.affiliationManagerEmail}</p>
                                 <p className="text-sm text-gray-700"><span className="font-medium">スキル:</span> {result.skills.join(', ')}</p>
                                 <p className="text-sm text-gray-700"><span className="font-medium">経験:</span> {result.experience}</p>
+                                
+                                {/* New technician information fields */}
+                                <div className="grid grid-cols-3 gap-2 mt-1">
+                                  <p className="text-sm text-gray-700"><span className="font-medium">国籍:</span> {result.nationality || '未設定'}</p>
+                                  <p className="text-sm text-gray-700"><span className="font-medium">年齢:</span> {result.age || '未設定'}</p>
+                                  <p className="text-sm text-gray-700"><span className="font-medium">性別:</span> {result.gender || '未設定'}</p>
+                                </div>
                               </div>
                             </div>
                             
