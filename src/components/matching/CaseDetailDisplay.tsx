@@ -14,6 +14,7 @@ interface CaseItem {
   workType?: string;
   priority?: string;
   description?: string;
+  detailDescription?: string;
   companyType?: string;
 }
 
@@ -47,6 +48,13 @@ export function CaseDetailDisplay({ caseData }: CaseDetailDisplayProps) {
             <div>
               <p className="text-sm font-medium japanese-text">概要:</p>
               <p className="japanese-text text-sm text-muted-foreground">{caseData.description}</p>
+            </div>
+          )}
+          
+          {caseData.detailDescription && (
+            <div>
+              <p className="text-sm font-medium japanese-text">詳細説明:</p>
+              <p className="japanese-text text-sm text-muted-foreground">{caseData.detailDescription}</p>
             </div>
           )}
           

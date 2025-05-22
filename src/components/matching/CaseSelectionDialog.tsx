@@ -20,6 +20,7 @@ export interface CaseItem {
   workType?: string;
   priority?: string;
   description?: string;
+  detailDescription?: string;
   companyType?: string;
 }
 
@@ -43,6 +44,7 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
     location: item.location,
     workType: item.workType,
     description: item.description,
+    detailDescription: item.detailDescription,
     companyType: item.source === 'manual' ? '他社' : '自社', // Using source as a proxy for companyType
     priority: item.priority
   }));

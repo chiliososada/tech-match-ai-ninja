@@ -38,6 +38,7 @@ interface CaseItem {
   workType?: string;
   priority?: string;
   description?: string;
+  detailDescription?: string;
   companyType?: string;
 }
 
@@ -207,6 +208,7 @@ export function CaseToCandidate() {
       workType: data.workType,
       priority: "medium",
       description: data.originalText,
+      detailDescription: data.detailDescription || data.originalText,
       companyType: data.companyType || "未設定"
     };
     
