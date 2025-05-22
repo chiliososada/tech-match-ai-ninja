@@ -46,7 +46,7 @@ export function CaseDetailDisplay({ caseData }: CaseDetailDisplayProps) {
           {caseData.description && (
             <div>
               <p className="text-sm font-medium japanese-text">概要:</p>
-              <p className="japanese-text text-sm text-muted-foreground line-clamp-3">{caseData.description}</p>
+              <p className="japanese-text text-sm text-muted-foreground">{caseData.description}</p>
             </div>
           )}
           
