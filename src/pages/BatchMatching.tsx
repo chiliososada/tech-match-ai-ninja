@@ -12,9 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { SendMessageDialog } from '@/components/matching/SendMessageDialog';
 import { EnhancedMatchingResult } from '@/components/matching/types';
-import { MatchingResultsCard } from '@/components/matching/MatchingResultsCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Pagination } from '@/components/ui/pagination';
 
 export function BatchMatching() {
   const [activeTab, setActiveTab] = useState<"combined-matching" | "matching-history">("combined-matching");
@@ -29,8 +29,10 @@ export function BatchMatching() {
   const [showCandidates, setShowCandidates] = useState<boolean>(false);
   const [showCases, setShowCases] = useState<boolean>(false);
   
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  // Pagination states
+  const [caseResultsCurrentPage, setCaseResultsCurrentPage] = useState<number>(1);
+  const [candidateResultsCurrentPage, setCandidateResultsCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 3; // Number of items per page
   
   // SendMessageDialog state
   const [isSendMessageDialogOpen, setIsSendMessageDialogOpen] = useState<boolean>(false);
@@ -51,6 +53,27 @@ export function BatchMatching() {
       companyName: '株式会社B',
       candidateCount: 3,
       topCandidates: ['高橋三郎', '田中四郎', '伊藤五郎']
+    },
+    {
+      id: 3,
+      caseName: 'ECサイト開発案件',
+      companyName: '株式会社C',
+      candidateCount: 7,
+      topCandidates: ['渡辺六郎', '小林七郎', '加藤八郎']
+    },
+    {
+      id: 4,
+      caseName: 'クラウド移行プロジェクト',
+      companyName: '株式会社D',
+      candidateCount: 4,
+      topCandidates: ['松本九郎', '井上十郎', '木村十一郎']
+    },
+    {
+      id: 5,
+      caseName: 'AI推薦システム開発',
+      companyName: '株式会社E',
+      candidateCount: 6,
+      topCandidates: ['林十二郎', '山本十三郎', '斎藤十四郎']
     }
   ];
 
@@ -81,6 +104,24 @@ export function BatchMatching() {
       name: '佐藤 花子',
       skills: ['Java', 'Spring Boot', 'Oracle'],
       matchCount: 5,
+    },
+    {
+      id: "3", // String ID
+      name: '鈴木 一郎',
+      skills: ['Python', 'Django', 'PostgreSQL'],
+      matchCount: 2,
+    },
+    {
+      id: "4", // String ID
+      name: '高橋 次郎',
+      skills: ['JavaScript', 'Vue.js', 'Firebase'],
+      matchCount: 4,
+    },
+    {
+      id: "5", // String ID
+      name: '渡辺 三郎',
+      skills: ['Ruby', 'Rails', 'MySQL'],
+      matchCount: 6,
     }
   ];
 
@@ -137,6 +178,12 @@ export function BatchMatching() {
       matchScore: 87,
     }
   ];
+
+  // Function to get paginated results
+  const getPaginatedResults = (results: any[], page: number) => {
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    return results.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  };
 
   const handleSearch = () => {
     setIsSearched(true);
@@ -237,105 +284,106 @@ export function BatchMatching() {
               </div>
             </div>
 
-            {/* Results Area - Updated with card-based layout similar to Case Matching */}
+            {/* Results Area - With pagination for large result sets */}
             {isSearched && (
               <div className="space-y-8">
-                {/* Case to Candidate Results using MatchingResultsCard */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="shadow-sm">
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-medium mb-4 japanese-text flex items-center">
-                        <Badge className="mr-2 bg-blue-100 text-blue-800 border-blue-200">案件→人材</Badge>
-                        案件に合う技術者検索結果
-                      </h3>
-                      
-                      <div className="space-y-4">
-                        {enhancedCaseResults.map(result => (
-                          <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-lg">{result.caseName}</h4>
-                                <Badge className="bg-green-100 text-green-800">{result.candidateCount}名</Badge>
-                              </div>
-                              <div className="text-sm text-gray-600 space-y-1">
-                                <p><span className="font-medium">会社:</span> {result.caseCompany}</p>
-                                <p><span className="font-medium">候補者:</span> {result.candidateName}</p>
-                                <p><span className="font-medium">マッチング率:</span> {result.matchingRate}</p>
-                              </div>
-                              <div className="mt-3 flex justify-end">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="japanese-text"
-                                  onClick={() => setShowCandidates(true)}
-                                >
-                                  候補者一覧を見る
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                {/* Case to Candidate Results */}
+                <Card className="shadow-sm">
+                  <CardContent className="p-4">
+                    <h3 className="text-lg font-medium mb-4 japanese-text flex items-center">
+                      <Badge className="mr-2 bg-blue-100 text-blue-800 border-blue-200">案件→人材</Badge>
+                      案件に合う技術者検索結果
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      {getPaginatedResults(enhancedCaseResults, caseResultsCurrentPage).map(result => (
+                        <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-medium text-lg">{result.caseName}</h4>
+                              <Badge className="bg-green-100 text-green-800">{result.candidateCount}名</Badge>
+                            </div>
+                            <div className="text-sm text-gray-600 space-y-1">
+                              <p><span className="font-medium">会社:</span> {result.caseCompany}</p>
+                              <p><span className="font-medium">候補者:</span> {result.candidateName}</p>
+                              <p><span className="font-medium">マッチング率:</span> {result.matchingRate}</p>
+                            </div>
+                            <div className="mt-3 flex justify-end">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="japanese-text"
+                                onClick={() => setShowCandidates(true)}
+                              >
+                                候補者一覧を見る
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    
+                    {/* Pagination for case results */}
+                    {enhancedCaseResults.length > ITEMS_PER_PAGE && (
+                      <div className="mt-4 flex justify-center">
+                        <Pagination
+                          currentPage={caseResultsCurrentPage}
+                          totalPages={Math.ceil(enhancedCaseResults.length / ITEMS_PER_PAGE)}
+                          onPageChange={setCaseResultsCurrentPage}
+                        />
                       </div>
-                    </CardContent>
-                  </Card>
+                    )}
+                  </CardContent>
+                </Card>
 
-                  {/* Candidate to Case Results */}
-                  <Card className="shadow-sm">
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-medium mb-4 japanese-text flex items-center">
-                        <Badge className="mr-2 bg-purple-100 text-purple-800 border-purple-200">人材→案件</Badge>
-                        技術者に合う案件検索結果
-                      </h3>
-                      
-                      <div className="space-y-4">
-                        {enhancedCandidateResults.map(result => (
-                          <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-lg">{result.candidateName}</h4>
-                                <Badge className="bg-blue-100 text-blue-800">{result.caseName}</Badge>
-                              </div>
-                              <div className="text-sm text-gray-600 space-y-1">
-                                <p><span className="font-medium">スキル:</span> {result.skills}</p>
-                                <p><span className="font-medium">所属:</span> {result.candidateCompany}</p>
-                                <p><span className="font-medium">マッチング率:</span> {result.matchingRate}</p>
-                              </div>
-                              <div className="mt-3 flex justify-end">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="japanese-text"
-                                  onClick={() => setShowCases(true)}
-                                >
-                                  案件を見る
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                {/* Candidate to Case Results */}
+                <Card className="shadow-sm">
+                  <CardContent className="p-4">
+                    <h3 className="text-lg font-medium mb-4 japanese-text flex items-center">
+                      <Badge className="mr-2 bg-purple-100 text-purple-800 border-purple-200">人材→案件</Badge>
+                      技術者に合う案件検索結果
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      {getPaginatedResults(enhancedCandidateResults, candidateResultsCurrentPage).map(result => (
+                        <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-medium text-lg">{result.candidateName}</h4>
+                              <Badge className="bg-blue-100 text-blue-800">{result.caseName}</Badge>
+                            </div>
+                            <div className="text-sm text-gray-600 space-y-1">
+                              <p><span className="font-medium">スキル:</span> {result.skills}</p>
+                              <p><span className="font-medium">所属:</span> {result.candidateCompany}</p>
+                              <p><span className="font-medium">マッチング率:</span> {result.matchingRate}</p>
+                            </div>
+                            <div className="mt-3 flex justify-end">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="japanese-text"
+                                onClick={() => setShowCases(true)}
+                              >
+                                案件を見る
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    
+                    {/* Pagination for candidate results */}
+                    {enhancedCandidateResults.length > ITEMS_PER_PAGE && (
+                      <div className="mt-4 flex justify-center">
+                        <Pagination
+                          currentPage={candidateResultsCurrentPage}
+                          totalPages={Math.ceil(enhancedCandidateResults.length / ITEMS_PER_PAGE)}
+                          onPageChange={setCandidateResultsCurrentPage}
+                        />
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Alternative display using the MatchingResultsCard component */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <MatchingResultsCard 
-                    title="案件に合う技術者 (カード表示)"
-                    description="案件に適した候補者のリスト"
-                    results={enhancedCaseResults as any}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                  />
-                  
-                  <MatchingResultsCard 
-                    title="技術者に合う案件 (カード表示)"
-                    description="技術者に適した案件のリスト"
-                    matches={matchingCandidateResults}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                  />
-                </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             )}
 
