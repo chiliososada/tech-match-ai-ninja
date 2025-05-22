@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -53,7 +54,7 @@ const generateCompaniesData = () => {
     }
     
     return acc;
-  }, {});
+  }, {} as Record<string, any>); // Fix: Add type annotation to the accumulator
   
   // For 自社, add some default representatives
   if (companiesByName['テックイノベーション株式会社'] && companiesByName['テックイノベーション株式会社'].representatives.length === 0) {
