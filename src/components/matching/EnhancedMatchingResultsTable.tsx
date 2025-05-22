@@ -231,10 +231,13 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               <TableHead>
                 <div className="japanese-text">会社</div>
               </TableHead>
-              <TableHead className="w-[150px]">
+              <TableHead className="w-[120px]">
                 <div className="japanese-text">案件担当者</div>
               </TableHead>
-              <TableHead className="w-[200px]">
+              <TableHead className="w-[150px]">
+                <div className="japanese-text">案件担当者メール</div>
+              </TableHead>
+              <TableHead className="w-[150px]">
                 <div className="japanese-text">メモ</div>
               </TableHead>
               <TableHead className="w-[120px]">
@@ -269,6 +272,9 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                   <TableCell className="japanese-text">
                     {result.caseManager || '未設定'}
                   </TableCell>
+                  <TableCell className="japanese-text">
+                    {result.caseManagerEmail || 'manager@example.com'}
+                  </TableCell>
                   <TableCell className="whitespace-normal japanese-text">
                     {memos[result.id] || result.memo || ''}
                   </TableCell>
@@ -296,7 +302,7 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4 japanese-text">
+                <TableCell colSpan={9} className="text-center py-4 japanese-text">
                   マッチング結果がありません
                 </TableCell>
               </TableRow>

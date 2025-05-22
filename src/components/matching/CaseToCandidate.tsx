@@ -45,6 +45,7 @@ export function CaseToCandidate() {
       caseCompany: 'システム開発株式会社',
       candidateCompany: 'テック株式会社',
       caseManager: '田中課長',
+      caseManagerEmail: 'tanaka@system-dev.co.jp',
       memo: '希望単価70万円/月',
       recommendationComment: 'コミュニケーション能力も高いため推薦します'
     },
@@ -59,6 +60,7 @@ export function CaseToCandidate() {
       caseCompany: 'ウェブ開発株式会社',
       candidateCompany: 'エンジニア株式会社',
       caseManager: '伊藤課長',
+      caseManagerEmail: 'ito@web-dev.co.jp',
     },
     {
       id: 3,
@@ -71,6 +73,7 @@ export function CaseToCandidate() {
       caseCompany: 'クラウドサービス株式会社',
       candidateCompany: 'ITソリューション株式会社',
       caseManager: '小林部長',
+      caseManagerEmail: 'kobayashi@cloud.co.jp',
       recommendationComment: '自動化スキルが高く、迅速な対応が可能',
     },
     {
@@ -84,6 +87,7 @@ export function CaseToCandidate() {
       caseCompany: 'サーバー株式会社',
       candidateCompany: 'デベロップ株式会社',
       caseManager: '加藤部長',
+      caseManagerEmail: 'kato@server.co.jp',
       memo: '研修後に参画可能',
     },
     {
@@ -97,6 +101,7 @@ export function CaseToCandidate() {
       caseCompany: 'アプリケーション株式会社',
       candidateCompany: 'モバイル株式会社',
       caseManager: '斎藤課長',
+      caseManagerEmail: 'saito@app.co.jp',
     },
     {
       id: 6,
@@ -109,6 +114,7 @@ export function CaseToCandidate() {
       caseCompany: '分析株式会社',
       candidateCompany: 'データ株式会社',
       caseManager: '佐々木部長',
+      caseManagerEmail: 'sasaki@analysis.co.jp',
       recommendationComment: 'デモ実績多数あり、即戦力として期待できる',
     }
   ]);
