@@ -13,7 +13,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <Sidebar />
       </div>
       <div className="flex flex-1 flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="flex-1 overflow-hidden bg-background">
           {children}
         </main>
       </div>

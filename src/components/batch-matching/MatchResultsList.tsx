@@ -29,7 +29,7 @@ export const MatchResultsList: React.FC<MatchResultsListProps> = ({
         <CardContent className="p-4">
           <h3 className="text-lg font-medium mb-4 japanese-text">マッチング検索結果</h3>
           
-          <div className="space-y-4 max-h-[calc(100vh-250px)] overflow-auto pr-2">
+          <div className="space-y-4">
             {results.map(result => (
               <MatchResultItem
                 key={result.id}
