@@ -138,7 +138,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="japanese-text">
-            メッセージ送信
+            メール送信
           </DialogTitle>
           <DialogDescription className="japanese-text">
             {recipientCompany}に{matchData.caseName}について連絡します
@@ -171,6 +171,16 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* Case Manager Display */}
+            {matchData.caseManager && (
+              <div className="bg-muted/40 p-2 rounded border border-muted">
+                <p className="text-sm font-medium japanese-text flex items-center">
+                  <span className="text-muted-foreground mr-2">案件担当者:</span> 
+                  {matchData.caseManager}
+                </p>
+              </div>
+            )}
             
             <div>
               <label htmlFor="recipient" className="text-sm font-medium japanese-text">送信先</label>
