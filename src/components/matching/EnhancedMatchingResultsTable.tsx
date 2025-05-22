@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { 
   Table, 
@@ -150,15 +151,14 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
   // Handle export to CSV
   const handleExportCSV = () => {
     if (sortedResults.length === 0) {
-      toast("エクスポートできるデータがありません", { 
-        description: "マッチング結果がありません",
-        type: "error"
+      toast.error("エクスポートできるデータがありません", { 
+        description: "マッチング結果がありません"
       });
       return;
     }
     
     exportToCSV(sortedResults, "matching-results");
-    toast("CSVエクスポート完了", {
+    toast.success("CSVエクスポート完了", {
       description: "マッチング結果がエクスポートされました",
     });
   };
