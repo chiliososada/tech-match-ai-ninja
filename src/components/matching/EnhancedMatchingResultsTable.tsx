@@ -9,7 +9,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Eye, Send, ArrowUp, ArrowDown, FileText, Download } from 'lucide-react';
+import { Eye, Send, ArrowUp, ArrowDown, Download } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 import { MatchDetailDialog } from './MatchDetailDialog';
 import { SendMessageDialog } from './SendMessageDialog';
@@ -141,6 +141,18 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
     setIsMessageOpen(true);
   };
 
+  // Handle clicking on a manager to send a message
+  const handleManagerClick = (match: EnhancedMatchingResult) => {
+    if (match.caseManagerEmail || match.affiliationManagerEmail) {
+      setSelectedMatch(match);
+      setIsMessageOpen(true);
+    } else {
+      toast.error("メールアドレスが設定されていません", {
+        description: "担当者のメールアドレスがありません"
+      });
+    }
+  };
+
   // Handle memo save
   const handleMemoSave = (id: number | string, memo: string) => {
     setMemos(prev => ({ ...prev, [id]: memo }));
@@ -269,8 +281,12 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="japanese-text">
-                    <div>
+                  <TableCell 
+                    className="japanese-text cursor-pointer hover:bg-blue-50 transition-colors"
+                    onClick={() => handleManagerClick(result)}
+                    title={result.caseManagerEmail ? "クリックしてメール送信" : ""}
+                  >
+                    <div className={`border-l-4 ${result.caseManagerEmail ? 'border-blue-500 pl-2' : 'border-transparent pl-2'}`}>
                       <p>{result.caseManager || '未設定'}</p>
                       {result.caseManagerEmail && (
                         <p className="text-xs text-gray-500 mt-1">
@@ -279,8 +295,12 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="japanese-text">
-                    <div>
+                  <TableCell 
+                    className="japanese-text cursor-pointer hover:bg-green-50 transition-colors"
+                    onClick={() => handleManagerClick(result)}
+                    title={result.affiliationManagerEmail ? "クリックしてメール送信" : ""}
+                  >
+                    <div className={`border-l-4 ${result.affiliationManagerEmail ? 'border-green-500 pl-2' : 'border-transparent pl-2'}`}>
                       <p>{result.affiliationManager || '未設定'}</p>
                       {result.affiliationManagerEmail && (
                         <p className="text-xs text-gray-500 mt-1">
