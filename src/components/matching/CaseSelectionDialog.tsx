@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { caseData } from '@/components/cases/data/caseData';
 
 export interface CaseItem {
   id: number;
@@ -20,7 +20,7 @@ export interface CaseItem {
   workType?: string;
   priority?: string;
   description?: string;
-  companyType?: string; // Added companyType field
+  companyType?: string;
 }
 
 interface CaseSelectionDialogProps {
@@ -32,81 +32,20 @@ export function CaseSelectionDialog({ onSelect }: CaseSelectionDialogProps) {
   const [companyTypeFilter, setCompanyTypeFilter] = useState<string>("all");
   const [open, setOpen] = useState(false);
   
-  // Enhanced dummy data for existing cases
-  const existingCases: CaseItem[] = [
-    { 
-      id: 1, 
-      title: 'Java開発エンジニア', 
-      client: '株式会社テック',
-      skills: ['Java', 'Spring Boot', 'MySQL'],
-      experience: '5',
-      budget: '60~80',
-      location: '東京',
-      workType: 'リモート可',
-      description: '金融系システムの開発案件。Java/Spring Bootの経験者を募集。',
-      companyType: '自社'
-    },
-    { 
-      id: 2, 
-      title: 'フロントエンドエンジニア', 
-      client: 'デジタルソリューション株式会社',
-      skills: ['React', 'TypeScript', 'Next.js'],
-      experience: '3',
-      budget: '50~70',
-      location: '大阪',
-      workType: 'リモート可',
-      description: 'ECサイトのフロントエンド開発。React/TypeScriptの経験者必須。',
-      companyType: '他社'
-    },
-    { 
-      id: 3, 
-      title: 'インフラエンジニア', 
-      client: 'クラウドシステム株式会社',
-      skills: ['AWS', 'Docker', 'Kubernetes'],
-      experience: '3',
-      budget: '70~90',
-      location: '東京',
-      workType: 'オンサイト',
-      description: 'クラウド環境の構築・運用。AWS、Docker、Kubernetesの経験者を募集。',
-      companyType: '自社'
-    },
-    { 
-      id: 4, 
-      title: 'バックエンドエンジニア', 
-      client: 'ウェブサービス株式会社',
-      skills: ['Python', 'Django', 'PostgreSQL'],
-      experience: '3',
-      budget: '55~75',
-      location: '福岡',
-      workType: 'フルリモート',
-      description: 'WebサービスのAPI開発。Python/Djangoの経験者を募集。',
-      companyType: '他社'
-    },
-    { 
-      id: 5, 
-      title: 'モバイルアプリ開発者', 
-      client: 'モバイルテクノロジー株式会社',
-      skills: ['iOS', 'Swift', 'Objective-C'],
-      experience: '4',
-      budget: '65~85',
-      location: '東京',
-      workType: 'ハイブリッド',
-      description: 'iOSアプリケーション開発。Swift/Objective-Cの経験者必須。',
-      companyType: '自社'
-    },
-    { 
-      id: 6, 
-      title: 'データアナリスト', 
-      client: 'データインサイト株式会社',
-      skills: ['Python', 'R', 'SQL', 'Tableau'],
-      experience: '3',
-      budget: '60~80',
-      location: '名古屋',
-      workType: 'リモート可',
-      description: 'データ分析と可視化。Python/R/SQLの経験者を募集。',
-      companyType: '他社'
-    }
-  ];
+  // Convert caseData to CaseItem format
+  const existingCases: CaseItem[] = caseData.map(item => ({
+    id: parseInt(item.id),
+    title: item.title,
+    client: item.company,
+    skills: Array.isArray(item.skills) ? item.skills : item.skills ? [item.skills] : [],
+    experience: item.experience,
+    budget: item.budget,
+    location: item.location,
+    workType: item.workType,
+    description: item.description,
+    companyType: item.source === 'manual' ? '他社' : '自社', // Using source as a proxy for companyType
+    priority: item.priority
+  }));
 
   // Filter cases based on search query and company type
   const filteredCases = existingCases.filter(caseItem => {
