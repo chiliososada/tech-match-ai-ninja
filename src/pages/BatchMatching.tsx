@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, List, Mail } from 'lucide-react';
+import { FileText, List, Mail, User } from 'lucide-react';
 import { BatchMatchingTab3 } from '@/components/batch-matching/BatchMatchingTab3';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -14,6 +14,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { EnhancedMatchingResultsTable } from '@/components/matching/EnhancedMatchingResultsTable';
+import { CaseDetailDisplay } from '@/components/matching/CaseDetailDisplay';
+import { CandidateDetailDialog } from '@/components/batch-matching/CandidateDetailDialog';
+import { CaseDetailDialog } from '@/components/batch-matching/CaseDetailDialog';
 
 export function BatchMatching() {
   const [activeTab, setActiveTab] = useState<"combined-matching" | "matching-history">("combined-matching");
@@ -34,6 +37,12 @@ export function BatchMatching() {
   // SendMessageDialog state
   const [isSendMessageDialogOpen, setIsSendMessageDialogOpen] = useState<boolean>(false);
   const [selectedMatch, setSelectedMatch] = useState<EnhancedMatchingResult | null>(null);
+  
+  // New dialog states for case and candidate details
+  const [isCaseDetailDialogOpen, setIsCaseDetailDialogOpen] = useState<boolean>(false);
+  const [isCandidateDetailDialogOpen, setIsCandidateDetailDialogOpen] = useState<boolean>(false);
+  const [selectedCase, setSelectedCase] = useState<any>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
 
   // Enhanced sample data for bidirectional matching results with more company information
   const combinedMatchingResults = [
@@ -51,6 +60,7 @@ export function BatchMatching() {
       affiliationManager: '鈴木課長',
       affiliationManagerEmail: 'suzuki@companyX.co.jp',
       memo: 'システム開発経験あり',
+      matchingReason: 'JavaとSpring Boot経験が10年以上あり、案件に必要なスキルと経験年数が一致しています',
     },
     {
       id: "2",
@@ -148,25 +158,222 @@ export function BatchMatching() {
   const caseDetails = [
     {
       id: "1",
-      name: 'ECサイト開発案件',
+      name: 'XX証券向けシステム開発',
       company: '株式会社A',
       location: '東京（リモート可）',
-      skills: 'React, TypeScript, AWS',
+      skills: ['Java', 'Spring Boot', 'AWS'],
       rate: '70万円/月',
       matchScore: 95,
       manager: '佐藤部長',
       managerEmail: 'sato@companyA.co.jp',
+      detailDescription: '金融機関向けシステム開発案件です。Javaを使用したバックエンド開発を担当していただきます。Spring Bootのフレームワークを使用し、AWSでのデプロイも含まれます。開発期間は約6ヶ月を予定しています。',
+      priority: 'high',
+      workType: 'ハイブリッド',
+      experienceRequired: '5年以上',
+      budget: '65-75万円/月',
     },
     {
       id: "2",
-      name: 'コーポレートサイトリニューアル',
+      name: 'ECサイト開発案件',
       company: '株式会社B',
       location: '大阪（リモート可）',
-      skills: 'React, Next.js, TypeScript',
+      skills: ['React', 'TypeScript', 'AWS'],
       rate: '65万円/月',
       matchScore: 87,
       manager: '田中部長',
       managerEmail: 'tanaka@companyB.co.jp',
+    },
+    {
+      id: "3",
+      name: '物流管理システム構築',
+      company: '株式会社C',
+      location: '東京（リモート可）',
+      skills: ['Python', 'Django', 'PostgreSQL'],
+      rate: '60万円/月',
+      matchScore: 80,
+      manager: '渡辺部長',
+      managerEmail: 'watanabe@companyC.co.jp',
+    },
+    {
+      id: "4",
+      name: 'クラウド移行プロジェクト',
+      company: '株式会社D',
+      location: '東京（リモート可）',
+      skills: ['AWS', 'Terraform', 'Docker'],
+      rate: '70万円/月',
+      matchScore: 85,
+      manager: '山本部長',
+      managerEmail: 'yamamoto@companyD.co.jp',
+    },
+    {
+      id: "5",
+      name: 'AI推薦システム開発',
+      company: '株式会社E',
+      location: '大阪（リモート可）',
+      skills: ['Python', 'TensorFlow', 'AWS'],
+      rate: '75万円/月',
+      matchScore: 90,
+      manager: '小林部長',
+      managerEmail: 'kobayashi@companyE.co.jp',
+    },
+    {
+      id: "6",
+      name: 'XX証券向けシステム開発',  // Same case as ID 1, different candidate
+      company: '株式会社A',
+      location: '東京（リモート可）',
+      skills: ['Java', 'Spring Boot', 'Oracle'],
+      rate: '60万円/月',
+      matchScore: 85,
+      manager: '佐藤部長',
+      managerEmail: 'sato@companyA.co.jp',
+    },
+    {
+      id: "7",
+      name: 'ECサイト開発案件',  // Same case as ID 2, different candidate
+      company: '株式会社B',
+      location: '大阪（リモート可）',
+      skills: ['React', 'Next.js', 'GraphQL'],
+      rate: '60万円/月',
+      matchScore: 80,
+      manager: '田中部長',
+      managerEmail: 'tanaka@companyB.co.jp',
+    }
+  ];
+  
+  // Sample candidate details
+  const candidateDetails = [
+    {
+      id: "u1",
+      name: '山田太郎',
+      company: '技術者株式会社X',
+      skills: ['Java', 'Spring Boot', 'AWS', 'Docker', 'Kubernetes'],
+      experience: '10年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2024-07-01',
+      preferredWorkLocation: '東京・リモート',
+      hourlyRate: '7,000円',
+      manager: '鈴木課長',
+      managerEmail: 'suzuki@companyX.co.jp',
+      bio: 'バックエンド開発とクラウドインフラ構築を専門としています。金融系システムの開発経験が豊富です。',
+      projects: [
+        { name: '大手銀行システム統合', duration: '2年', role: 'バックエンドリード' },
+        { name: '証券取引プラットフォーム', duration: '1.5年', role: 'フルスタック開発者' }
+      ]
+    },
+    {
+      id: "u2",
+      name: '佐藤花子',
+      company: '技術者株式会社Y',
+      skills: ['React', 'TypeScript', 'AWS'],
+      experience: '7年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2024-08-01',
+      preferredWorkLocation: '大阪・リモート',
+      hourlyRate: '6,000円',
+      manager: '高橋課長',
+      managerEmail: 'takahashi@companyY.co.jp',
+      bio: 'フロントエンド開発を専門としています。ECサイト開発経験が豊富です。',
+      projects: [
+        { name: 'ECサイトリニューアル', duration: '1年', role: 'フロントエンドリード' },
+        { name: 'AIコンサルティング', duration: '0.5年', role: 'フロントエンド開発者' }
+      ]
+    },
+    {
+      id: "u3",
+      name: '鈴木一郎',
+      company: '技術者株式会社Z',
+      skills: ['Python', 'Django', 'PostgreSQL'],
+      experience: '5年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2024-09-01',
+      preferredWorkLocation: '東京・リモート',
+      hourlyRate: '5,000円',
+      manager: '伊藤課長',
+      managerEmail: 'ito@companyZ.co.jp',
+      bio: 'バックエンド開発を専門としています。物流管理システムの開発経験が豊富です。',
+      projects: [
+        { name: '物流管理システム構築', duration: '2年', role: 'バックエンドリード' },
+        { name: 'AIコンサルティング', duration: '0.5年', role: 'バックエンド開発者' }
+      ]
+    },
+    {
+      id: "u4",
+      name: '高橋次郎',
+      company: '技術者株式会社W',
+      skills: ['AWS', 'Terraform', 'Docker'],
+      experience: '8年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2024-10-01',
+      preferredWorkLocation: '東京・リモート',
+      hourlyRate: '6,000円',
+      manager: '中村課長',
+      managerEmail: 'nakamura@companyW.co.jp',
+      bio: 'クラウドインフラ構築を専門としています。クラウド移行プロジェクトの開発経験が豊富です。',
+      projects: [
+        { name: 'クラウド移行プロジェクト', duration: '2年', role: 'クラウドインフラリード' },
+        { name: 'AIコンサルティング', duration: '0.5年', role: 'クラウドインフラ開発者' }
+      ]
+    },
+    {
+      id: "u5",
+      name: '渡辺三郎',
+      company: '技術者株式会社V',
+      skills: ['Python', 'TensorFlow', 'AWS'],
+      experience: '6年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2024-11-01',
+      preferredWorkLocation: '大阪・リモート',
+      hourlyRate: '7,000円',
+      manager: '加藤課長',
+      managerEmail: 'kato@companyV.co.jp',
+      bio: 'AI開発を専門としています。AI推薦システムの開発経験が豊富です。',
+      projects: [
+        { name: 'AI推薦システム開発', duration: '2年', role: 'AI開発リード' },
+        { name: 'AIコンサルティング', duration: '0.5年', role: 'AI開発開発者' }
+      ]
+    },
+    {
+      id: "u6",
+      name: '伊藤健太',
+      company: '技術者株式会社U',
+      skills: ['Java', 'Spring Boot', 'Oracle'],
+      experience: '8年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2024-12-01',
+      preferredWorkLocation: '東京・リモート',
+      hourlyRate: '6,000円',
+      manager: '吉田課長',
+      managerEmail: 'yoshida@companyU.co.jp',
+      bio: 'Java開発を専門としています。システム開発経験が豊富です。',
+      projects: [
+        { name: 'システム開発', duration: '2年', role: 'システム開発リード' },
+        { name: 'AIコンサルティング', duration: '0.5年', role: 'システム開発開発者' }
+      ]
+    },
+    {
+      id: "u7",
+      name: '佐々木隆',
+      company: '技術者株式会社T',
+      skills: ['React', 'Next.js', 'GraphQL'],
+      experience: '6年',
+      japaneseLevel: 'ネイティブ',
+      englishLevel: 'ビジネスレベル',
+      availableFrom: '2025-01-01',
+      preferredWorkLocation: '大阪・リモート',
+      hourlyRate: '5,000円',
+      manager: '山田課長',
+      managerEmail: 'yamada@companyT.co.jp',
+      bio: 'フロントエンド開発を専門としています。ECサイト開発経験が豊富です。',
+      projects: [
+        { name: 'ECサイト開発案件', duration: '2年', role: 'フロントエンドリード' },
+        { name: 'AIコンサルティング', duration: '0.5年', role: 'フロントエンド開発者' }
+      ]
     }
   ];
 
@@ -190,7 +397,7 @@ export function BatchMatching() {
       caseName: match.caseName,
       candidateName: match.candidateName,
       matchingRate: match.matchingRate,
-      matchingReason: 'スキル・経験年数が一致',
+      matchingReason: match.matchingReason || 'スキル・経験年数が一致',
       caseCompany: match.caseCompany,
       candidateCompany: match.candidateCompany,
       caseManager: match.caseManager,
@@ -203,6 +410,41 @@ export function BatchMatching() {
     
     setSelectedMatch(matchData);
     setIsSendMessageDialogOpen(true);
+  };
+  
+  // Handle showing case details
+  const handleCaseDetail = (result: any) => {
+    // Find the corresponding case details
+    const caseDetail = caseDetails.find(c => c.name === result.caseName) || {
+      id: `c${result.id}`,
+      name: result.caseName,
+      company: result.caseCompany,
+      skills: result.skills,
+      manager: result.caseManager,
+      managerEmail: result.caseManagerEmail,
+      detailDescription: '案件の詳細情報が登録されていません。'
+    };
+    
+    setSelectedCase(caseDetail);
+    setIsCaseDetailDialogOpen(true);
+  };
+  
+  // Handle showing candidate details
+  const handleCandidateDetail = (result: any) => {
+    // Find the corresponding candidate details
+    const candidateDetail = candidateDetails.find(c => c.name === result.candidateName) || {
+      id: `u${result.id}`,
+      name: result.candidateName,
+      company: result.candidateCompany,
+      skills: result.skills,
+      experience: result.experience,
+      manager: result.affiliationManager,
+      managerEmail: result.affiliationManagerEmail,
+      bio: '技術者の詳細情報が登録されていません。'
+    };
+    
+    setSelectedCandidate(candidateDetail);
+    setIsCandidateDetailDialogOpen(true);
   };
 
   return (
@@ -308,14 +550,29 @@ export function BatchMatching() {
                               </div>
                             </div>
                             
+                            {/* Add matching reason */}
+                            <div className="mt-3 p-2 bg-blue-50 rounded text-sm">
+                              <p className="font-medium text-blue-800">マッチング理由:</p>
+                              <p className="text-gray-700">{result.matchingReason}</p>
+                            </div>
+                            
                             <div className="mt-3 flex justify-end space-x-2">
                               <Button 
                                 size="sm" 
                                 variant="outline"
                                 className="japanese-text"
-                                onClick={() => setShowCases(true)}
+                                onClick={() => handleCaseDetail(result)}
                               >
                                 案件詳細
+                              </Button>
+                              <Button 
+                                size="sm"
+                                variant="outline"
+                                className="japanese-text"
+                                onClick={() => handleCandidateDetail(result)}
+                              >
+                                <User className="h-4 w-4 mr-1" />
+                                技術者詳細
                               </Button>
                               <Button 
                                 size="sm" 
@@ -383,7 +640,7 @@ export function BatchMatching() {
                         <TableCell className="font-medium">{caseItem.name}</TableCell>
                         <TableCell>{caseItem.company}</TableCell>
                         <TableCell>{caseItem.location}</TableCell>
-                        <TableCell>{caseItem.skills}</TableCell>
+                        <TableCell>{Array.isArray(caseItem.skills) ? caseItem.skills.join(', ') : caseItem.skills}</TableCell>
                         <TableCell>{caseItem.rate}</TableCell>
                         <TableCell>
                           <div>
@@ -411,6 +668,20 @@ export function BatchMatching() {
                 </div>
               </DialogContent>
             </Dialog>
+            
+            {/* Case Detail Dialog */}
+            <CaseDetailDialog
+              isOpen={isCaseDetailDialogOpen}
+              onClose={() => setIsCaseDetailDialogOpen(false)}
+              caseData={selectedCase}
+            />
+            
+            {/* Candidate Detail Dialog */}
+            <CandidateDetailDialog
+              isOpen={isCandidateDetailDialogOpen}
+              onClose={() => setIsCandidateDetailDialogOpen(false)}
+              candidateData={selectedCandidate}
+            />
             
             {/* Send Message Dialog */}
             <SendMessageDialog 
