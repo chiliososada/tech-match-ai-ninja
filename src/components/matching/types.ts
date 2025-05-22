@@ -11,6 +11,8 @@ export interface EnhancedMatchingResult {
   candidateCompany?: string;
   caseManager?: string; // Added case manager property
   caseManagerEmail?: string; // Added case manager email property
+  affiliationManager?: string; // Added affiliation manager property
+  affiliationManagerEmail?: string; // Added affiliation manager email property
   memo?: string;
   recommendationComment?: string; // Added recommendation comment property
 }

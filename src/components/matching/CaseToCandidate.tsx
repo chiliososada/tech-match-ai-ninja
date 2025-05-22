@@ -46,6 +46,8 @@ export function CaseToCandidate() {
       candidateCompany: 'テック株式会社',
       caseManager: '田中課長',
       caseManagerEmail: 'tanaka@system-dev.co.jp',
+      affiliationManager: '山本部長',
+      affiliationManagerEmail: 'yamamoto@tech-co.jp',
       memo: '希望単価70万円/月',
       recommendationComment: 'コミュニケーション能力も高いため推薦します'
     },
@@ -61,6 +63,8 @@ export function CaseToCandidate() {
       candidateCompany: 'エンジニア株式会社',
       caseManager: '伊藤課長',
       caseManagerEmail: 'ito@web-dev.co.jp',
+      affiliationManager: '佐藤課長',
+      affiliationManagerEmail: 'sato@engineer.co.jp',
     },
     {
       id: 3,
@@ -74,6 +78,8 @@ export function CaseToCandidate() {
       candidateCompany: 'ITソリューション株式会社',
       caseManager: '小林部長',
       caseManagerEmail: 'kobayashi@cloud.co.jp',
+      affiliationManager: '高橋マネージャー',
+      affiliationManagerEmail: 'takahashi@it-solutions.co.jp',
       recommendationComment: '自動化スキルが高く、迅速な対応が可能',
     },
     {
@@ -88,6 +94,8 @@ export function CaseToCandidate() {
       candidateCompany: 'デベロップ株式会社',
       caseManager: '加藤部長',
       caseManagerEmail: 'kato@server.co.jp',
+      affiliationManager: '木村リーダー',
+      affiliationManagerEmail: 'kimura@develop.co.jp',
       memo: '研修後に参画可能',
     },
     {
@@ -102,6 +110,8 @@ export function CaseToCandidate() {
       candidateCompany: 'モバイル株式会社',
       caseManager: '斎藤課長',
       caseManagerEmail: 'saito@app.co.jp',
+      affiliationManager: '渡辺マネージャー',
+      affiliationManagerEmail: 'watanabe@mobile.co.jp',
     },
     {
       id: 6,
@@ -115,6 +125,8 @@ export function CaseToCandidate() {
       candidateCompany: 'データ株式会社',
       caseManager: '佐々木部長',
       caseManagerEmail: 'sasaki@analysis.co.jp',
+      affiliationManager: '中村リーダー',
+      affiliationManagerEmail: 'nakamura@data.co.jp',
       recommendationComment: 'デモ実績多数あり、即戦力として期待できる',
     }
   ]);

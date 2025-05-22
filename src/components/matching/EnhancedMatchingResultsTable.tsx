@@ -237,6 +237,12 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               <TableHead className="w-[150px]">
                 <div className="japanese-text">案件担当者メール</div>
               </TableHead>
+              <TableHead className="w-[120px]">
+                <div className="japanese-text">所属担当者</div>
+              </TableHead>
+              <TableHead className="w-[150px]">
+                <div className="japanese-text">所属担当者メール</div>
+              </TableHead>
               <TableHead className="w-[150px]">
                 <div className="japanese-text">メモ</div>
               </TableHead>
@@ -275,6 +281,12 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                   <TableCell className="japanese-text">
                     {result.caseManagerEmail || 'manager@example.com'}
                   </TableCell>
+                  <TableCell className="japanese-text">
+                    {result.affiliationManager || '未設定'}
+                  </TableCell>
+                  <TableCell className="japanese-text">
+                    {result.affiliationManagerEmail || 'affiliation@example.com'}
+                  </TableCell>
                   <TableCell className="whitespace-normal japanese-text">
                     {memos[result.id] || result.memo || ''}
                   </TableCell>
@@ -302,7 +314,7 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-4 japanese-text">
+                <TableCell colSpan={11} className="text-center py-4 japanese-text">
                   マッチング結果がありません
                 </TableCell>
               </TableRow>
