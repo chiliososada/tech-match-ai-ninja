@@ -46,6 +46,7 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
       experience: '3年',
       budget: '60-80万円',
       description: '金融系システムの開発案件です。React, TypeScriptを使用した画面開発が主な業務となります。',
+      detailDescription: '本案件は大手金融機関向けの新規システム開発プロジェクトです。React、TypeScriptを使用したフロントエンド開発を担当していただきます。アジャイル開発手法を採用しており、2週間単位でのスプリント開発を行います。チームは日本人エンジニア5名と外国籍エンジニア2名で構成されています。'
     };
   };
 
@@ -194,13 +195,13 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                   )}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="w-[300px]">
                 <div className="japanese-text">マッチング理由</div>
               </TableHead>
               <TableHead>
-                <div className="japanese-text">企業</div>
+                <div className="japanese-text">会社</div>
               </TableHead>
-              <TableHead>
+              <TableHead className="w-[200px]">
                 <div className="japanese-text">メモ</div>
               </TableHead>
               <TableHead className="w-[120px]">
@@ -215,16 +216,24 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                   <TableCell className="font-medium japanese-text">{result.caseName}</TableCell>
                   <TableCell className="japanese-text">{result.candidateName}</TableCell>
                   <TableCell className="font-bold">{result.matchingRate}</TableCell>
-                  <TableCell className="japanese-text max-w-[200px] truncate" title={result.matchingReason}>
+                  <TableCell className="japanese-text whitespace-normal">
                     {result.matchingReason}
                   </TableCell>
                   <TableCell>
                     <div className="text-xs japanese-text">
-                      <div>{result.candidateCompany || ''}</div>
-                      <div>{result.caseCompany || ''}</div>
+                      {result.candidateCompany && (
+                        <div className="mb-1">
+                          <span className="font-semibold text-blue-600">候補者:</span> {result.candidateCompany}
+                        </div>
+                      )}
+                      {result.caseCompany && (
+                        <div>
+                          <span className="font-semibold text-green-600">案件:</span> {result.caseCompany}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-[120px] truncate" title={memos[result.id] || result.memo || ''}>
+                  <TableCell className="whitespace-normal japanese-text">
                     {memos[result.id] || result.memo || ''}
                   </TableCell>
                   <TableCell>

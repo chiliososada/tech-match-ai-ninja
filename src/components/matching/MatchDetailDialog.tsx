@@ -163,6 +163,13 @@ export const MatchDetailDialog: React.FC<MatchDetailDialogProps> = ({
                     <p className="japanese-text border p-3 rounded-md bg-muted/10">{caseData.description}</p>
                   </div>
                 )}
+                
+                {caseData.detailDescription && (
+                  <div>
+                    <p className="text-sm font-medium japanese-text">詳細説明</p>
+                    <p className="japanese-text border p-3 rounded-md bg-muted/10 whitespace-pre-wrap">{caseData.detailDescription}</p>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="japanese-text">案件情報がありません</p>
