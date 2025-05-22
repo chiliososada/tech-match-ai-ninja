@@ -11,9 +11,14 @@ import { FilterArea } from '@/components/batch-matching/FilterArea';
 import { MatchResultsList } from '@/components/batch-matching/MatchResultsList';
 import { useBatchMatching } from '@/components/batch-matching/hooks/useBatchMatching';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 export function BatchMatching() {
   const [activeTab, setActiveTab] = useState<"combined-matching" | "matching-history">("combined-matching");
+  const { toast } = useToast();
+  
+  // Custom state for saved matching history
+  const [savedMatchingHistory, setSavedMatchingHistory] = useState<any[]>([]);
   
   const {
     // Filter states
@@ -52,6 +57,23 @@ export function BatchMatching() {
     handleCaseDetail,
     handleCandidateDetail
   } = useBatchMatching();
+
+  // Handler for saving matching results to history
+  const handleSaveToHistory = (result: any) => {
+    const historyEntry = {
+      id: Date.now(),
+      date: new Date().toLocaleString('ja-JP'),
+      user: 'Current User',
+      result: result,
+      status: 'マッチング保存済み',
+    };
+    
+    setSavedMatchingHistory(prev => [historyEntry, ...prev]);
+    toast({
+      title: "マッチング結果を保存しました",
+      description: `${result.caseName} と ${result.candidateName} のマッチングが履歴に保存されました。`,
+    });
+  };
 
   return (
     <MainLayout>
@@ -97,6 +119,7 @@ export function BatchMatching() {
                     onCaseDetail={handleCaseDetail}
                     onCandidateDetail={handleCandidateDetail}
                     onSendMessage={handleSendMessage}
+                    onSaveToHistory={handleSaveToHistory}
                   />
                 </div>
               )}
@@ -123,7 +146,7 @@ export function BatchMatching() {
             
             {/* Matching History Tab */}
             <TabsContent value="matching-history">
-              <BatchMatchingTab3 />
+              <BatchMatchingTab3 savedMatchingHistory={savedMatchingHistory} />
             </TabsContent>
           </Tabs>
         </div>

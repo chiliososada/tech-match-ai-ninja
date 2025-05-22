@@ -12,6 +12,7 @@ interface MatchResultsListProps {
   onCaseDetail: (result: any) => void;
   onCandidateDetail: (result: any) => void;
   onSendMessage: (result: any) => void;
+  onSaveToHistory: (result: any) => void;
 }
 
 export const MatchResultsList: React.FC<MatchResultsListProps> = ({
@@ -21,7 +22,8 @@ export const MatchResultsList: React.FC<MatchResultsListProps> = ({
   onPageChange,
   onCaseDetail,
   onCandidateDetail,
-  onSendMessage
+  onSendMessage,
+  onSaveToHistory
 }) => {
   return (
     <div className="w-full">
@@ -37,6 +39,7 @@ export const MatchResultsList: React.FC<MatchResultsListProps> = ({
                 onCaseDetail={onCaseDetail}
                 onCandidateDetail={onCandidateDetail}
                 onSendMessage={onSendMessage}
+                onSaveToHistory={onSaveToHistory}
               />
             ))}
           </div>

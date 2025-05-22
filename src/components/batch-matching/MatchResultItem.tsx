@@ -3,20 +3,22 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Mail, User } from 'lucide-react';
+import { Mail, User, Save } from 'lucide-react';
 
 interface MatchResultItemProps {
   result: any;
   onCaseDetail: (result: any) => void;
   onCandidateDetail: (result: any) => void;
   onSendMessage: (result: any) => void;
+  onSaveToHistory: (result: any) => void;
 }
 
 export const MatchResultItem: React.FC<MatchResultItemProps> = ({
   result,
   onCaseDetail,
   onCandidateDetail,
-  onSendMessage
+  onSendMessage,
+  onSaveToHistory
 }) => {
   return (
     <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
@@ -72,6 +74,15 @@ export const MatchResultItem: React.FC<MatchResultItemProps> = ({
           >
             <User className="h-4 w-4 mr-1" />
             技術者詳細
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="japanese-text"
+            onClick={() => onSaveToHistory(result)}
+          >
+            <Save className="h-4 w-4 mr-1" />
+            履歴に保存
           </Button>
           <Button 
             size="sm" 
