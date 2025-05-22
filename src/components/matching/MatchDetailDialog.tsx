@@ -43,6 +43,30 @@ export const MatchDetailDialog: React.FC<MatchDetailDialogProps> = ({
     // Close dialog or show success message
   };
 
+  // Helper function to render skills appropriately based on type
+  const renderSkills = (skills: string | string[] | undefined) => {
+    if (!skills) return null;
+    
+    if (Array.isArray(skills)) {
+      return (
+        <div className="flex flex-wrap gap-1">
+          {skills.map((skill, index) => (
+            <Badge key={index} variant="outline" className="bg-blue-50">{skill}</Badge>
+          ))}
+        </div>
+      );
+    } else {
+      // If skills is a string, split by commas and render as badges
+      return (
+        <div className="flex flex-wrap gap-1">
+          {skills.split(',').map((skill, index) => (
+            <Badge key={index} variant="outline" className="bg-blue-50">{skill.trim()}</Badge>
+          ))}
+        </div>
+      );
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
@@ -129,11 +153,7 @@ export const MatchDetailDialog: React.FC<MatchDetailDialogProps> = ({
                 {caseData.skills && (
                   <div>
                     <p className="text-sm font-medium japanese-text">必要スキル</p>
-                    <div className="flex flex-wrap gap-1">
-                      {caseData.skills.map((skill, index) => (
-                        <Badge key={index} variant="outline" className="bg-blue-50">{skill}</Badge>
-                      ))}
-                    </div>
+                    {renderSkills(caseData.skills)}
                   </div>
                 )}
                 
@@ -165,7 +185,7 @@ export const MatchDetailDialog: React.FC<MatchDetailDialogProps> = ({
                   
                   <div>
                     <p className="text-sm font-medium japanese-text">スキル</p>
-                    <p className="japanese-text">{candidateData.skills}</p>
+                    {renderSkills(candidateData.skills)}
                   </div>
                   
                   <div>

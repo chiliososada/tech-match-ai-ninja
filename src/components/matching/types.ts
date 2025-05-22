@@ -31,7 +31,7 @@ export interface CaseDetailItem {
 export interface CandidateItem {
   id: number | string;
   name: string;
-  skills: string;
+  skills: string | string[];
   companyType?: string;
   companyName?: string;
   nationality?: string;

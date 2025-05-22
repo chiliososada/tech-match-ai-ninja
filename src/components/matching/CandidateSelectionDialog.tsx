@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,21 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { candidatesData } from '@/components/candidates/data/candidatesData';
 import { Engineer } from '@/components/candidates/types';
-
-interface CandidateItem {
-  id: number;
-  name: string;
-  skills: string;
-  companyType?: string;
-  companyName?: string;
-  nationality?: string;
-  age?: string;
-  gender?: string;
-  experience?: string;
-  japaneseLevel?: string;
-  availability?: string;
-  status?: string[];
-}
+import { CandidateItem } from './types';
 
 interface CandidateSelectionDialogProps {
   onSelect: (selectedCandidate: CandidateItem) => void;
@@ -39,7 +24,8 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
     return {
       id: parseInt(engineer.id),
       name: engineer.name,
-      skills: Array.isArray(engineer.skills) ? engineer.skills.join(', ') : engineer.skills || '',
+      // Keep skills as is - our updated CandidateItem type supports both string and string[]
+      skills: engineer.skills,
       companyType: engineer.companyType || '自社',
       companyName: engineer.companyName || '',
       nationality: engineer.nationality || '',
@@ -58,12 +44,23 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
   // Filter candidates based on company type and search query
   const filteredCandidates = candidates.filter(candidate => {
     const matchesCompanyType = companyTypeFilter === "all" || candidate.companyType === companyTypeFilter;
+    
     const matchesSearch = !searchQuery || 
       candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.skills.toLowerCase().includes(searchQuery.toLowerCase());
+      (typeof candidate.skills === 'string' 
+        ? candidate.skills.toLowerCase().includes(searchQuery.toLowerCase())
+        : candidate.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase())));
     
     return matchesCompanyType && matchesSearch;
   });
+
+  // Helper function to display skills regardless of their type
+  const displaySkills = (skills: string | string[]): string => {
+    if (Array.isArray(skills)) {
+      return skills.join(', ');
+    }
+    return skills;
+  };
 
   const handleSelect = (candidate: CandidateItem) => {
     onSelect(candidate);
@@ -130,7 +127,7 @@ export function CandidateSelectionDialog({ onSelect }: CandidateSelectionDialogP
               {filteredCandidates.map((candidate) => (
                 <TableRow key={candidate.id}>
                   <TableCell className="font-medium japanese-text">{candidate.name}</TableCell>
-                  <TableCell className="japanese-text">{candidate.skills}</TableCell>
+                  <TableCell className="japanese-text">{displaySkills(candidate.skills)}</TableCell>
                   <TableCell className="japanese-text">{candidate.companyType}</TableCell>
                   <TableCell className="japanese-text">{candidate.companyType === '他社' ? candidate.companyName : '-'}</TableCell>
                   <TableCell className="text-right">

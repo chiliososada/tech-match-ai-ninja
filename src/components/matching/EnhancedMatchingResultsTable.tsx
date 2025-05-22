@@ -52,7 +52,27 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
   // Get candidate details (dummy implementation)
   const getCandidateDetails = (candidateId: number | string): CandidateItem | undefined => {
     // Find in candidatesData or return dummy data
-    return candidatesData.find(c => c.id === candidateId) || {
+    const candidate = candidatesData.find(c => c.id === candidateId);
+    
+    if (candidate) {
+      return {
+        id: candidateId,
+        name: candidate.name,
+        // Handle skills whether it's an array or string
+        skills: candidate.skills,
+        companyType: candidate.companyType,
+        companyName: candidate.companyName,
+        nationality: candidate.nationality,
+        age: candidate.age,
+        gender: candidate.gender,
+        experience: candidate.experience,
+        japaneseLevel: candidate.japaneseLevel,
+        availability: candidate.availability,
+        status: Array.isArray(candidate.status) ? candidate.status : (candidate.status ? [candidate.status] : [])
+      };
+    }
+    
+    return {
       id: candidateId,
       name: selectedMatch?.candidateName || 'Unknown',
       skills: 'JavaScript, React, TypeScript',
