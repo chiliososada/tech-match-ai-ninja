@@ -44,7 +44,8 @@ export function CandidateToCase() {
     if (!selectedCandidate) {
       toast("エラー", {
         description: "候補者を選択してください",
-        variant: "destructive",
+        // Fix: use correct property for the sonner toast library
+        style: { backgroundColor: 'hsl(var(--destructive))' },
       });
       return;
     }
