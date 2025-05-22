@@ -4,7 +4,6 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CompanyTypeAnalysis } from '@/components/email-analysis/CompanyTypeAnalysis';
 import { EmailListWithExtraction } from '@/components/email-analysis/EmailListWithExtraction';
-import { CompanyEmailHistory } from '@/components/email-analysis/CompanyEmailHistory';
 import { toast } from '@/hooks/use-toast';
 
 export function EmailAnalysis() {
@@ -19,7 +18,6 @@ export function EmailAnalysis() {
           <TabsList>
             <TabsTrigger value="company-type-analysis" className="japanese-text">企業タイプ分析</TabsTrigger>
             <TabsTrigger value="email-list" className="japanese-text">メール一覧</TabsTrigger>
-            <TabsTrigger value="company-history" className="japanese-text">会社別メール履歴</TabsTrigger>
           </TabsList>
           
           <TabsContent value="company-type-analysis" className="space-y-6">
@@ -28,10 +26,6 @@ export function EmailAnalysis() {
           
           <TabsContent value="email-list" className="space-y-6">
             <EmailListWithExtraction />
-          </TabsContent>
-          
-          <TabsContent value="company-history" className="space-y-6">
-            <CompanyEmailHistory />
           </TabsContent>
         </Tabs>
       </div>
