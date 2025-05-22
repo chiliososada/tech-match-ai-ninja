@@ -231,17 +231,11 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               <TableHead>
                 <div className="japanese-text">会社</div>
               </TableHead>
-              <TableHead className="w-[120px]">
+              <TableHead className="w-[200px]">
                 <div className="japanese-text">案件担当者</div>
               </TableHead>
-              <TableHead className="w-[150px]">
-                <div className="japanese-text">案件担当者メール</div>
-              </TableHead>
-              <TableHead className="w-[120px]">
+              <TableHead className="w-[200px]">
                 <div className="japanese-text">所属担当者</div>
-              </TableHead>
-              <TableHead className="w-[150px]">
-                <div className="japanese-text">所属担当者メール</div>
               </TableHead>
               <TableHead className="w-[150px]">
                 <div className="japanese-text">メモ</div>
@@ -276,16 +270,24 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
                     </div>
                   </TableCell>
                   <TableCell className="japanese-text">
-                    {result.caseManager || '未設定'}
+                    <div>
+                      <p>{result.caseManager || '未設定'}</p>
+                      {result.caseManagerEmail && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {result.caseManagerEmail}
+                        </p>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="japanese-text">
-                    {result.caseManagerEmail || 'manager@example.com'}
-                  </TableCell>
-                  <TableCell className="japanese-text">
-                    {result.affiliationManager || '未設定'}
-                  </TableCell>
-                  <TableCell className="japanese-text">
-                    {result.affiliationManagerEmail || 'affiliation@example.com'}
+                    <div>
+                      <p>{result.affiliationManager || '未設定'}</p>
+                      {result.affiliationManagerEmail && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {result.affiliationManagerEmail}
+                        </p>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="whitespace-normal japanese-text">
                     {memos[result.id] || result.memo || ''}
@@ -314,7 +316,7 @@ export const EnhancedMatchingResultsTable: React.FC<EnhancedMatchingResultsTable
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={11} className="text-center py-4 japanese-text">
+                <TableCell colSpan={9} className="text-center py-4 japanese-text">
                   マッチング結果がありません
                 </TableCell>
               </TableRow>
