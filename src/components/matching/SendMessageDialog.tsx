@@ -57,7 +57,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
   const [emailAddress, setEmailAddress] = useState('');
   const [isContactSelectOpen, setIsContactSelectOpen] = useState(false);
 
-  // This useEffect should run only when isOpen changes and matchData is not null
+  // This useEffect will run whenever isOpen or matchData changes
   useEffect(() => {
     if (isOpen && matchData) {
       // Default to case manager email if available
@@ -66,8 +66,8 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
     }
   }, [isOpen, matchData]);
   
-  // Early return pattern - if matchData is null, return empty fragment
-  // IMPORTANT: This must come AFTER all hook calls
+  // If matchData is null, return null instead of an early return
+  // This ensures hooks are always called in the same order
   if (!matchData) {
     return null;
   }
