@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -191,6 +192,30 @@ export function EmailListWithExtraction() {
     setIsDialogOpen(true);
   };
 
+  // 抽出情報を表示するヘルパー関数
+  const renderExtractedInfo = (email: typeof emailData[0]) => {
+    if (email.emailType === 'case') {
+      return (
+        <div className="flex flex-col">
+          <span className="text-xs font-medium">{email.extractionResults.position}</span>
+          <span className="text-xs text-gray-500">
+            {email.extractionResults.budget} | {email.extractionResults.location}
+          </span>
+        </div>
+      );
+    } else if (email.emailType === 'engineer') {
+      return (
+        <div className="flex flex-col">
+          <span className="text-xs font-medium">{email.extractionResults.engineerName}</span>
+          <span className="text-xs text-gray-500">
+            {email.extractionResults.experience} | {email.extractionResults.preferredConditions}
+          </span>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <Card>
@@ -272,7 +297,7 @@ export function EmailListWithExtraction() {
                   <TableHead className="japanese-text">送信者</TableHead>
                   <TableHead className="japanese-text">会社</TableHead>
                   <TableHead className="japanese-text">受信日時</TableHead>
-                  <TableHead className="japanese-text">抽出キーワード</TableHead>
+                  <TableHead className="japanese-text">抽出情報</TableHead>
                   <TableHead className="japanese-text text-right">詳細</TableHead>
                 </TableRow>
               </TableHeader>
@@ -292,37 +317,7 @@ export function EmailListWithExtraction() {
                     <TableCell className="text-sm">
                       {new Date(email.receivedDate).toLocaleString()}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {email.emailType === 'case' ? (
-                          <>
-                            {email.extractionResults.skills.slice(0, 2).map((skill, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
-                            {email.extractionResults.skills.length > 2 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{email.extractionResults.skills.length - 2}
-                              </Badge>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            {email.extractionResults.skills.slice(0, 2).map((skill, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
-                            {email.extractionResults.skills.length > 2 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{email.extractionResults.skills.length - 2}
-                              </Badge>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
+                    <TableCell>{renderExtractedInfo(email)}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" className="japanese-text">
                         詳細
