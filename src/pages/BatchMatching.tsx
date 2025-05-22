@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,137 +29,96 @@ export function BatchMatching() {
   const [showCases, setShowCases] = useState<boolean>(false);
   
   // Pagination states
-  const [caseResultsCurrentPage, setCaseResultsCurrentPage] = useState<number>(1);
-  const [candidateResultsCurrentPage, setCandidateResultsCurrentPage] = useState<number>(1);
+  const [matchingResultsCurrentPage, setMatchingResultsCurrentPage] = useState<number>(1);
   const ITEMS_PER_PAGE = 3; // Number of items per page
   
   // SendMessageDialog state
   const [isSendMessageDialogOpen, setIsSendMessageDialogOpen] = useState<boolean>(false);
   const [selectedMatch, setSelectedMatch] = useState<EnhancedMatchingResult | null>(null);
 
-  // Sample data for demonstrations
-  const matchingCaseResults = [
+  // Combined sample data for bidirectional matching results
+  const combinedMatchingResults = [
     {
-      id: 1,
+      id: "1",
+      matchType: "case-to-candidate", // 案件→人材
       caseName: 'XX証券向けシステム開発',
-      companyName: '株式会社A',
-      candidateCount: 5,
-      topCandidates: ['山田太郎', '佐藤一郎', '鈴木次郎']
+      caseCompany: '株式会社A',
+      candidateName: '山田太郎',
+      candidateCompany: '技術者株式会社X',
+      matchingRate: "92%",
+      skills: ['Java', 'Spring Boot', 'AWS'],
+      experience: '10年',
     },
     {
-      id: 2,
-      caseName: '物流管理システム構築',
-      companyName: '株式会社B',
-      candidateCount: 3,
-      topCandidates: ['高橋三郎', '田中四郎', '伊藤五郎']
-    },
-    {
-      id: 3,
+      id: "2",
+      matchType: "candidate-to-case", // 人材→案件
       caseName: 'ECサイト開発案件',
-      companyName: '株式会社C',
-      candidateCount: 7,
-      topCandidates: ['渡辺六郎', '小林七郎', '加藤八郎']
-    },
-    {
-      id: 4,
-      caseName: 'クラウド移行プロジェクト',
-      companyName: '株式会社D',
-      candidateCount: 4,
-      topCandidates: ['松本九郎', '井上十郎', '木村十一郎']
-    },
-    {
-      id: 5,
-      caseName: 'AI推薦システム開発',
-      companyName: '株式会社E',
-      candidateCount: 6,
-      topCandidates: ['林十二郎', '山本十三郎', '斎藤十四郎']
-    }
-  ];
-
-  // Enhanced matching results format similar to case matching
-  const enhancedCaseResults = matchingCaseResults.map(item => ({
-    id: item.id.toString(), // Convert ID to string
-    caseName: item.caseName,
-    candidateName: item.topCandidates.join('、'),
-    matchingRate: "85%", // Example matching rate
-    matchingReason: "スキル・経験・希望単価が一致",
-    caseCompany: item.companyName,
-    candidateCompany: "技術者所属会社",
-    candidateCount: item.candidateCount,
-    status: "マッチング成功",
-    statusClass: "bg-green-100 text-green-800",
-  }));
-
-  // Update the candidate results to use string IDs
-  const matchingCandidateResults = [
-    {
-      id: "1", // String ID
-      name: '田中 太郎',
+      caseCompany: '株式会社B',
+      candidateName: '佐藤花子',
+      candidateCompany: '技術者株式会社Y',
+      matchingRate: "88%",
       skills: ['React', 'TypeScript', 'AWS'],
-      matchCount: 3,
+      experience: '7年',
     },
     {
-      id: "2", // String ID
-      name: '佐藤 花子',
-      skills: ['Java', 'Spring Boot', 'Oracle'],
-      matchCount: 5,
-    },
-    {
-      id: "3", // String ID
-      name: '鈴木 一郎',
+      id: "3",
+      matchType: "case-to-candidate", // 案件→人材
+      caseName: '物流管理システム構築',
+      caseCompany: '株式会社C',
+      candidateName: '鈴木一郎',
+      candidateCompany: '技術者株式会社Z',
+      matchingRate: "85%",
       skills: ['Python', 'Django', 'PostgreSQL'],
-      matchCount: 2,
+      experience: '5年',
     },
     {
-      id: "4", // String ID
-      name: '高橋 次郎',
-      skills: ['JavaScript', 'Vue.js', 'Firebase'],
-      matchCount: 4,
+      id: "4",
+      matchType: "candidate-to-case", // 人材→案件
+      caseName: 'クラウド移行プロジェクト',
+      caseCompany: '株式会社D',
+      candidateName: '高橋次郎',
+      candidateCompany: '技術者株式会社W',
+      matchingRate: "90%",
+      skills: ['AWS', 'Terraform', 'Docker'],
+      experience: '8年',
     },
     {
-      id: "5", // String ID
-      name: '渡辺 三郎',
-      skills: ['Ruby', 'Rails', 'MySQL'],
-      matchCount: 6,
+      id: "5",
+      matchType: "case-to-candidate", // 案件→人材
+      caseName: 'AI推薦システム開発',
+      caseCompany: '株式会社E',
+      candidateName: '渡辺三郎',
+      candidateCompany: '技術者株式会社V',
+      matchingRate: "87%",
+      skills: ['Python', 'TensorFlow', 'AWS'],
+      experience: '6年',
     }
   ];
 
-  // Enhanced candidate matching results
-  const enhancedCandidateResults = matchingCandidateResults.map(item => ({
-    id: item.id, // Already string ID
-    candidateName: item.name,
-    caseName: `マッチング案件 ${item.matchCount}件`,
-    matchingRate: "92%", // Example matching rate
-    matchingReason: "スキルセットが案件要件と一致",
-    candidateCompany: "株式会社テックソリューション",
-    caseCompany: "複数企業",
-    skills: item.skills.join(', '),
-    status: "候補者あり",
-    statusClass: "bg-blue-100 text-blue-800",
-  }));
-
-  // Sample candidates details for modal - update IDs to strings
+  // Sample candidates details for modal
   const candidatesDetails = [
     {
-      id: "1", // String ID
+      id: "1",
       name: '山田太郎',
       skills: 'Java, AWS, Spring Boot',
       experience: '10年',
+      companyName: '技術者株式会社X',
       matchScore: 92,
     },
     {
-      id: "2", // String ID
+      id: "2",
       name: '佐藤一郎',
       skills: 'Java, React, AWS',
       experience: '8年',
+      companyName: '技術者株式会社Y',
       matchScore: 87,
     }
   ];
 
-  // Sample case details for modal - update IDs to strings 
+  // Sample case details for modal
   const caseDetails = [
     {
-      id: "1", // String ID
+      id: "1",
       name: 'ECサイト開発案件',
       company: '株式会社A',
       location: '東京（リモート可）',
@@ -169,7 +127,7 @@ export function BatchMatching() {
       matchScore: 95,
     },
     {
-      id: "2", // String ID
+      id: "2",
       name: 'コーポレートサイトリニューアル',
       company: '株式会社B',
       location: '大阪（リモート可）',
@@ -201,7 +159,7 @@ export function BatchMatching() {
       matchingRate: `${candidate.matchScore}%`,
       matchingReason: 'スキル・経験年数が一致',
       caseCompany: 'システム開発株式会社',
-      candidateCompany: 'テック株式会社',
+      candidateCompany: candidate.companyName || 'テック株式会社',
       caseManager: '田中課長',
       caseManagerEmail: 'tanaka@system-dev.co.jp',
       affiliationManager: '山本部長',
@@ -233,7 +191,7 @@ export function BatchMatching() {
             </TabsTrigger>
           </TabsList>
           
-          {/* Combined Tab for Case to Candidate and Candidate to Case */}
+          {/* Combined Tab for bidirectional matching */}
           <TabsContent value="combined-matching">
             {/* Filter Area - Simplified with only three filters */}
             <div className="p-6 bg-white rounded-lg shadow-sm border mb-6">
@@ -287,35 +245,58 @@ export function BatchMatching() {
             {/* Results Area - With pagination for large result sets */}
             {isSearched && (
               <div className="space-y-8">
-                {/* Case to Candidate Results */}
+                {/* Combined Bidirectional Matching Results */}
                 <Card className="shadow-sm">
                   <CardContent className="p-4">
-                    <h3 className="text-lg font-medium mb-4 japanese-text flex items-center">
-                      <Badge className="mr-2 bg-blue-100 text-blue-800 border-blue-200">案件→人材</Badge>
-                      案件に合う技術者検索結果
-                    </h3>
+                    <h3 className="text-lg font-medium mb-4 japanese-text">マッチング検索結果</h3>
                     
                     <div className="space-y-4">
-                      {getPaginatedResults(enhancedCaseResults, caseResultsCurrentPage).map(result => (
+                      {getPaginatedResults(combinedMatchingResults, matchingResultsCurrentPage).map(result => (
                         <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-medium text-lg">{result.caseName}</h4>
-                              <Badge className="bg-green-100 text-green-800">{result.candidateCount}名</Badge>
+                              <h4 className="font-medium text-lg">
+                                {result.matchType === "case-to-candidate" 
+                                  ? `${result.caseName} → ${result.candidateName}` 
+                                  : `${result.candidateName} → ${result.caseName}`}
+                              </h4>
+                              <Badge 
+                                className={result.matchType === "case-to-candidate" 
+                                  ? "bg-blue-100 text-blue-800" 
+                                  : "bg-purple-100 text-purple-800"}
+                              >
+                                {result.matchType === "case-to-candidate" ? "案件→人材" : "人材→案件"}
+                              </Badge>
                             </div>
                             <div className="text-sm text-gray-600 space-y-1">
-                              <p><span className="font-medium">会社:</span> {result.caseCompany}</p>
-                              <p><span className="font-medium">候補者:</span> {result.candidateName}</p>
+                              <p><span className="font-medium">案件会社:</span> {result.caseCompany}</p>
+                              <p><span className="font-medium">技術者所属:</span> {result.candidateCompany}</p>
                               <p><span className="font-medium">マッチング率:</span> {result.matchingRate}</p>
+                              <p><span className="font-medium">スキル:</span> {result.skills.join(', ')}</p>
+                              <p><span className="font-medium">経験:</span> {result.experience}</p>
                             </div>
                             <div className="mt-3 flex justify-end">
                               <Button 
                                 size="sm" 
                                 variant="outline" 
-                                className="japanese-text"
-                                onClick={() => setShowCandidates(true)}
+                                className="japanese-text mr-2"
+                                onClick={() => result.matchType === "case-to-candidate" ? setShowCandidates(true) : setShowCases(true)}
                               >
-                                候補者一覧を見る
+                                {result.matchType === "case-to-candidate" ? "候補者詳細" : "案件詳細"}
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="japanese-text"
+                                onClick={() => handleSendMessage({
+                                  id: result.id,
+                                  name: result.candidateName,
+                                  skills: result.skills.join(', '),
+                                  experience: result.experience,
+                                  companyName: result.candidateCompany,
+                                  matchScore: parseInt(result.matchingRate)
+                                })}
+                              >
+                                メッセージ送信
                               </Button>
                             </div>
                           </CardContent>
@@ -323,62 +304,13 @@ export function BatchMatching() {
                       ))}
                     </div>
                     
-                    {/* Pagination for case results */}
-                    {enhancedCaseResults.length > ITEMS_PER_PAGE && (
+                    {/* Pagination for matching results */}
+                    {combinedMatchingResults.length > ITEMS_PER_PAGE && (
                       <div className="mt-4 flex justify-center">
                         <Pagination
-                          currentPage={caseResultsCurrentPage}
-                          totalPages={Math.ceil(enhancedCaseResults.length / ITEMS_PER_PAGE)}
-                          onPageChange={setCaseResultsCurrentPage}
-                        />
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Candidate to Case Results */}
-                <Card className="shadow-sm">
-                  <CardContent className="p-4">
-                    <h3 className="text-lg font-medium mb-4 japanese-text flex items-center">
-                      <Badge className="mr-2 bg-purple-100 text-purple-800 border-purple-200">人材→案件</Badge>
-                      技術者に合う案件検索結果
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {getPaginatedResults(enhancedCandidateResults, candidateResultsCurrentPage).map(result => (
-                        <Card key={result.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-medium text-lg">{result.candidateName}</h4>
-                              <Badge className="bg-blue-100 text-blue-800">{result.caseName}</Badge>
-                            </div>
-                            <div className="text-sm text-gray-600 space-y-1">
-                              <p><span className="font-medium">スキル:</span> {result.skills}</p>
-                              <p><span className="font-medium">所属:</span> {result.candidateCompany}</p>
-                              <p><span className="font-medium">マッチング率:</span> {result.matchingRate}</p>
-                            </div>
-                            <div className="mt-3 flex justify-end">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="japanese-text"
-                                onClick={() => setShowCases(true)}
-                              >
-                                案件を見る
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                    
-                    {/* Pagination for candidate results */}
-                    {enhancedCandidateResults.length > ITEMS_PER_PAGE && (
-                      <div className="mt-4 flex justify-center">
-                        <Pagination
-                          currentPage={candidateResultsCurrentPage}
-                          totalPages={Math.ceil(enhancedCandidateResults.length / ITEMS_PER_PAGE)}
-                          onPageChange={setCandidateResultsCurrentPage}
+                          currentPage={matchingResultsCurrentPage}
+                          totalPages={Math.ceil(combinedMatchingResults.length / ITEMS_PER_PAGE)}
+                          onPageChange={setMatchingResultsCurrentPage}
                         />
                       </div>
                     )}
@@ -401,6 +333,7 @@ export function BatchMatching() {
                         <Checkbox />
                       </TableHead>
                       <TableHead className="japanese-text">名前</TableHead>
+                      <TableHead className="japanese-text">所属会社</TableHead>
                       <TableHead className="japanese-text">スキル</TableHead>
                       <TableHead className="japanese-text">経験</TableHead>
                       <TableHead className="japanese-text">マッチ率</TableHead>
@@ -414,6 +347,7 @@ export function BatchMatching() {
                           <Checkbox />
                         </TableCell>
                         <TableCell className="font-medium">{candidate.name}</TableCell>
+                        <TableCell>{candidate.companyName}</TableCell>
                         <TableCell>{candidate.skills}</TableCell>
                         <TableCell>{candidate.experience}</TableCell>
                         <TableCell>
