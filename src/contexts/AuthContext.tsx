@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -114,12 +115,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       
       if (authUser) {
-        // 创建基本的 profile 对象
+        // 创建基本的 profile 对象，包含所有字段
         const basicProfile: UserProfile = {
           id: authUser.id,
           first_name: authUser.user_metadata?.first_name || '',
           last_name: authUser.user_metadata?.last_name || '',
           avatar_url: authUser.user_metadata?.avatar_url || '',
+          job_title: authUser.user_metadata?.job_title || '', // 添加这个字段
+          company: authUser.user_metadata?.company || '', // 添加这个字段
           role: 'member' // 默认角色
         };
         
