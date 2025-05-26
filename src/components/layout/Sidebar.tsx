@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   FileText, 
   Users, 
@@ -12,8 +13,20 @@ import {
   BarChart2,
   ServerCog,
   Building,
-  Building2
+  Building2,
+  User,
+  LogOut,
+  ChevronUp
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type SidebarItem = {
   icon: React.ReactNode;
@@ -90,7 +103,7 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 export function Sidebar() {
-  // Add state to track which submenus are expanded
+  const { user, profile, signOut } = useAuth();
   const [expandedItems, setExpandedItems] = useState<{[key: string]: boolean}>({
     '自社': true,
     '他社': true
@@ -103,6 +116,20 @@ export function Sidebar() {
     }));
   };
 
+  const getInitials = () => {
+    if (profile?.first_name || profile?.last_name) {
+      return `${profile.first_name?.charAt(0) || ''}${profile.last_name?.charAt(0) || ''}`;
+    }
+    return user?.email?.charAt(0).toUpperCase() || 'U';
+  };
+
+  const getDisplayName = () => {
+    if (profile?.first_name || profile?.last_name) {
+      return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    }
+    return user?.email || 'User';
+  };
+
   return (
     <div className="h-screen flex flex-col bg-sidebar border-r border-sidebar-border">
       <div className="p-6">
@@ -112,7 +139,6 @@ export function Sidebar() {
         {sidebarItems.map((item, i) => (
           <React.Fragment key={i}>
             {item.subItems ? (
-              // Render item with submenu
               <div className="space-y-1">
                 <div 
                   className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all text-sidebar-foreground cursor-pointer"
@@ -125,7 +151,6 @@ export function Sidebar() {
                   </span>
                 </div>
                 
-                {/* Sub items */}
                 {expandedItems[item.label] && (
                   <div className="pl-6 space-y-1 mt-1">
                     {item.subItems.map((subItem, j) => (
@@ -149,7 +174,6 @@ export function Sidebar() {
                 )}
               </div>
             ) : (
-              // Render regular menu item without submenu
               <NavLink
                 to={item.href}
                 className={({ isActive }) =>
@@ -169,15 +193,44 @@ export function Sidebar() {
         ))}
       </div>
       <div className="p-4 border-t border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-custom-blue-200 flex items-center justify-center text-custom-blue-700 font-medium">
-            TR
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">Tech Recruiter</p>
-            <p className="text-xs text-muted-foreground truncate">tech.recruiter@example.com</p>
-          </div>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full h-auto p-2 justify-start">
+              <div className="flex items-center gap-3 w-full">
+                <Avatar className="h-8 w-8">
+                  {profile?.avatar_url ? (
+                    <AvatarImage src={profile.avatar_url} />
+                  ) : null}
+                  <AvatarFallback className="text-sm font-medium">
+                    {getInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">
+                    {getDisplayName()}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user?.email}
+                  </p>
+                </div>
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" className="w-56 mb-2">
+            <NavLink to="/profile">
+              <DropdownMenuItem className="cursor-pointer">
+                <User className="h-4 w-4 mr-2" />
+                <span className="japanese-text">个人资料</span>
+              </DropdownMenuItem>
+            </NavLink>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer" onClick={signOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              <span className="japanese-text">退出登录</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
