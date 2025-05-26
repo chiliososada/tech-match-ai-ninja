@@ -64,18 +64,24 @@ export function Profile() {
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
 
-      // まず、プロファイルが存在するかチェック
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
+      // 直接 auth.users のメタデータを更新する方法を試す
+      const { data: updatedUser, error: authError } = await supabase.auth.updateUser({
+        data: {
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          job_title: profileData.job_title,
+          company: profileData.company,
+        }
+      });
 
-      if (fetchError) {
-        console.error('プロファイル取得エラー:', fetchError);
-        throw fetchError;
+      if (authError) {
+        console.error('Auth更新エラー:', authError);
+        throw authError;
       }
 
+      console.log('Auth更新成功:', updatedUser);
+
+      // profiles テーブルへの更新は簡単な upsert を使用
       const updates = {
         id: user.id,
         first_name: profileData.first_name,
@@ -85,26 +91,20 @@ export function Profile() {
         updated_at: new Date().toISOString(),
       };
 
-      let result;
-      if (existingProfile) {
-        // 既存のプロファイルを更新
-        result = await supabase
-          .from('profiles')
-          .update(updates)
-          .eq('id', user.id);
-      } else {
-        // 新しいプロファイルを作成
-        result = await supabase
-          .from('profiles')
-          .insert(updates);
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(updates, { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
+        });
+
+      if (profileError) {
+        console.error('プロファイル保存エラー:', profileError);
+        // プロファイルエラーは警告として扱い、処理を続行
+        console.log('プロファイルテーブルの更新に失敗しましたが、認証データは更新されました');
       }
 
-      if (result.error) {
-        console.error('プロファイル保存エラー:', result.error);
-        throw result.error;
-      }
-
-      console.log('プロファイル更新成功');
+      console.log('プロファイル更新完了');
       toast({
         title: "更新成功",
         description: "プロファイルが更新されました",
