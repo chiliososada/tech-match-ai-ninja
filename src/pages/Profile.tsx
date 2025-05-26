@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,25 +73,57 @@ export function Profile() {
 
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
+      console.log('現在のセッション:', await supabase.auth.getSession());
+
+      // 先检查用户是否有权限访问profiles表
+      const { data: testData, error: testError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      console.log('権限テスト結果:', { testData, testError });
+
+      if (testError) {
+        console.error('権限テストエラー:', testError);
+        toast({
+          title: "権限エラー",
+          description: `データベースアクセス権限がありません: ${testError.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
 
       // 更新 profiles 表
-      const { error: profileError } = await supabase
+      const updateData = {
+        id: user.id,
+        first_name: profileData.first_name || null,
+        last_name: profileData.last_name || null,
+        avatar_url: profileData.avatar_url || null,
+        job_title: profileData.job_title || null,
+        company: profileData.company || null,
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('実際の更新データ:', updateData);
+
+      const { data: updateResult, error: profileError } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
-          first_name: profileData.first_name || null,
-          last_name: profileData.last_name || null,
-          avatar_url: profileData.avatar_url || null,
-          job_title: profileData.job_title || null,
-          company: profileData.company || null,
-          updated_at: new Date().toISOString()
-        }, {
+        .upsert(updateData, {
           onConflict: 'id'
-        });
+        })
+        .select();
+
+      console.log('更新結果:', { updateResult, profileError });
 
       if (profileError) {
         console.error('Profiles表更新エラー:', profileError);
-        throw profileError;
+        toast({
+          title: "更新失敗",
+          description: `プロファイル更新エラー: ${profileError.message}`,
+          variant: "destructive",
+        });
+        return;
       }
 
       console.log('プロファイル更新完了');
@@ -106,10 +139,10 @@ export function Profile() {
       }, 1000);
 
     } catch (error: any) {
-      console.error('プロファイル更新エラー:', error);
+      console.error('予期しないプロファイル更新エラー:', error);
       toast({
         title: "更新失敗",
-        description: error.message || "プロファイルの更新中にエラーが発生しました",
+        description: `予期しないエラー: ${error.message || "プロファイルの更新中にエラーが発生しました"}`,
         variant: "destructive",
       });
     } finally {
