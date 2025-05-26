@@ -35,7 +35,6 @@ export function Profile() {
   });
 
   useEffect(() => {
-    // 使用 auth user data 作为后备方案
     if (user || profile) {
       const userData = profile || user?.user_metadata;
       setProfileData({
@@ -53,7 +52,29 @@ export function Profile() {
     try {
       setUpdating(true);
       
-      if (!user) return;
+      if (!user) {
+        toast({
+          title: "エラー",
+          description: "ユーザーが認証されていません",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('プロファイル更新開始:', user.id);
+      console.log('更新データ:', profileData);
+
+      // まず、プロファイルが存在するかチェック
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('プロファイル取得エラー:', fetchError);
+        throw fetchError;
+      }
 
       const updates = {
         id: user.id,
@@ -64,23 +85,35 @@ export function Profile() {
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert(updates, { onConflict: 'id' });
-
-      if (error) {
-        throw error;
+      let result;
+      if (existingProfile) {
+        // 既存のプロファイルを更新
+        result = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('id', user.id);
+      } else {
+        // 新しいプロファイルを作成
+        result = await supabase
+          .from('profiles')
+          .insert(updates);
       }
 
+      if (result.error) {
+        console.error('プロファイル保存エラー:', result.error);
+        throw result.error;
+      }
+
+      console.log('プロファイル更新成功');
       toast({
         title: "更新成功",
         description: "プロファイルが更新されました",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('プロファイル更新エラー:', error);
       toast({
         title: "更新失敗",
-        description: "プロファイルの更新中にエラーが発生しました",
+        description: error.message || "プロファイルの更新中にエラーが発生しました",
         variant: "destructive",
       });
     } finally {
