@@ -137,7 +137,7 @@ export function Sidebar() {
       </div>
       <div className="flex-1 px-4 space-y-2 overflow-y-auto py-2">
         {sidebarItems.map((item, i) => (
-          <React.Fragment key={i}>
+          <div key={i}>
             {item.subItems ? (
               <div className="space-y-1">
                 <div 
@@ -189,7 +189,7 @@ export function Sidebar() {
                 <span className="japanese-text">{item.label}</span>
               </NavLink>
             )}
-          </React.Fragment>
+          </div>
         ))}
       </div>
       <div className="p-4 border-t border-sidebar-border">
