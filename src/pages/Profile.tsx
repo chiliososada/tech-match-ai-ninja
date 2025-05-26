@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,7 +63,8 @@ export function Profile() {
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
 
-      // 直接 auth.users のメタデータを更新する方法を試す
+      // Step 1: 先にauth.usersのメタデータを更新
+      console.log('Step 1: auth.users メタデータ更新中...');
       const { data: updatedUser, error: authError } = await supabase.auth.updateUser({
         data: {
           first_name: profileData.first_name,
@@ -81,7 +81,22 @@ export function Profile() {
 
       console.log('Auth更新成功:', updatedUser);
 
-      // profiles テーブルへの更新は簡単な upsert を使用
+      // Step 2: profilesテーブルを更新
+      console.log('Step 2: profiles テーブル更新中...');
+      
+      // まず現在のセッションを確認
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error('セッション取得エラー:', sessionError);
+        throw sessionError;
+      }
+      
+      if (!session) {
+        throw new Error('有効なセッションがありません');
+      }
+
+      console.log('現在のセッション:', session.user.id);
+
       const updates = {
         id: user.id,
         first_name: profileData.first_name,
@@ -91,26 +106,40 @@ export function Profile() {
         updated_at: new Date().toISOString(),
       };
 
-      const { error: profileError } = await supabase
+      console.log('Profiles更新データ:', updates);
+
+      // upsertを使用して確実に保存
+      const { data: profileResult, error: profileError } = await supabase
         .from('profiles')
         .upsert(updates, { 
           onConflict: 'id',
           ignoreDuplicates: false 
-        });
+        })
+        .select();
 
       if (profileError) {
         console.error('プロファイル保存エラー:', profileError);
-        // プロファイルエラーは警告として扱い、処理を続行
-        console.log('プロファイルテーブルの更新に失敗しましたが、認証データは更新されました');
+        console.error('エラー詳細:', profileError.message, profileError.details, profileError.hint);
+        
+        // プロファイルエラーでも続行（auth.usersは更新されているため）
+        toast({
+          title: "部分的に更新成功",
+          description: "基本情報は更新されましたが、詳細プロファイルの保存に失敗しました",
+          variant: "destructive",
+        });
+        return;
       }
 
-      console.log('プロファイル更新完了');
+      console.log('プロファイル更新成功:', profileResult);
+      
       toast({
         title: "更新成功",
-        description: "プロファイルが更新されました",
+        description: "プロファイルが正常に更新されました",
       });
+
     } catch (error: any) {
       console.error('プロファイル更新エラー:', error);
+      console.error('エラー詳細:', error.message);
       toast({
         title: "更新失敗",
         description: error.message || "プロファイルの更新中にエラーが発生しました",
