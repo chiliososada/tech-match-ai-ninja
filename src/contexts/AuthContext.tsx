@@ -355,6 +355,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const inviteUser = async (email: string, role: string, tenantId: string) => {
     try {
+      // 验证角色类型
+      const validRoles = ['owner', 'admin', 'member', 'viewer', 'test_user', 'developer'];
+      if (!validRoles.includes(role)) {
+        const error = new Error("无效的角色类型");
+        return { error };
+      }
+
       // 生成邀请令牌
       const token = crypto.randomUUID();
       const expiresAt = new Date();
@@ -365,7 +372,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .insert({
           tenant_id: tenantId,
           email,
-          role,
+          role: role as 'owner' | 'admin' | 'member' | 'viewer' | 'test_user' | 'developer',
           invited_by: user?.id,
           token,
           expires_at: expiresAt.toISOString(),
