@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 设置认证状态监听器
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        console.log('认证状态变化:', event, currentSession?.user?.id);
+        console.log('認証状態変化:', event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -65,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // 延迟获取用户资料和租户信息
           setTimeout(() => {
             fetchUserProfile(currentSession.user.id);
-          }, 0);
+          }, 100);
         } else {
           setProfile(null);
           setCurrentTenant(null);
@@ -79,12 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // 根据事件显示提示
         if (event === 'SIGNED_IN') {
           toast({
-            title: "登录成功",
-            description: "欢迎回来",
+            title: "ログイン成功",
+            description: "お帰りなさい",
           });
         } else if (event === 'SIGNED_OUT') {
           toast({
-            title: "已退出登录",
+            title: "ログアウトしました",
           });
         }
       }
@@ -109,78 +108,116 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      // 获取用户资料
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      console.log('ユーザープロファイル取得開始:', userId);
+      
+      // 先尝试直接从 auth.users 获取基本信息，避免 RLS 问题
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      
+      if (authUser) {
+        // 创建基本的 profile 对象
+        const basicProfile: UserProfile = {
+          id: authUser.id,
+          first_name: authUser.user_metadata?.first_name || '',
+          last_name: authUser.user_metadata?.last_name || '',
+          avatar_url: authUser.user_metadata?.avatar_url || '',
+          role: 'member' // 默认角色
+        };
+        
+        setProfile(basicProfile);
+        console.log('基本プロファイル設定完了:', basicProfile);
+        
+        // 尝试获取详细的 profile 数据（如果 RLS 允许）
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
 
-      if (profileError) {
-        console.error('获取用户资料错误:', profileError);
-        setLoading(false);
-        return;
-      }
-
-      setProfile(profileData);
-
-      // 获取用户的租户列表
-      const { data: tenantsData, error: tenantsError } = await supabase
-        .rpc('get_user_tenants');
-
-      if (tenantsError) {
-        console.error('获取租户列表错误:', tenantsError);
-      } else if (tenantsData) {
-        // 获取完整的租户信息
-        const tenantIds = tenantsData.map((t: any) => t.tenant_id);
-        const { data: fullTenants, error: fullTenantsError } = await supabase
-          .from('tenants')
-          .select('*')
-          .in('id', tenantIds);
-
-        if (!fullTenantsError && fullTenants) {
-          setTenants(fullTenants);
-          
-          // 设置当前租户（默认租户或第一个租户）
-          const defaultTenant = tenantsData.find((t: any) => t.is_default);
-          if (defaultTenant) {
-            const currentTenantData = fullTenants.find(t => t.id === defaultTenant.tenant_id);
-            setCurrentTenant(currentTenantData || null);
-          } else if (fullTenants.length > 0) {
-            setCurrentTenant(fullTenants[0]);
+          if (!profileError && profileData) {
+            setProfile(profileData);
+            console.log('詳細プロファイル設定完了:', profileData);
+          } else if (profileError) {
+            console.log('詳細プロファイル取得エラー（基本プロファイルを使用）:', profileError.message);
           }
+        } catch (error) {
+          console.log('プロファイルアクセスエラー（基本情報のみ使用）:', error);
+        }
+
+        // 尝试获取租户信息
+        try {
+          const { data: tenantsData, error: tenantsError } = await supabase
+            .rpc('get_user_tenants');
+
+          if (!tenantsError && tenantsData) {
+            const tenantIds = tenantsData.map((t: any) => t.tenant_id);
+            const { data: fullTenants, error: fullTenantsError } = await supabase
+              .from('tenants')
+              .select('*')
+              .in('id', tenantIds);
+
+            if (!fullTenantsError && fullTenants) {
+              setTenants(fullTenants);
+              
+              const defaultTenant = tenantsData.find((t: any) => t.is_default);
+              if (defaultTenant) {
+                const currentTenantData = fullTenants.find(t => t.id === defaultTenant.tenant_id);
+                setCurrentTenant(currentTenantData || null);
+              } else if (fullTenants.length > 0) {
+                setCurrentTenant(fullTenants[0]);
+              }
+            }
+          }
+        } catch (error) {
+          console.log('テナント情報取得エラー:', error);
+          // 创建默认的个人租户信息
+          const defaultTenant: Tenant = {
+            id: 'default',
+            name: 'パーソナルワークスペース',
+            type: 'individual',
+            is_active: true,
+            subscription_plan: 'free'
+          };
+          setTenants([defaultTenant]);
+          setCurrentTenant(defaultTenant);
         }
       }
 
       setLoading(false);
     } catch (error) {
-      console.error('获取用户信息时发生错误:', error);
+      console.error('ユーザー情報取得時にエラーが発生:', error);
       setLoading(false);
+      
+      toast({
+        title: "プロファイル読み込みエラー",
+        description: "ユーザー情報の取得に失敗しました",
+        variant: "destructive",
+      });
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       if (!email || !password) {
-        const error = new Error("邮箱和密码不能为空");
+        const error = new Error("メールアドレスとパスワードを入力してください");
         return { error };
       }
 
-      console.log('尝试登录:', email);
+      console.log('ログイン試行:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        console.error('登录错误:', error);
+        console.error('ログインエラー:', error);
         return { error };
       }
       
-      console.log('登录成功:', data.user?.id);
+      console.log('ログイン成功:', data.user?.id);
       return { error: null };
     } catch (error) {
-      console.error('意外的登录错误:', error);
+      console.error('予期しないログインエラー:', error);
       return { error: error as Error };
     }
   };
@@ -192,11 +229,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     try {
       if (!email || !password) {
-        const error = new Error("邮箱和密码不能为空");
+        const error = new Error("メールアドレスとパスワードを入力してください");
         return { error };
       }
 
-      console.log('尝试注册:', email);
+      console.log('アカウント作成試行:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -207,40 +244,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       if (error) {
-        console.error('注册错误:', error);
+        console.error('アカウント作成エラー:', error);
         return { error };
       } else {
-        console.log('注册成功:', data.user?.id);
+        console.log('アカウント作成成功:', data.user?.id);
         toast({
-          title: "注册成功",
-          description: data.session ? "您已成功登录" : "请检查您的电子邮箱以完成验证",
+          title: "アカウント作成成功",
+          description: data.session ? "ログインしました" : "メールアドレスを確認して登録を完了してください",
         });
       }
       
       return { error: null };
     } catch (error) {
-      console.error('意外的注册错误:', error);
+      console.error('予期しないアカウント作成エラー:', error);
       return { error: error as Error };
     }
   };
 
   const signOut = async () => {
     try {
-      console.log('尝试退出登录');
+      console.log('ログアウト試行');
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error('退出错误:', error);
+        console.error('ログアウトエラー:', error);
         toast({
-          title: "退出失败",
+          title: "ログアウト失敗",
           description: error.message,
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('意外的退出错误:', error);
+      console.error('予期しないログアウトエラー:', error);
       toast({
-        title: "退出失败",
-        description: "发生未知错误，请稍后重试",
+        title: "ログアウト失敗",
+        description: "予期しないエラーが発生しました。しばらくしてからお試しください",
         variant: "destructive",
       });
     }
@@ -248,7 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      console.log('尝试Google登录');
+      console.log('Google ログイン試行');
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -257,18 +294,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       if (error) {
-        console.error('Google登录错误:', error);
+        console.error('Google ログインエラー:', error);
         toast({
-          title: "Google登录失败",
+          title: "Google ログイン失敗",
           description: error.message,
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('意外的Google登录错误:', error);
+      console.error('予期しない Google ログインエラー:', error);
       toast({
-        title: "Google登录失败",
-        description: "发生未知错误，请稍后重试",
+        title: "Google ログイン失敗",
+        description: "予期しないエラーが発生しました。しばらくしてからお試しください",
         variant: "destructive",
       });
     }
@@ -279,27 +316,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const tenant = tenants.find(t => t.id === tenantId);
       if (tenant) {
         setCurrentTenant(tenant);
-        
-        // 更新用户资料中的默认租户
-        const { error } = await supabase
-          .from('profiles')
-          .update({ tenant_id: tenantId })
-          .eq('id', user?.id);
-
-        if (error) {
-          console.error('更新默认租户错误:', error);
-        } else {
-          toast({
-            title: "租户切换成功",
-            description: `已切换到 ${tenant.name}`,
-          });
-        }
+        toast({
+          title: "テナント切り替え成功",
+          description: `${tenant.name} に切り替えました`,
+        });
       }
     } catch (error) {
-      console.error('切换租户错误:', error);
+      console.error('テナント切り替えエラー:', error);
       toast({
-        title: "切换租户失败",
-        description: "发生未知错误，请稍后重试",
+        title: "テナント切り替え失敗",
+        description: "予期しないエラーが発生しました。しばらくしてからお試しください",
         variant: "destructive",
       });
     }
@@ -318,54 +344,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error('创建租户错误:', error);
+        console.error('テナント作成エラー:', error);
         return { error };
       }
 
-      // 将当前用户添加为租户所有者
-      const { error: memberError } = await supabase
-        .from('tenant_members')
-        .insert({
-          tenant_id: data.id,
-          user_id: user?.id,
-          role: 'owner',
-        });
-
-      if (memberError) {
-        console.error('添加租户成员错误:', memberError);
-        return { error: memberError };
-      }
-
-      // 刷新租户列表
       if (user) {
         await fetchUserProfile(user.id);
       }
 
       toast({
-        title: "租户创建成功",
-        description: `${name} 已成功创建`,
+        title: "テナント作成成功",
+        description: `${name} が正常に作成されました`,
       });
 
       return { error: null };
     } catch (error) {
-      console.error('意外的创建租户错误:', error);
+      console.error('予期しないテナント作成エラー:', error);
       return { error: error as Error };
     }
   };
 
   const inviteUser = async (email: string, role: string, tenantId: string) => {
     try {
-      // 验证角色类型
       const validRoles = ['owner', 'admin', 'member', 'viewer', 'test_user', 'developer'];
       if (!validRoles.includes(role)) {
-        const error = new Error("无效的角色类型");
+        const error = new Error("無効な役割です");
         return { error };
       }
 
-      // 生成邀请令牌
       const token = crypto.randomUUID();
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7); // 7天后过期
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
       const { error } = await supabase
         .from('invitations')
@@ -379,18 +388,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
       if (error) {
-        console.error('创建邀请错误:', error);
+        console.error('招待作成エラー:', error);
         return { error };
       }
 
       toast({
-        title: "邀请发送成功",
-        description: `已向 ${email} 发送邀请`,
+        title: "招待送信成功",
+        description: `${email} に招待を送信しました`,
       });
 
       return { error: null };
     } catch (error) {
-      console.error('意外的邀请错误:', error);
+      console.error('予期しない招待エラー:', error);
       return { error: error as Error };
     }
   };
@@ -419,7 +428,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth必须在AuthProvider内部使用');
+    throw new Error('useAuth は AuthProvider 内で使用する必要があります');
   }
   return context;
 };

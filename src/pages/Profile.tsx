@@ -35,17 +35,19 @@ export function Profile() {
   });
 
   useEffect(() => {
-    if (profile) {
+    // 使用 auth user data 作为后备方案
+    if (user || profile) {
+      const userData = profile || user?.user_metadata;
       setProfileData({
-        first_name: profile.first_name || '',
-        last_name: profile.last_name || '',
-        avatar_url: profile.avatar_url || '',
-        job_title: profile.job_title || '',
-        company: profile.company || '',
+        first_name: userData?.first_name || '',
+        last_name: userData?.last_name || '',
+        avatar_url: userData?.avatar_url || '',
+        job_title: userData?.job_title || '',
+        company: userData?.company || '',
       });
       setLoading(false);
     }
-  }, [profile]);
+  }, [profile, user]);
 
   async function updateProfile() {
     try {
@@ -64,8 +66,7 @@ export function Profile() {
 
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+        .upsert(updates, { onConflict: 'id' });
 
       if (error) {
         throw error;
@@ -73,13 +74,13 @@ export function Profile() {
 
       toast({
         title: "更新成功",
-        description: "您的个人资料已更新",
+        description: "プロファイルが更新されました",
       });
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      console.error('プロファイル更新エラー:', error);
       toast({
-        title: "更新失败",
-        description: "更新个人资料时出错",
+        title: "更新失敗",
+        description: "プロファイルの更新中にエラーが発生しました",
         variant: "destructive",
       });
     } finally {
@@ -106,14 +107,14 @@ export function Profile() {
 
   const getRoleDisplayName = (role?: string) => {
     const roleMap = {
-      'developer': '开发者',
+      'developer': '開発者',
       'owner': '所有者',
-      'admin': '管理员',
-      'member': '成员',
-      'viewer': '查看者',
-      'test_user': '测试用户'
+      'admin': '管理者',
+      'member': 'メンバー',
+      'viewer': '閲覧者',
+      'test_user': 'テストユーザー'
     };
-    return roleMap[role as keyof typeof roleMap] || '未知';
+    return roleMap[role as keyof typeof roleMap] || '不明';
   };
 
   if (loading) {
@@ -130,14 +131,14 @@ export function Profile() {
     <MainLayout>
       <div className="flex-1 space-y-8 p-8 pt-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight japanese-text">个人档案</h2>
-          <Button variant="outline" onClick={signOut} className="japanese-text">退出登录</Button>
+          <h2 className="text-3xl font-bold tracking-tight japanese-text">プロファイル</h2>
+          <Button variant="outline" onClick={signOut} className="japanese-text">ログアウト</Button>
         </div>
 
         <TenantSelector />
 
         <div className="grid gap-6">
-          {/* 用户基本信息 */}
+          {/* ユーザー基本情報 */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-4">
@@ -149,9 +150,9 @@ export function Profile() {
                 </Avatar>
                 <div className="space-y-2">
                   <div>
-                    <CardTitle className="japanese-text">个人信息</CardTitle>
+                    <CardTitle className="japanese-text">個人情報</CardTitle>
                     <CardDescription className="japanese-text">
-                      更新您的个人资料信息
+                      プロファイル情報を更新してください
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -159,7 +160,7 @@ export function Profile() {
                       {getRoleDisplayName(profile?.role)}
                     </Badge>
                     {profile?.is_test_account && (
-                      <Badge variant="outline" className="japanese-text">测试账号</Badge>
+                      <Badge variant="outline" className="japanese-text">テストアカウント</Badge>
                     )}
                   </div>
                 </div>
@@ -187,7 +188,7 @@ export function Profile() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="japanese-text">电子邮箱</Label>
+                <Label htmlFor="email" className="japanese-text">メールアドレス</Label>
                 <Input
                   id="email"
                   type="email"
@@ -195,26 +196,26 @@ export function Profile() {
                   disabled
                 />
                 <p className="text-sm text-muted-foreground japanese-text">
-                  邮箱地址不可更改
+                  メールアドレスは変更できません
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="job_title" className="japanese-text">职位</Label>
+                  <Label htmlFor="job_title" className="japanese-text">職種</Label>
                   <Input
                     id="job_title"
                     value={profileData.job_title || ''}
                     onChange={(e) => setProfileData({...profileData, job_title: e.target.value})}
-                    placeholder="招聘顾问 / 人事经理"
+                    placeholder="採用担当者 / 人事マネージャー"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company" className="japanese-text">公司</Label>
+                  <Label htmlFor="company" className="japanese-text">会社名</Label>
                   <Input
                     id="company"
                     value={profileData.company || ''}
                     onChange={(e) => setProfileData({...profileData, company: e.target.value})}
-                    placeholder="公司名称"
+                    placeholder="会社名"
                   />
                 </div>
               </div>
@@ -225,20 +226,20 @@ export function Profile() {
                 disabled={updating} 
                 className="japanese-text"
               >
-                {updating ? '保存中...' : '保存更改'}
+                {updating ? '保存中...' : '変更を保存'}
               </Button>
             </CardFooter>
           </Card>
 
-          {/* 当前工作空间信息 */}
+          {/* 現在のワークスペース情報 */}
           {currentTenant && (
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="japanese-text">当前工作空间</CardTitle>
+                    <CardTitle className="japanese-text">現在のワークスペース</CardTitle>
                     <CardDescription className="japanese-text">
-                      工作空间详细信息和成员管理
+                      ワークスペースの詳細とメンバー管理
                     </CardDescription>
                   </div>
                   {profile?.role && ['owner', 'admin'].includes(profile.role) && (
@@ -249,23 +250,23 @@ export function Profile() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <Label className="japanese-text">工作空间名称</Label>
+                    <Label className="japanese-text">ワークスペース名</Label>
                     <p className="text-sm font-medium">{currentTenant.name}</p>
                   </div>
                   <div>
-                    <Label className="japanese-text">类型</Label>
+                    <Label className="japanese-text">タイプ</Label>
                     <p className="text-sm font-medium">
-                      {currentTenant.type === 'enterprise' ? '企业' : '个人'}
+                      {currentTenant.type === 'enterprise' ? '企業' : '個人'}
                     </p>
                   </div>
                   {currentTenant.domain && (
                     <div>
-                      <Label className="japanese-text">域名</Label>
+                      <Label className="japanese-text">ドメイン</Label>
                       <p className="text-sm font-medium">{currentTenant.domain}</p>
                     </div>
                   )}
                   <div>
-                    <Label className="japanese-text">订阅计划</Label>
+                    <Label className="japanese-text">サブスクリプションプラン</Label>
                     <p className="text-sm font-medium">{currentTenant.subscription_plan || 'Free'}</p>
                   </div>
                 </div>
