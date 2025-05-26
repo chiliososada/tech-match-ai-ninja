@@ -63,7 +63,7 @@ export function Profile() {
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
 
-      // Step 1: auth.usersのメタデータを更新
+      // 暫時只更新 auth.users 的元数据，因为 profiles 表有 RLS 问题
       console.log('auth.users メタデータ更新中...');
       const { error: authError } = await supabase.auth.updateUser({
         data: {
@@ -77,29 +77,6 @@ export function Profile() {
       if (authError) {
         console.error('Auth更新エラー:', authError);
         throw authError;
-      }
-
-      // Step 2: profilesテーブルを更新
-      console.log('profiles テーブル更新中...');
-      const updates = {
-        id: user.id,
-        first_name: profileData.first_name,
-        last_name: profileData.last_name,
-        job_title: profileData.job_title,
-        company: profileData.company,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(updates, { 
-          onConflict: 'id',
-          ignoreDuplicates: false 
-        });
-
-      if (profileError) {
-        console.error('プロファイル更新エラー:', profileError);
-        throw profileError;
       }
 
       console.log('プロファイル更新完了');
