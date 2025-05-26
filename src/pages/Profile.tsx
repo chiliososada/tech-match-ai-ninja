@@ -94,6 +94,7 @@ export function Profile() {
         avatar_url: profileData.avatar_url || null,
         job_title: profileData.job_title || null,
         company: profileData.company || null,
+        tenant_id: currentTenant?.id || null, // 确保设置正确的tenant_id
         updated_at: new Date().toISOString()
       };
 
