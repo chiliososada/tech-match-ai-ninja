@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -71,30 +70,6 @@ export function Profile() {
         return;
       }
 
-      console.log('プロファイル更新開始:', user.id);
-      console.log('更新データ:', profileData);
-      console.log('現在のセッション:', await supabase.auth.getSession());
-
-      // 先检查用户是否有权限访问profiles表
-      const { data: testData, error: testError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      console.log('権限テスト結果:', { testData, testError });
-
-      if (testError) {
-        console.error('権限テストエラー:', testError);
-        toast({
-          title: "権限エラー",
-          description: `データベースアクセス権限がありません: ${testError.message}`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // 更新 profiles 表
       const updateData = {
         id: user.id,
         first_name: profileData.first_name || null,
@@ -105,19 +80,14 @@ export function Profile() {
         updated_at: new Date().toISOString()
       };
 
-      console.log('実際の更新データ:', updateData);
-
-      const { data: updateResult, error: profileError } = await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .upsert(updateData, {
           onConflict: 'id'
-        })
-        .select();
-
-      console.log('更新結果:', { updateResult, profileError });
+        });
 
       if (profileError) {
-        console.error('Profiles表更新エラー:', profileError);
+        console.error('プロファイル更新エラー:', profileError);
         toast({
           title: "更新失敗",
           description: `プロファイル更新エラー: ${profileError.message}`,
@@ -126,8 +96,6 @@ export function Profile() {
         return;
       }
 
-      console.log('プロファイル更新完了');
-      
       toast({
         title: "更新成功",
         description: "プロファイルが正常に更新されました",
