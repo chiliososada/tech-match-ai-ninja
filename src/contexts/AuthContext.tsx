@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -111,79 +110,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('ユーザープロファイル取得開始:', userId);
       
-      // 先尝试直接从 auth.users 获取基本信息，避免 RLS 问题
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      
-      if (authUser) {
-        // 创建基本的 profile 对象，包含所有字段
-        const basicProfile: UserProfile = {
-          id: authUser.id,
-          first_name: authUser.user_metadata?.first_name || '',
-          last_name: authUser.user_metadata?.last_name || '',
-          avatar_url: authUser.user_metadata?.avatar_url || '',
-          job_title: authUser.user_metadata?.job_title || '', // 添加这个字段
-          company: authUser.user_metadata?.company || '', // 添加这个字段
-          role: 'member' // 默认角色
-        };
-        
-        setProfile(basicProfile);
-        console.log('基本プロファイル設定完了:', basicProfile);
-        
-        // 尝试获取详细的 profile 数据（如果 RLS 允许）
-        try {
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .maybeSingle();
+      // 现在使用修复后的 profiles 表
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
 
-          if (!profileError && profileData) {
-            setProfile(profileData);
-            console.log('詳細プロファイル設定完了:', profileData);
-          } else if (profileError) {
-            console.log('詳細プロファイル取得エラー（基本プロファイルを使用）:', profileError.message);
-          }
-        } catch (error) {
-          console.log('プロファイルアクセスエラー（基本情報のみ使用）:', error);
+      if (profileError) {
+        console.error('プロファイル取得エラー:', profileError);
+        // 如果没有profile记录，创建一个基本的profile
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          const basicProfile: UserProfile = {
+            id: authUser.id,
+            first_name: authUser.user_metadata?.first_name || '',
+            last_name: authUser.user_metadata?.last_name || '',
+            avatar_url: authUser.user_metadata?.avatar_url || '',
+            job_title: authUser.user_metadata?.job_title || '',
+            company: authUser.user_metadata?.company || '',
+            role: 'member'
+          };
+          setProfile(basicProfile);
         }
+      } else if (profileData) {
+        setProfile(profileData);
+        console.log('プロファイル設定完了:', profileData);
+      }
 
-        // 尝试获取租户信息
-        try {
-          const { data: tenantsData, error: tenantsError } = await supabase
-            .rpc('get_user_tenants');
+      // 尝试获取租户信息
+      try {
+        const { data: tenantsData, error: tenantsError } = await supabase
+          .rpc('get_user_tenants');
 
-          if (!tenantsError && tenantsData) {
-            const tenantIds = tenantsData.map((t: any) => t.tenant_id);
-            const { data: fullTenants, error: fullTenantsError } = await supabase
-              .from('tenants')
-              .select('*')
-              .in('id', tenantIds);
+        if (!tenantsError && tenantsData) {
+          const tenantIds = tenantsData.map((t: any) => t.tenant_id);
+          const { data: fullTenants, error: fullTenantsError } = await supabase
+            .from('tenants')
+            .select('*')
+            .in('id', tenantIds);
 
-            if (!fullTenantsError && fullTenants) {
-              setTenants(fullTenants);
-              
-              const defaultTenant = tenantsData.find((t: any) => t.is_default);
-              if (defaultTenant) {
-                const currentTenantData = fullTenants.find(t => t.id === defaultTenant.tenant_id);
-                setCurrentTenant(currentTenantData || null);
-              } else if (fullTenants.length > 0) {
-                setCurrentTenant(fullTenants[0]);
-              }
+          if (!fullTenantsError && fullTenants) {
+            setTenants(fullTenants);
+            
+            const defaultTenant = tenantsData.find((t: any) => t.is_default);
+            if (defaultTenant) {
+              const currentTenantData = fullTenants.find(t => t.id === defaultTenant.tenant_id);
+              setCurrentTenant(currentTenantData || null);
+            } else if (fullTenants.length > 0) {
+              setCurrentTenant(fullTenants[0]);
             }
           }
-        } catch (error) {
-          console.log('テナント情報取得エラー:', error);
-          // 创建默认的个人租户信息
-          const defaultTenant: Tenant = {
-            id: 'default',
-            name: 'パーソナルワークスペース',
-            type: 'individual',
-            is_active: true,
-            subscription_plan: 'free'
-          };
-          setTenants([defaultTenant]);
-          setCurrentTenant(defaultTenant);
         }
+      } catch (error) {
+        console.log('テナント情報取得エラー:', error);
+        // 创建默认的个人租户信息
+        const defaultTenant: Tenant = {
+          id: 'default',
+          name: 'パーソナルワークスペース',
+          type: 'individual',
+          is_active: true,
+          subscription_plan: 'free'
+        };
+        setTenants([defaultTenant]);
+        setCurrentTenant(defaultTenant);
       }
 
       setLoading(false);

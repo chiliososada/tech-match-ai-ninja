@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,8 +35,18 @@ export function Profile() {
   });
 
   useEffect(() => {
-    if (user || profile) {
-      const userData = profile || user?.user_metadata;
+    if (profile) {
+      setProfileData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        avatar_url: profile.avatar_url || '',
+        job_title: profile.job_title || '',
+        company: profile.company || '',
+      });
+      setLoading(false);
+    } else if (user) {
+      // 如果没有profile但有user，使用auth metadata作为fallback
+      const userData = user.user_metadata;
       setProfileData({
         first_name: userData?.first_name || '',
         last_name: userData?.last_name || '',
@@ -63,8 +74,25 @@ export function Profile() {
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
 
-      // 更新 auth.users 的元数据
-      console.log('auth.users メタデータ更新中...');
+      // 首先尝试更新 profiles 表
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          avatar_url: profileData.avatar_url,
+          job_title: profileData.job_title,
+          company: profileData.company,
+          updated_at: new Date().toISOString()
+        });
+
+      if (profileError) {
+        console.error('Profiles表更新エラー:', profileError);
+        throw profileError;
+      }
+
+      // 同时更新 auth.users 的元数据以保持一致性
       const { error: authError } = await supabase.auth.updateUser({
         data: {
           first_name: profileData.first_name,
@@ -76,21 +104,21 @@ export function Profile() {
 
       if (authError) {
         console.error('Auth更新エラー:', authError);
-        throw authError;
+        // 不抛出错误，因为主要的profile数据已经保存
+        console.log('プロファイル更新完了（authメタデータ更新は失敗）');
+      } else {
+        console.log('プロファイル更新完了');
       }
-
-      console.log('プロファイル更新完了');
-      
-      // 等待一下让 Supabase 的状态更新完成
-      setTimeout(() => {
-        // 触发 AuthContext 重新获取用户数据
-        window.location.reload();
-      }, 500);
       
       toast({
         title: "更新成功",
         description: "プロファイルが正常に更新されました",
       });
+
+      // 刷新页面以获取最新数据
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
 
     } catch (error: any) {
       console.error('プロファイル更新エラー:', error);
@@ -162,7 +190,9 @@ export function Profile() {
                   {profileData.avatar_url ? (
                     <AvatarImage src={profileData.avatar_url} />
                   ) : null}
-                  <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
+                  <AvatarFallback className="text-lg">
+                    {`${profileData.first_name?.charAt(0) || ''}${profileData.last_name?.charAt(0) || ''}`}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="space-y-2">
                   <div>
@@ -172,8 +202,8 @@ export function Profile() {
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={getRoleBadgeVariant(profile?.role)} className="japanese-text">
-                      {getRoleDisplayName(profile?.role)}
+                    <Badge variant={profile?.role === 'developer' ? 'destructive' : profile?.role === 'owner' ? 'default' : profile?.role === 'admin' ? 'secondary' : 'outline'} className="japanese-text">
+                      {profile?.role === 'developer' ? '開発者' : profile?.role === 'owner' ? '所有者' : profile?.role === 'admin' ? '管理者' : profile?.role === 'member' ? 'メンバー' : profile?.role === 'viewer' ? '閲覧者' : profile?.role === 'test_user' ? 'テストユーザー' : '不明'}
                     </Badge>
                     {profile?.is_test_account && (
                       <Badge variant="outline" className="japanese-text">テストアカウント</Badge>
