@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,7 +63,7 @@ export function Profile() {
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
 
-      // 暫時只更新 auth.users 的元数据，因为 profiles 表有 RLS 问题
+      // 更新 auth.users 的元数据
       console.log('auth.users メタデータ更新中...');
       const { error: authError } = await supabase.auth.updateUser({
         data: {
@@ -82,18 +81,11 @@ export function Profile() {
 
       console.log('プロファイル更新完了');
       
-      // 强制重新获取用户数据来更新界面
-      const { data: { user: updatedUser } } = await supabase.auth.getUser();
-      if (updatedUser) {
-        // 更新本地状态以反映最新数据
-        setProfileData({
-          first_name: updatedUser.user_metadata?.first_name || '',
-          last_name: updatedUser.user_metadata?.last_name || '',
-          avatar_url: updatedUser.user_metadata?.avatar_url || '',
-          job_title: updatedUser.user_metadata?.job_title || '',
-          company: updatedUser.user_metadata?.company || '',
-        });
-      }
+      // 等待一下让 Supabase 的状态更新完成
+      setTimeout(() => {
+        // 触发 AuthContext 重新获取用户数据
+        window.location.reload();
+      }, 500);
       
       toast({
         title: "更新成功",
