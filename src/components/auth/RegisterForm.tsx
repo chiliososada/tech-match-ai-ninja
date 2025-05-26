@@ -26,18 +26,18 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
     let isValid = true;
 
     if (!email) {
-      newErrors.email = "邮箱不能为空";
+      newErrors.email = "メールアドレスを入力してください";
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "请输入有效的邮箱地址";
+      newErrors.email = "有効なメールアドレスを入力してください";
       isValid = false;
     }
 
     if (!password) {
-      newErrors.password = "密码不能为空";
+      newErrors.password = "パスワードを入力してください";
       isValid = false;
     } else if (password.length < 6) {
-      newErrors.password = "密码长度至少6个字符";
+      newErrors.password = "パスワードは6文字以上で入力してください";
       isValid = false;
     }
 
@@ -55,40 +55,40 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
     setIsSubmitting(true);
     
     try {
-      console.log('尝试注册:', email);
+      console.log('アカウント登録試行:', email);
       const { error } = await signUp(email, password, {
         first_name: firstName,
         last_name: lastName,
       });
       
       if (error) {
-        console.error("注册错误:", error);
+        console.error("登録エラー:", error);
         
         if (error.message.includes("is invalid")) {
           toast({
-            title: "注册失败",
-            description: "请输入有效的邮箱地址",
+            title: "登録失敗",
+            description: "有効なメールアドレスを入力してください",
             variant: "destructive",
           });
         } else if (error.message.includes("already registered")) {
           toast({
-            title: "注册失败",
-            description: "该邮箱已被注册",
+            title: "登録失敗",
+            description: "このメールアドレスは既に登録されています",
             variant: "destructive",
           });
         } else {
           toast({
-            title: "注册失败",
+            title: "登録失敗",
             description: error.message,
             variant: "destructive",
           });
         }
       }
     } catch (error) {
-      console.error('意外的注册错误:', error);
+      console.error('予期しない登録エラー:', error);
       toast({
-        title: "注册失败",
-        description: "发生未知错误，请稍后重试",
+        title: "登録失敗",
+        description: "予期しないエラーが発生しました。しばらくしてからもう一度お試しください",
         variant: "destructive",
       });
     } finally {
@@ -101,26 +101,28 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
       <CardContent className="space-y-4 pt-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="firstName" className="japanese-text">姓</Label>
+            <Label htmlFor="firstName" className="japanese-text">名</Label>
             <Input 
               id="firstName" 
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               disabled={isSubmitting}
+              placeholder="太郎"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName" className="japanese-text">名</Label>
+            <Label htmlFor="lastName" className="japanese-text">姓</Label>
             <Input 
               id="lastName" 
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               disabled={isSubmitting}
+              placeholder="田中"
             />
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="registerEmail" className="japanese-text">电子邮箱</Label>
+          <Label htmlFor="registerEmail" className="japanese-text">メールアドレス</Label>
           <Input 
             id="registerEmail" 
             type="email" 
@@ -135,7 +137,7 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
           {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="registerPassword" className="japanese-text">密码</Label>
+          <Label htmlFor="registerPassword" className="japanese-text">パスワード</Label>
           <Input 
             id="registerPassword" 
             type="password"
@@ -156,14 +158,14 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
           className="w-full japanese-text" 
           disabled={isSubmitting}
         >
-          {isSubmitting ? "注册中..." : "注册"}
+          {isSubmitting ? "登録中..." : "アカウント登録"}
         </Button>
         <div className="relative w-full">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground japanese-text">或</span>
+            <span className="bg-background px-2 text-muted-foreground japanese-text">または</span>
           </div>
         </div>
         <Button 
@@ -174,7 +176,7 @@ export function RegisterForm({ onGoogleLogin }: RegisterFormProps) {
           disabled={isSubmitting}
         >
           <FcGoogle className="h-5 w-5" />
-          <span className="japanese-text">使用谷歌账号注册</span>
+          <span className="japanese-text">Googleアカウントで登録</span>
         </Button>
       </CardFooter>
     </form>

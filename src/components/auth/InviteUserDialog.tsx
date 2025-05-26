@@ -41,19 +41,19 @@ export function InviteUserDialog({ tenantId }: InviteUserDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="japanese-text">
           <UserPlus className="h-4 w-4 mr-2" />
-          邀请用户
+          ユーザー招待
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="japanese-text">邀请用户</DialogTitle>
+          <DialogTitle className="japanese-text">ユーザー招待</DialogTitle>
           <DialogDescription className="japanese-text">
-            邀请新用户加入当前工作空间
+            新しいユーザーを現在のワークスペースに招待します
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="inviteEmail" className="japanese-text">邮箱地址</Label>
+            <Label htmlFor="inviteEmail" className="japanese-text">メールアドレス</Label>
             <Input
               id="inviteEmail"
               type="email"
@@ -63,16 +63,16 @@ export function InviteUserDialog({ tenantId }: InviteUserDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="inviteRole" className="japanese-text">角色</Label>
+            <Label htmlFor="inviteRole" className="japanese-text">役割</Label>
             <Select value={role} onValueChange={setRole}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="member">成员</SelectItem>
-                <SelectItem value="admin">管理员</SelectItem>
-                <SelectItem value="viewer">查看者</SelectItem>
-                <SelectItem value="test_user">测试用户</SelectItem>
+                <SelectItem value="member">メンバー</SelectItem>
+                <SelectItem value="admin">管理者</SelectItem>
+                <SelectItem value="viewer">閲覧者</SelectItem>
+                <SelectItem value="test_user">テストユーザー</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -83,7 +83,7 @@ export function InviteUserDialog({ tenantId }: InviteUserDialogProps) {
             disabled={isInviting || !email.trim()}
             className="japanese-text"
           >
-            {isInviting ? '发送中...' : '发送邀请'}
+            {isInviting ? '送信中...' : '招待を送信'}
           </Button>
         </DialogFooter>
       </DialogContent>

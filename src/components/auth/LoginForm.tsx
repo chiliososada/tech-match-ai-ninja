@@ -24,18 +24,18 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
     let isValid = true;
 
     if (!email) {
-      newErrors.email = "邮箱不能为空";
+      newErrors.email = "メールアドレスを入力してください";
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "请输入有效的邮箱地址";
+      newErrors.email = "有効なメールアドレスを入力してください";
       isValid = false;
     }
 
     if (!password) {
-      newErrors.password = "密码不能为空";
+      newErrors.password = "パスワードを入力してください";
       isValid = false;
     } else if (password.length < 6) {
-      newErrors.password = "密码长度至少6个字符";
+      newErrors.password = "パスワードは6文字以上で入力してください";
       isValid = false;
     }
 
@@ -53,32 +53,31 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
     setIsSubmitting(true);
     
     try {
-      console.log('尝试登录:', email);
+      console.log('ログイン試行:', email);
       const { error } = await signIn(email, password);
       
       if (error) {
-        console.error("登录错误:", error);
+        console.error("ログインエラー:", error);
         
-        // 根据错误类型显示不同的错误信息
         if (error.message.includes("Invalid login credentials")) {
           toast({
-            title: "登录失败",
-            description: "邮箱或密码错误，请重试",
+            title: "ログイン失敗",
+            description: "メールアドレスまたはパスワードが正しくありません",
             variant: "destructive",
           });
         } else {
           toast({
-            title: "登录失败",
+            title: "ログイン失敗",
             description: error.message,
             variant: "destructive",
           });
         }
       }
     } catch (error) {
-      console.error('意外的登录错误:', error);
+      console.error('予期しないログインエラー:', error);
       toast({
-        title: "登录失败",
-        description: "发生未知错误，请稍后重试",
+        title: "ログイン失敗",
+        description: "予期しないエラーが発生しました。しばらくしてからもう一度お試しください",
         variant: "destructive",
       });
     } finally {
@@ -90,7 +89,7 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
     <form onSubmit={handleSignIn}>
       <CardContent className="space-y-4 pt-4">
         <div className="space-y-2">
-          <Label htmlFor="email" className="japanese-text">电子邮箱</Label>
+          <Label htmlFor="email" className="japanese-text">メールアドレス</Label>
           <Input 
             id="email" 
             type="email" 
@@ -105,7 +104,7 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
           {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password" className="japanese-text">密码</Label>
+          <Label htmlFor="password" className="japanese-text">パスワード</Label>
           <Input 
             id="password" 
             type="password"
@@ -126,14 +125,14 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
           className="w-full japanese-text" 
           disabled={isSubmitting}
         >
-          {isSubmitting ? "登录中..." : "登录"}
+          {isSubmitting ? "ログイン中..." : "ログイン"}
         </Button>
         <div className="relative w-full">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground japanese-text">或</span>
+            <span className="bg-background px-2 text-muted-foreground japanese-text">または</span>
           </div>
         </div>
         <Button 
@@ -144,7 +143,7 @@ export function LoginForm({ onGoogleLogin }: LoginFormProps) {
           disabled={isSubmitting}
         >
           <FcGoogle className="h-5 w-5" />
-          <span className="japanese-text">使用谷歌账号登录</span>
+          <span className="japanese-text">Googleアカウントでログイン</span>
         </Button>
       </CardFooter>
     </form>
