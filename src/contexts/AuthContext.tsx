@@ -34,7 +34,14 @@ interface AuthContextType {
   tenants: Tenant[];
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{error: Error | null}>;
-  signUp: (email: string, password: string, userData?: { first_name?: string; last_name?: string }) => Promise<{error: Error | null}>;
+  signUp: (email: string, password: string, userData?: { 
+    first_name?: string; 
+    last_name?: string; 
+    registration_type?: string;
+    company_name?: string;
+    company_email?: string;
+    position?: string;
+  }) => Promise<{error: Error | null}>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   switchTenant: (tenantId: string) => Promise<void>;
@@ -218,7 +225,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (
     email: string, 
     password: string, 
-    userData?: { first_name?: string; last_name?: string }
+    userData?: { 
+      first_name?: string; 
+      last_name?: string; 
+      registration_type?: string;
+      company_name?: string;
+      company_email?: string;
+      position?: string;
+    }
   ) => {
     try {
       if (!email || !password) {
@@ -226,7 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error };
       }
 
-      console.log('アカウント作成試行:', email);
+      console.log('アカウント作成試行:', email, userData);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -241,9 +255,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error };
       } else {
         console.log('アカウント作成成功:', data.user?.id);
+        const registrationType = userData?.registration_type || 'personal';
+        const successMessage = registrationType === 'company' 
+          ? "会社アカウントが作成されました" 
+          : "個人アカウントが作成されました";
+        
         toast({
           title: "アカウント作成成功",
-          description: data.session ? "ログインしました" : "メールアドレスを確認して登録を完了してください",
+          description: data.session ? successMessage : "メールアドレスを確認して登録を完了してください",
         });
       }
       

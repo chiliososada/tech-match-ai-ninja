@@ -68,9 +68,11 @@ export type Database = {
           expires_at: string | null
           first_name: string | null
           id: string
+          is_company_admin: boolean | null
           is_test_account: boolean | null
           job_title: string | null
           last_name: string | null
+          position: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           tenant_id: string | null
           updated_at: string
@@ -82,9 +84,11 @@ export type Database = {
           expires_at?: string | null
           first_name?: string | null
           id: string
+          is_company_admin?: boolean | null
           is_test_account?: boolean | null
           job_title?: string | null
           last_name?: string | null
+          position?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           tenant_id?: string | null
           updated_at?: string
@@ -96,9 +100,11 @@ export type Database = {
           expires_at?: string | null
           first_name?: string | null
           id?: string
+          is_company_admin?: boolean | null
           is_test_account?: boolean | null
           job_title?: string | null
           last_name?: string | null
+          position?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           tenant_id?: string | null
           updated_at?: string
@@ -167,6 +173,8 @@ export type Database = {
       }
       tenants: {
         Row: {
+          company_email: string | null
+          company_name: string | null
           created_at: string
           domain: string | null
           id: string
@@ -178,6 +186,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          company_email?: string | null
+          company_name?: string | null
           created_at?: string
           domain?: string | null
           id?: string
@@ -189,6 +199,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          company_email?: string | null
+          company_name?: string | null
           created_at?: string
           domain?: string | null
           id?: string
