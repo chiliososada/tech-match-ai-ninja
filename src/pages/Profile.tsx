@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -70,8 +71,24 @@ export function Profile() {
         return;
       }
 
+      // First check if profile exists
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('プロファイル確認エラー:', checkError);
+        toast({
+          title: "更新失敗",
+          description: `プロファイル確認エラー: ${checkError.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       const updateData = {
-        id: user.id,
         first_name: profileData.first_name || null,
         last_name: profileData.last_name || null,
         avatar_url: profileData.avatar_url || null,
@@ -80,17 +97,29 @@ export function Profile() {
         updated_at: new Date().toISOString()
       };
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(updateData, {
-          onConflict: 'id'
-        });
+      let result;
+      if (existingProfile) {
+        // Profile exists, use UPDATE
+        result = await supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', user.id);
+      } else {
+        // Profile doesn't exist, use INSERT
+        result = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            ...updateData,
+            created_at: new Date().toISOString()
+          });
+      }
 
-      if (profileError) {
-        console.error('プロファイル更新エラー:', profileError);
+      if (result.error) {
+        console.error('プロファイル更新エラー:', result.error);
         toast({
           title: "更新失敗",
-          description: `プロファイル更新エラー: ${profileError.message}`,
+          description: `プロファイル更新エラー: ${result.error.message}`,
           variant: "destructive",
         });
         return;
