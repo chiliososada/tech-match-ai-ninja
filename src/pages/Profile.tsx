@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,17 +73,19 @@ export function Profile() {
       console.log('プロファイル更新開始:', user.id);
       console.log('更新データ:', profileData);
 
-      // 首先尝试更新 profiles 表
+      // 更新 profiles 表
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          first_name: profileData.first_name,
-          last_name: profileData.last_name,
-          avatar_url: profileData.avatar_url,
-          job_title: profileData.job_title,
-          company: profileData.company,
+          first_name: profileData.first_name || null,
+          last_name: profileData.last_name || null,
+          avatar_url: profileData.avatar_url || null,
+          job_title: profileData.job_title || null,
+          company: profileData.company || null,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
         });
 
       if (profileError) {
@@ -92,23 +93,7 @@ export function Profile() {
         throw profileError;
       }
 
-      // 同时更新 auth.users 的元数据以保持一致性
-      const { error: authError } = await supabase.auth.updateUser({
-        data: {
-          first_name: profileData.first_name,
-          last_name: profileData.last_name,
-          job_title: profileData.job_title,
-          company: profileData.company,
-        }
-      });
-
-      if (authError) {
-        console.error('Auth更新エラー:', authError);
-        // 不抛出错误，因为主要的profile数据已经保存
-        console.log('プロファイル更新完了（authメタデータ更新は失敗）');
-      } else {
-        console.log('プロファイル更新完了');
-      }
+      console.log('プロファイル更新完了');
       
       toast({
         title: "更新成功",
