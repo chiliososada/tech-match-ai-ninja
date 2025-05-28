@@ -2,12 +2,22 @@
 import { DatabaseEngineer } from '@/hooks/useEngineers';
 import { Engineer } from '@/components/candidates/types';
 
+// Helper function to ensure array format
+const ensureArray = (value: any): string[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    return value.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
 // 将数据库engineer转换为UI engineer格式
 export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Engineer => {
   return {
     id: dbEngineer.id,
     name: dbEngineer.name,
-    skills: dbEngineer.skills || [],
+    skills: ensureArray(dbEngineer.skills),
     japaneseLevel: dbEngineer.japanese_level || '',
     englishLevel: dbEngineer.english_level || '',
     experience: dbEngineer.experience,
@@ -17,7 +27,7 @@ export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Eng
     companyType: dbEngineer.company_type,
     companyName: dbEngineer.company_name || '',
     source: dbEngineer.source || 'manual',
-    technicalKeywords: dbEngineer.technical_keywords || [],
+    technicalKeywords: ensureArray(dbEngineer.technical_keywords),
     selfPromotion: dbEngineer.self_promotion || '',
     workScope: dbEngineer.work_scope || '',
     workExperience: dbEngineer.work_experience || '',
@@ -27,7 +37,7 @@ export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Eng
     nearestStation: dbEngineer.nearest_station || '',
     education: dbEngineer.education || '',
     arrivalYear: dbEngineer.arrival_year || '',
-    certifications: dbEngineer.certifications || [],
+    certifications: ensureArray(dbEngineer.certifications),
     email: dbEngineer.email || '',
     phone: dbEngineer.phone || '',
     registeredAt: new Date(dbEngineer.created_at).toLocaleDateString('ja-JP'),
@@ -39,7 +49,7 @@ export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Eng
 export const transformUIToDatabaseEngineer = (uiEngineer: any) => {
   return {
     name: uiEngineer.name,
-    skills: Array.isArray(uiEngineer.skills) ? uiEngineer.skills : uiEngineer.skills?.split(',').map((s: string) => s.trim()) || [],
+    skills: ensureArray(uiEngineer.skills),
     japanese_level: uiEngineer.japaneseLevel,
     english_level: uiEngineer.englishLevel,
     experience: uiEngineer.experience,
@@ -47,7 +57,7 @@ export const transformUIToDatabaseEngineer = (uiEngineer: any) => {
     current_status: uiEngineer.status,
     remarks: uiEngineer.remarks,
     company_name: uiEngineer.companyName,
-    technical_keywords: Array.isArray(uiEngineer.technicalKeywords) ? uiEngineer.technicalKeywords : uiEngineer.technicalKeywords?.split(',').map((s: string) => s.trim()) || [],
+    technical_keywords: ensureArray(uiEngineer.technicalKeywords),
     self_promotion: uiEngineer.selfPromotion,
     work_scope: uiEngineer.workScope,
     work_experience: uiEngineer.workExperience,
@@ -57,7 +67,7 @@ export const transformUIToDatabaseEngineer = (uiEngineer: any) => {
     nearest_station: uiEngineer.nearestStation,
     education: uiEngineer.education,
     arrival_year: uiEngineer.arrivalYear,
-    certifications: Array.isArray(uiEngineer.certifications) ? uiEngineer.certifications : uiEngineer.certifications?.split(',').map((s: string) => s.trim()) || [],
+    certifications: ensureArray(uiEngineer.certifications),
     email: uiEngineer.email,
     phone: uiEngineer.phone
   };

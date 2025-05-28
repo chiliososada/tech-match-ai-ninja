@@ -82,6 +82,16 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     }
   };
 
+  // Helper function to ensure array format
+  const ensureArray = (value: any): string[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      return value.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
   // 新增engineer
   const createEngineer = async (engineerData: any) => {
     if (!currentTenant) {
@@ -90,16 +100,37 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     }
 
     try {
+      console.log('Creating engineer with data:', engineerData);
+      
       const newEngineer = {
-        ...engineerData,
+        name: engineerData.name,
+        skills: ensureArray(engineerData.skills),
+        japanese_level: engineerData.japaneseLevel,
+        english_level: engineerData.englishLevel,
+        experience: engineerData.experience,
+        availability: engineerData.availability,
+        current_status: engineerData.status || 'available',
+        remarks: engineerData.remarks,
         company_type: companyTypeMapping[companyType],
+        company_name: engineerData.companyName,
         source: 'manual',
-        tenant_id: currentTenant.id,
-        skills: engineerData.skills ? engineerData.skills.split(',').map((s: string) => s.trim()) : [],
-        technical_keywords: engineerData.technicalKeywords ? engineerData.technicalKeywords.split(',').map((s: string) => s.trim()) : [],
-        certifications: engineerData.certifications ? engineerData.certifications.split(',').map((s: string) => s.trim()) : [],
-        current_status: engineerData.status || 'available'
+        technical_keywords: ensureArray(engineerData.technicalKeywords),
+        self_promotion: engineerData.selfPromotion,
+        work_scope: engineerData.workScope,
+        work_experience: engineerData.workExperience,
+        nationality: engineerData.nationality,
+        age: engineerData.age,
+        gender: engineerData.gender,
+        nearest_station: engineerData.nearestStation,
+        education: engineerData.education,
+        arrival_year: engineerData.arrivalYear,
+        certifications: ensureArray(engineerData.certifications),
+        email: engineerData.email,
+        phone: engineerData.phone,
+        tenant_id: currentTenant.id
       };
+
+      console.log('Processed engineer data for insert:', newEngineer);
 
       const { data, error } = await supabase
         .from('engineers')
@@ -107,8 +138,12 @@ export const useEngineers = (companyType: 'own' | 'other') => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database insert error:', error);
+        throw error;
+      }
       
+      console.log('Successfully created engineer:', data);
       await fetchEngineers(); // 重新获取数据
       toast.success('技術者情報を登録しました');
       return data;
@@ -124,9 +159,9 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     try {
       const updatedEngineer = {
         ...engineerData,
-        skills: Array.isArray(engineerData.skills) ? engineerData.skills : engineerData.skills?.split(',').map((s: string) => s.trim()) || [],
-        technical_keywords: Array.isArray(engineerData.technical_keywords) ? engineerData.technical_keywords : engineerData.technical_keywords?.split(',').map((s: string) => s.trim()) || [],
-        certifications: Array.isArray(engineerData.certifications) ? engineerData.certifications : engineerData.certifications?.split(',').map((s: string) => s.trim()) || [],
+        skills: ensureArray(engineerData.skills),
+        technical_keywords: ensureArray(engineerData.technical_keywords),
+        certifications: ensureArray(engineerData.certifications),
         updated_at: new Date().toISOString()
       };
 
