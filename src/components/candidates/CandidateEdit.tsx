@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -114,14 +113,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">国籍</Label>
               <Select
-                value={localEngineer.nationality || "未選択"}
-                onValueChange={(value) => handleChange('nationality', value)}
+                value={localEngineer.nationality || "placeholder"}
+                onValueChange={(value) => handleChange('nationality', value === 'placeholder' ? '' : value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="国籍を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="placeholder" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="日本" className="japanese-text">日本</SelectItem>
                   <SelectItem value="中国" className="japanese-text">中国</SelectItem>
                   <SelectItem value="インド" className="japanese-text">インド</SelectItem>
@@ -143,14 +142,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">性別</Label>
               <Select
-                value={localEngineer.gender || "未選択"}
-                onValueChange={(value) => handleChange('gender', value)}
+                value={localEngineer.gender || "placeholder"}
+                onValueChange={(value) => handleChange('gender', value === 'placeholder' ? '' : value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="性別を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="placeholder" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="男性" className="japanese-text">男性</SelectItem>
                   <SelectItem value="女性" className="japanese-text">女性</SelectItem>
                   <SelectItem value="その他" className="japanese-text">その他</SelectItem>
@@ -219,14 +218,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">日本語レベル <span className="text-red-500">*</span></Label>
               <Select
-                value={localEngineer.japaneseLevel || "未選択"}
-                onValueChange={(value) => handleChange('japaneseLevel', value)}
+                value={localEngineer.japaneseLevel || "placeholder"}
+                onValueChange={(value) => handleChange('japaneseLevel', value === 'placeholder' ? '' : value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="日本語レベルを選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="placeholder" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="不問" className="japanese-text">不問</SelectItem>
                   <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
                   <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
@@ -238,14 +237,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">英語レベル</Label>
               <Select
-                value={localEngineer.englishLevel || "未選択"}
-                onValueChange={(value) => handleChange('englishLevel', value)}
+                value={localEngineer.englishLevel || "placeholder"}
+                onValueChange={(value) => handleChange('englishLevel', value === 'placeholder' ? '' : value)}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="英語レベルを選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="placeholder" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="不問" className="japanese-text">不問</SelectItem>
                   <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
                   <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
@@ -297,14 +296,14 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
             <div className="space-y-2">
               <Label className="japanese-text">ステータス</Label>
               <Select
-                value={localEngineer.status ? (Array.isArray(localEngineer.status) ? localEngineer.status[0] : localEngineer.status) : "未選択"}
-                onValueChange={(value) => handleChange('status', [value])}
+                value={localEngineer.status ? (Array.isArray(localEngineer.status) ? localEngineer.status[0] : localEngineer.status) : "placeholder"}
+                onValueChange={(value) => handleChange('status', value === 'placeholder' ? [] : [value])}
               >
                 <SelectTrigger className="japanese-text">
                   <SelectValue placeholder="ステータスを選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                  <SelectItem value="placeholder" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
                   <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
                   <SelectItem value="面談" className="japanese-text">面談</SelectItem>

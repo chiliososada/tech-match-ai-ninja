@@ -33,6 +33,7 @@ export const FilterArea: React.FC<FilterAreaProps> = ({
               <SelectValue placeholder="選択してください" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="placeholder">選択してください</SelectItem>
               <SelectItem value="1">自社</SelectItem>
               <SelectItem value="2">他社</SelectItem>
             </SelectContent>
@@ -45,6 +46,7 @@ export const FilterArea: React.FC<FilterAreaProps> = ({
               <SelectValue placeholder="選択してください" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="placeholder">選択してください</SelectItem>
               <SelectItem value="1">自社</SelectItem>
               <SelectItem value="2">他社</SelectItem>
             </SelectContent>
