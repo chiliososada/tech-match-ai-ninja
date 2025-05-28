@@ -152,7 +152,6 @@ export const CandidateEdit: React.FC<CandidateEditProps> = ({
                   <SelectItem value="placeholder" className="japanese-text">選択してください</SelectItem>
                   <SelectItem value="男性" className="japanese-text">男性</SelectItem>
                   <SelectItem value="女性" className="japanese-text">女性</SelectItem>
-                  <SelectItem value="その他" className="japanese-text">その他</SelectItem>
                   <SelectItem value="回答しない" className="japanese-text">回答しない</SelectItem>
                 </SelectContent>
               </Select>
