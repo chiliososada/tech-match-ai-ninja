@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -101,15 +102,19 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     try {
       console.log('Creating engineer with data:', engineerData);
       
-      // 正确的状态值映射
-      const statusMapping: { [key: string]: string } = {
-        '提案中': '提案中',
-        '事前面談': '事前面談', 
-        '面談': '面談',
-        '結果待ち': '結果待ち',
-        '営業終了': '営業終了',
-        '': 'available'  // 默认状态
-      };
+      // 数据库状态值映射 - 确保只使用数据库允许的值
+      let dbStatus = 'available'; // 默认状态
+      
+      if (engineerData.status) {
+        // 如果传入的是日文状态，不进行映射，直接使用数据库允许的英文状态
+        const validStatuses = ['available', 'busy', 'inactive', 'pending'];
+        if (validStatuses.includes(engineerData.status)) {
+          dbStatus = engineerData.status;
+        } else {
+          // 如果是其他值，都设为默认的 available
+          dbStatus = 'available';
+        }
+      }
       
       const newEngineer = {
         name: engineerData.name,
@@ -118,7 +123,7 @@ export const useEngineers = (companyType: 'own' | 'other') => {
         english_level: engineerData.englishLevel || null,
         experience: engineerData.experience,
         availability: engineerData.availability || null,
-        current_status: statusMapping[engineerData.status] || 'available',
+        current_status: dbStatus, // 使用映射后的状态
         remarks: engineerData.remarks || null,
         company_type: companyTypeMapping[companyType],
         company_name: engineerData.companyName || null,
@@ -166,8 +171,16 @@ export const useEngineers = (companyType: 'own' | 'other') => {
   // 更新engineer
   const updateEngineer = async (id: string, engineerData: any) => {
     try {
+      // 确保状态值符合数据库约束
+      let dbStatus = engineerData.current_status || 'available';
+      const validStatuses = ['available', 'busy', 'inactive', 'pending'];
+      if (!validStatuses.includes(dbStatus)) {
+        dbStatus = 'available';
+      }
+
       const updatedEngineer = {
         ...engineerData,
+        current_status: dbStatus,
         skills: ensureArray(engineerData.skills),
         technical_keywords: ensureArray(engineerData.technical_keywords),
         certifications: ensureArray(engineerData.certifications),
