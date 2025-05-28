@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -103,6 +104,29 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 />
               </div>
               
+              <div className="space-y-2">
+                <Label htmlFor="email" className="japanese-text">メールアドレス</Label>
+                <Input 
+                  id="email" 
+                  type="email"
+                  value={formData.email || ''}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  placeholder="例: yamada@example.com"
+                  className="japanese-text"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="japanese-text">電話番号</Label>
+                <Input 
+                  id="phone" 
+                  value={formData.phone || ''}
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                  placeholder="例: 090-1234-5678"
+                  className="japanese-text"
+                />
+              </div>
+              
               {!isOwnCompany && (
                 <div className="space-y-2">
                   <Label htmlFor="companyName" className="japanese-text">所属会社 <span className="text-red-500">*</span></Label>
@@ -121,7 +145,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 <Label htmlFor="nationality" className="japanese-text">国籍</Label>
                 <Select
                   value={formData.nationality || "未選択"}
-                  onValueChange={(value) => handleChange('nationality', value)}
+                  onValueChange={(value) => handleChange('nationality', value === "未選択" ? "" : value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="国籍を選択" />
@@ -152,7 +176,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 <Label htmlFor="gender" className="japanese-text">性別</Label>
                 <Select
                   value={formData.gender || "未選択"}
-                  onValueChange={(value) => handleChange('gender', value)}
+                  onValueChange={(value) => handleChange('gender', value === "未選択" ? "" : value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="性別を選択" />
@@ -238,7 +262,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 <Label htmlFor="japanese" className="japanese-text">日本語レベル <span className="text-red-500">*</span></Label>
                 <Select
                   value={formData.japaneseLevel || "未選択"}
-                  onValueChange={(value) => handleChange('japaneseLevel', value)}
+                  onValueChange={(value) => handleChange('japaneseLevel', value === "未選択" ? "" : value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="日本語レベルを選択" />
@@ -257,7 +281,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 <Label htmlFor="english" className="japanese-text">英語レベル</Label>
                 <Select
                   value={formData.englishLevel || "未選択"}
-                  onValueChange={(value) => handleChange('englishLevel', value)}
+                  onValueChange={(value) => handleChange('englishLevel', value === "未選択" ? "" : value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="英語レベルを選択" />
@@ -321,7 +345,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                 <Label htmlFor="status" className="japanese-text">ステータス</Label>
                 <Select
                   value={formData.status || "未選択"}
-                  onValueChange={(value) => handleChange('status', value)}
+                  onValueChange={(value) => handleChange('status', value === "未選択" ? "" : value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="ステータスを選択" />

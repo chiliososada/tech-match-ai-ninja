@@ -70,6 +70,8 @@ export interface NewEngineerType {
   selfPromotion: string;
   workScope: string;
   workExperience: string;
+  email: string;  // Added email field
+  phone: string;  // Added phone field
   registeredAt: string;
   updatedAt: string;
 }

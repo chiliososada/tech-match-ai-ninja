@@ -44,6 +44,8 @@ const initialCandidateData: NewEngineerType = {
   selfPromotion: '',
   workScope: '',
   workExperience: '',
+  email: '',      // Added email field
+  phone: '',      // Added phone field
   registeredAt: '',
   updatedAt: '',
 };

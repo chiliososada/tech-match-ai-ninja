@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -46,6 +45,16 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     'other': '他社'
   };
 
+  // Helper function to ensure array format
+  const ensureArray = (value: any): string[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      return value.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
   // 获取engineers数据
   const fetchEngineers = async () => {
     if (!currentTenant) {
@@ -82,16 +91,6 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     }
   };
 
-  // Helper function to ensure array format
-  const ensureArray = (value: any): string[] => {
-    if (!value) return [];
-    if (Array.isArray(value)) return value;
-    if (typeof value === 'string') {
-      return value.split(',').map((s: string) => s.trim()).filter(Boolean);
-    }
-    return [];
-  };
-
   // 新增engineer
   const createEngineer = async (engineerData: any) => {
     if (!currentTenant) {
@@ -102,31 +101,41 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     try {
       console.log('Creating engineer with data:', engineerData);
       
+      // 正确的状态值映射
+      const statusMapping: { [key: string]: string } = {
+        '提案中': '提案中',
+        '事前面談': '事前面談', 
+        '面談': '面談',
+        '結果待ち': '結果待ち',
+        '営業終了': '営業終了',
+        '': 'available'  // 默认状态
+      };
+      
       const newEngineer = {
         name: engineerData.name,
         skills: ensureArray(engineerData.skills),
-        japanese_level: engineerData.japaneseLevel,
-        english_level: engineerData.englishLevel,
+        japanese_level: engineerData.japaneseLevel || null,
+        english_level: engineerData.englishLevel || null,
         experience: engineerData.experience,
-        availability: engineerData.availability,
-        current_status: engineerData.status || 'available',
-        remarks: engineerData.remarks,
+        availability: engineerData.availability || null,
+        current_status: statusMapping[engineerData.status] || 'available',
+        remarks: engineerData.remarks || null,
         company_type: companyTypeMapping[companyType],
-        company_name: engineerData.companyName,
+        company_name: engineerData.companyName || null,
         source: 'manual',
         technical_keywords: ensureArray(engineerData.technicalKeywords),
-        self_promotion: engineerData.selfPromotion,
-        work_scope: engineerData.workScope,
-        work_experience: engineerData.workExperience,
-        nationality: engineerData.nationality,
-        age: engineerData.age,
-        gender: engineerData.gender,
-        nearest_station: engineerData.nearestStation,
-        education: engineerData.education,
-        arrival_year: engineerData.arrivalYear,
+        self_promotion: engineerData.selfPromotion || null,
+        work_scope: engineerData.workScope || null,
+        work_experience: engineerData.workExperience || null,
+        nationality: engineerData.nationality || null,
+        age: engineerData.age || null,
+        gender: engineerData.gender || null,
+        nearest_station: engineerData.nearestStation || null,
+        education: engineerData.education || null,
+        arrival_year: engineerData.arrivalYear || null,
         certifications: ensureArray(engineerData.certifications),
-        email: engineerData.email,
-        phone: engineerData.phone,
+        email: engineerData.email || null,
+        phone: engineerData.phone || null,
         tenant_id: currentTenant.id
       };
 
