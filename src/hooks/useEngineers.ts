@@ -38,6 +38,7 @@ export interface DatabaseEngineer {
 export const useEngineers = (companyType: 'own' | 'other') => {
   const [engineers, setEngineers] = useState<DatabaseEngineer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { currentTenant } = useAuth();
 
   const companyTypeMapping = {
@@ -47,10 +48,17 @@ export const useEngineers = (companyType: 'own' | 'other') => {
 
   // 获取engineers数据
   const fetchEngineers = async () => {
-    if (!currentTenant) return;
+    if (!currentTenant) {
+      console.log('No current tenant, skipping engineer fetch');
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
+      setError(null);
+      console.log('Fetching engineers for tenant:', currentTenant.id, 'companyType:', companyTypeMapping[companyType]);
+      
       const { data, error } = await supabase
         .from('engineers')
         .select('*')
@@ -58,11 +66,17 @@ export const useEngineers = (companyType: 'own' | 'other') => {
         .eq('company_type', companyTypeMapping[companyType])
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching engineers:', error);
+        throw error;
+      }
+      
+      console.log('Successfully fetched engineers:', data?.length || 0);
       setEngineers(data || []);
     } catch (error: any) {
       console.error('Error fetching engineers:', error);
-      toast.error('人材データの取得に失敗しました');
+      setError(error.message || 'データの取得に失敗しました');
+      toast.error('人材データの取得に失敗しました: ' + (error.message || ''));
     } finally {
       setLoading(false);
     }
@@ -154,12 +168,14 @@ export const useEngineers = (companyType: 'own' | 'other') => {
   };
 
   useEffect(() => {
+    console.log('useEngineers effect triggered - currentTenant:', currentTenant?.id, 'companyType:', companyType);
     fetchEngineers();
   }, [currentTenant, companyType]);
 
   return {
     engineers,
     loading,
+    error,
     createEngineer,
     updateEngineer,
     deleteEngineer,

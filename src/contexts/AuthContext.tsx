@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -118,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('ユーザープロファイル取得開始:', userId);
       
-      // 现在使用修复后的 profiles 表
+      // 获取用户profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -159,17 +158,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('プロファイル設定完了:', convertedProfile);
       }
 
-      // 尝试获取租户信息
+      // 尝试获取租户信息 - 直接查询tenants表而不是使用RPC函数
       try {
-        const { data: tenantsData, error: tenantsError } = await supabase
-          .rpc('get_user_tenants');
+        // 先获取用户所属的租户ID
+        const { data: memberData, error: memberError } = await supabase
+          .from('tenant_members')
+          .select('tenant_id, is_active')
+          .eq('user_id', userId)
+          .eq('is_active', true);
 
-        if (!tenantsError && tenantsData) {
-          const tenantIds = tenantsData.map((t: any) => t.tenant_id);
+        if (!memberError && memberData && memberData.length > 0) {
+          const tenantIds = memberData.map(m => m.tenant_id);
+          
+          // 获取租户详细信息
           const { data: fullTenants, error: fullTenantsError } = await supabase
             .from('tenants')
             .select('*')
-            .in('id', tenantIds);
+            .in('id', tenantIds)
+            .eq('is_active', true);
 
           if (!fullTenantsError && fullTenants) {
             // Convert database tenants to Tenant format
@@ -184,14 +190,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }));
             setTenants(convertedTenants);
             
-            const defaultTenant = tenantsData.find((t: any) => t.is_default);
-            if (defaultTenant) {
-              const currentTenantData = convertedTenants.find(t => t.id === defaultTenant.tenant_id);
-              setCurrentTenant(currentTenantData || null);
+            // 设置当前租户（使用profile中的tenant_id或第一个租户）
+            const currentTenantId = profileData?.tenant_id;
+            if (currentTenantId) {
+              const currentTenantData = convertedTenants.find(t => t.id === currentTenantId);
+              setCurrentTenant(currentTenantData || convertedTenants[0] || null);
             } else if (convertedTenants.length > 0) {
               setCurrentTenant(convertedTenants[0]);
             }
           }
+        } else {
+          console.log('ユーザーはどのテナントにも属していません');
         }
       } catch (error) {
         console.log('テナント情報取得エラー:', error);

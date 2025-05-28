@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger, TabsWithContext } from '@/components/ui/tabs';
@@ -12,6 +13,8 @@ import { CandidateEdit } from '@/components/candidates/CandidateEdit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useEngineers } from '@/hooks/useEngineers';
 import { transformDatabaseToUIEngineer, transformUIToDatabaseEngineer } from '@/utils/engineerDataTransform';
+import { Spinner } from '@/components/ui/spinner';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CandidatesProps {
   companyType?: 'own' | 'other';
@@ -47,6 +50,7 @@ const initialCandidateData: NewEngineerType = {
 
 export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const location = useLocation();
+  const { currentTenant, loading: authLoading } = useAuth();
   
   // Company type from URL for backward compatibility
   const urlCompanyType = location.pathname.includes('/company/other') ? 'other' : 'own';
@@ -59,7 +63,7 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const tabContextId = `candidates-${effectiveCompanyType}`;
 
   // Use real database operations
-  const { engineers: dbEngineers, loading, createEngineer, updateEngineer, deleteEngineer } = useEngineers(effectiveCompanyType);
+  const { engineers: dbEngineers, loading: engineersLoading, error, createEngineer, updateEngineer, deleteEngineer } = useEngineers(effectiveCompanyType);
 
   // Transform database engineers to UI format
   const engineers = dbEngineers.map(transformDatabaseToUIEngineer);
@@ -160,11 +164,52 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
     return result !== null;
   };
 
-  if (loading) {
+  // Show loading spinner while auth or engineers are loading
+  if (authLoading || engineersLoading) {
     return (
       <MainLayout>
         <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="flex flex-col items-center space-y-4">
+            <Spinner className="h-12 w-12" />
+            <p className="text-sm text-muted-foreground japanese-text">
+              {authLoading ? '認証情報を読み込んでいます...' : '人材データを読み込んでいます...'}
+            </p>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  // Show error message if there's an error
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center space-y-4">
+            <p className="text-red-600 japanese-text">エラーが発生しました: {error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 japanese-text"
+            >
+              再読み込み
+            </button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  // Show message if no tenant is available
+  if (!currentTenant) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center space-y-4">
+            <p className="text-muted-foreground japanese-text">テナント情報が見つかりません</p>
+            <p className="text-sm text-muted-foreground japanese-text">
+              しばらく待ってから再度お試しください
+            </p>
+          </div>
         </div>
       </MainLayout>
     );
