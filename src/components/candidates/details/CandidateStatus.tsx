@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,7 +28,9 @@ export const CandidateStatus: React.FC<CandidateStatusProps> = ({
                 status === '事前面談' ? 'bg-orange-500 text-white' : 
                 status === '面談' ? 'bg-green-500 text-white' : 
                 status === '結果待ち' ? 'bg-purple-500 text-white' : 
-                status === '営業終了' ? 'bg-gray-500 text-white' : ''
+                status === '契約中' ? 'bg-emerald-500 text-white' :
+                status === '営業終了' ? 'bg-gray-500 text-white' : 
+                status === 'アーカイブ' ? 'bg-slate-500 text-white' : ''
               }`}
             >
               {status}
@@ -52,10 +55,13 @@ export const CandidateStatus: React.FC<CandidateStatusProps> = ({
             <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
             <SelectItem value="面談" className="japanese-text">面談</SelectItem>
             <SelectItem value="結果待ち" className="japanese-text">結果待ち</SelectItem>
+            <SelectItem value="契約中" className="japanese-text">契約中</SelectItem>
             <SelectItem value="営業終了" className="japanese-text">営業終了</SelectItem>
+            <SelectItem value="アーカイブ" className="japanese-text">アーカイブ</SelectItem>
           </SelectContent>
         </Select>
       </div>
     </div>
   );
 };
+

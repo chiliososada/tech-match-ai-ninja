@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -34,8 +35,8 @@ export const FilterArea: React.FC<FilterAreaProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="placeholder">選択してください</SelectItem>
-              <SelectItem value="1">自社</SelectItem>
-              <SelectItem value="2">他社</SelectItem>
+              <SelectItem value="自社">自社</SelectItem>
+              <SelectItem value="他社">他社</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -47,8 +48,8 @@ export const FilterArea: React.FC<FilterAreaProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="placeholder">選択してください</SelectItem>
-              <SelectItem value="1">自社</SelectItem>
-              <SelectItem value="2">他社</SelectItem>
+              <SelectItem value="自社">自社</SelectItem>
+              <SelectItem value="他社">他社</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -74,3 +75,4 @@ export const FilterArea: React.FC<FilterAreaProps> = ({
     </div>
   );
 };
+

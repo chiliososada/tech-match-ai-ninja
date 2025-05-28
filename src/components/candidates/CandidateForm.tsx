@@ -373,7 +373,9 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
                     <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
                     <SelectItem value="面談" className="japanese-text">面談</SelectItem>
                     <SelectItem value="結果待ち" className="japanese-text">結果待ち</SelectItem>
+                    <SelectItem value="契約中" className="japanese-text">契約中</SelectItem>
                     <SelectItem value="営業終了" className="japanese-text">営業終了</SelectItem>
+                    <SelectItem value="アーカイブ" className="japanese-text">アーカイブ</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -461,3 +463,4 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
     </>
   );
 };
+
