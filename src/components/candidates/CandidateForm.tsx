@@ -48,14 +48,31 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!formData.name || !formData.skills || !formData.japaneseLevel || !formData.experience) {
-      toast.error('必須項目を入力してください');
-      return;
+    // Validate required fields with detailed messages
+    const missingFields: string[] = [];
+    
+    if (!formData.name || formData.name.trim() === '') {
+      missingFields.push('氏名');
+    }
+    
+    if (!formData.skills || formData.skills.trim() === '') {
+      missingFields.push('保有スキル');
+    }
+    
+    if (!formData.japaneseLevel || formData.japaneseLevel === '未選択' || formData.japaneseLevel.trim() === '') {
+      missingFields.push('日本語レベル');
+    }
+    
+    if (!formData.experience || formData.experience.trim() === '') {
+      missingFields.push('経験年数');
     }
 
-    if (!isOwnCompany && !formData.companyName) {
-      toast.error('所属会社名を入力してください');
+    if (!isOwnCompany && (!formData.companyName || formData.companyName.trim() === '')) {
+      missingFields.push('所属会社');
+    }
+
+    if (missingFields.length > 0) {
+      toast.error(`次の必須項目を入力してください: ${missingFields.join('、')}`);
       return;
     }
 
@@ -86,7 +103,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
         <CardHeader>
           <CardTitle className="japanese-text">新規技術者登録</CardTitle>
           <CardDescription className="japanese-text">
-            技術者情報を登録します
+            技術者情報を登録します（<span className="text-red-500">*</span>は必須項目）
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -144,14 +161,14 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="nationality" className="japanese-text">国籍</Label>
                 <Select
-                  value={formData.nationality || "未選択"}
-                  onValueChange={(value) => handleChange('nationality', value === "未選択" ? "" : value)}
+                  value={formData.nationality || ""}
+                  onValueChange={(value) => handleChange('nationality', value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="国籍を選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="" className="japanese-text">選択してください</SelectItem>
                     <SelectItem value="日本" className="japanese-text">日本</SelectItem>
                     <SelectItem value="中国" className="japanese-text">中国</SelectItem>
                     <SelectItem value="インド" className="japanese-text">インド</SelectItem>
@@ -175,14 +192,14 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="gender" className="japanese-text">性別</Label>
                 <Select
-                  value={formData.gender || "未選択"}
-                  onValueChange={(value) => handleChange('gender', value === "未選択" ? "" : value)}
+                  value={formData.gender || ""}
+                  onValueChange={(value) => handleChange('gender', value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="性別を選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="" className="japanese-text">選択してください</SelectItem>
                     <SelectItem value="男性" className="japanese-text">男性</SelectItem>
                     <SelectItem value="女性" className="japanese-text">女性</SelectItem>
                     <SelectItem value="その他" className="japanese-text">その他</SelectItem>
@@ -261,14 +278,14 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="japanese" className="japanese-text">日本語レベル <span className="text-red-500">*</span></Label>
                 <Select
-                  value={formData.japaneseLevel || "未選択"}
-                  onValueChange={(value) => handleChange('japaneseLevel', value === "未選択" ? "" : value)}
+                  value={formData.japaneseLevel || ""}
+                  onValueChange={(value) => handleChange('japaneseLevel', value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="日本語レベルを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="" className="japanese-text">選択してください</SelectItem>
                     <SelectItem value="不問" className="japanese-text">不問</SelectItem>
                     <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
                     <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
@@ -280,14 +297,14 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="english" className="japanese-text">英語レベル</Label>
                 <Select
-                  value={formData.englishLevel || "未選択"}
-                  onValueChange={(value) => handleChange('englishLevel', value === "未選択" ? "" : value)}
+                  value={formData.englishLevel || ""}
+                  onValueChange={(value) => handleChange('englishLevel', value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="英語レベルを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="" className="japanese-text">選択してください</SelectItem>
                     <SelectItem value="不問" className="japanese-text">不問</SelectItem>
                     <SelectItem value="日常会話レベル" className="japanese-text">日常会話レベル</SelectItem>
                     <SelectItem value="ビジネスレベル" className="japanese-text">ビジネスレベル</SelectItem>
@@ -344,14 +361,14 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="status" className="japanese-text">ステータス</Label>
                 <Select
-                  value={formData.status || "未選択"}
-                  onValueChange={(value) => handleChange('status', value === "未選択" ? "" : value)}
+                  value={formData.status || ""}
+                  onValueChange={(value) => handleChange('status', value)}
                 >
                   <SelectTrigger className="japanese-text">
                     <SelectValue placeholder="ステータスを選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="未選択" className="japanese-text">選択してください</SelectItem>
+                    <SelectItem value="" className="japanese-text">選択してください</SelectItem>
                     <SelectItem value="提案中" className="japanese-text">提案中</SelectItem>
                     <SelectItem value="事前面談" className="japanese-text">事前面談</SelectItem>
                     <SelectItem value="面談" className="japanese-text">面談</SelectItem>
