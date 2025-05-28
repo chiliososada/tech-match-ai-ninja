@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Wand2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { NewEngineerType } from './types';
 
@@ -13,6 +14,7 @@ interface CandidateFormProps {
   initialData: NewEngineerType;
   onSubmit: (e: React.FormEvent) => void;
   onDataChange: (data: NewEngineerType) => void;
+  onCreateEngineer?: (data: NewEngineerType) => Promise<boolean>;
   recommendationTemplate: string;
   recommendationText: string;
   onRecommendationTemplateChange: (value: string) => void;
@@ -25,6 +27,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
   initialData,
   onSubmit,
   onDataChange,
+  onCreateEngineer,
   recommendationTemplate,
   recommendationText,
   onRecommendationTemplateChange,
@@ -33,11 +36,47 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
   isOwnCompany
 }) => {
   const [formData, setFormData] = useState<NewEngineerType>(initialData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field: keyof NewEngineerType, value: string) => {
     const updatedData = { ...formData, [field]: value };
     setFormData(updatedData);
     onDataChange(updatedData);
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.name || !formData.skills || !formData.japaneseLevel || !formData.experience) {
+      toast.error('必須項目を入力してください');
+      return;
+    }
+
+    if (!isOwnCompany && !formData.companyName) {
+      toast.error('所属会社名を入力してください');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      if (onCreateEngineer) {
+        const success = await onCreateEngineer(formData);
+        if (success) {
+          // Reset form after successful submission
+          setFormData(initialData);
+          toast.success('技術者情報を正常に登録しました');
+        }
+      } else {
+        onSubmit(e);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('登録に失敗しました');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -50,7 +89,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="space-y-6">            
+          <form onSubmit={handleFormSubmit} className="space-y-6" id="engineer-form">            
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="japanese-text">氏名 <span className="text-red-500">*</span></Label>
@@ -350,6 +389,7 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
             onClick={onGenerateRecommendation} 
             variant="outline" 
             className="w-full japanese-text"
+            disabled={isSubmitting}
           >
             <Wand2 className="mr-2 h-4 w-4" />
             AIで推薦文を生成
@@ -366,9 +406,14 @@ export const CandidateForm: React.FC<CandidateFormProps> = ({
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button onClick={onSubmit} type="submit" className="japanese-text">
+          <Button 
+            type="submit" 
+            form="engineer-form"
+            className="japanese-text"
+            disabled={isSubmitting}
+          >
             <Save className="mr-2 h-4 w-4" />
-            技術者と推薦文を登録
+            {isSubmitting ? '登録中...' : '技術者と推薦文を登録'}
           </Button>
         </CardFooter>
       </Card>

@@ -5,12 +5,13 @@ import { CandidateList } from '@/components/candidates/CandidateList';
 import { CandidateForm } from '@/components/candidates/CandidateForm';
 import { ResumeUpload } from '@/components/candidates/ResumeUpload';
 import { useLocation } from 'react-router-dom';
-import { Engineer, CategoryType, NewEngineerType } from '@/components/candidates/types';
+import { Engineer, NewEngineerType } from '@/components/candidates/types';
 import { toast } from 'sonner';
 import { CandidateDetails } from '@/components/candidates/CandidateDetails';
 import { CandidateEdit } from '@/components/candidates/CandidateEdit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { candidatesData } from '@/components/candidates/data/candidatesData';
+import { useEngineers } from '@/hooks/useEngineers';
+import { transformDatabaseToUIEngineer, transformUIToDatabaseEngineer } from '@/utils/engineerDataTransform';
 
 interface CandidatesProps {
   companyType?: 'own' | 'other';
@@ -33,7 +34,7 @@ const initialCandidateData: NewEngineerType = {
   arrivalYear: '',
   certifications: '',
   remarks: '',
-  companyType: '自社', // Default to 自社
+  companyType: '自社',
   companyName: '',
   source: '',
   technicalKeywords: '',
@@ -43,15 +44,6 @@ const initialCandidateData: NewEngineerType = {
   registeredAt: '',
   updatedAt: '',
 };
-
-// Mock data for CandidateList
-const mockEngineers: Engineer[] = candidatesData;
-
-const mockCategories: CategoryType[] = [
-  { id: '1', name: 'フロントエンド' },
-  { id: '2', name: 'バックエンド' },
-  { id: '3', name: 'フルスタック' },
-];
 
 export function Candidates({ companyType = 'own' }: CandidatesProps) {
   const location = useLocation();
@@ -65,6 +57,12 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
 
   // Generate a unique contextId based on company type to keep tabs independent
   const tabContextId = `candidates-${effectiveCompanyType}`;
+
+  // Use real database operations
+  const { engineers: dbEngineers, loading, createEngineer, updateEngineer, deleteEngineer } = useEngineers(effectiveCompanyType);
+
+  // Transform database engineers to UI format
+  const engineers = dbEngineers.map(transformDatabaseToUIEngineer);
 
   const [recommendationTemplate, setRecommendationTemplate] = useState<string>('');
   const [recommendationText, setRecommendationText] = useState<string>('');
@@ -94,18 +92,21 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (engineerToDelete) {
-      console.log(`Delete candidate: ${engineerToDelete}`);
-      toast.success('候補者を削除しました');
-      setIsDeleteDialogOpen(false);
-      setEngineerToDelete(null);
+      const success = await deleteEngineer(engineerToDelete);
+      if (success) {
+        setIsDeleteDialogOpen(false);
+        setEngineerToDelete(null);
+      }
     }
   };
 
-  const handleStatusChange = (id: string, newStatus: string) => {
-    console.log(`Change status of candidate ${id} to ${newStatus}`);
-    toast.success('ステータスを更新しました');
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    const engineer = dbEngineers.find(e => e.id === id);
+    if (engineer) {
+      await updateEngineer(id, { current_status: newStatus });
+    }
   };
 
   const handleEngineerStatusChange = (value: string) => {
@@ -121,9 +122,9 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('技術者情報を登録しました');
+    // Form submission is handled by the form component now
   };
 
   const handleDataChange = (data: any) => {
@@ -142,10 +143,32 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
     console.log('Updated engineer:', engineer);
   };
 
-  const handleSaveEdit = () => {
-    toast.success('技術者情報を更新しました');
-    setIsEditOpen(false);
+  const handleSaveEdit = async () => {
+    if (selectedEngineer) {
+      const transformedData = transformUIToDatabaseEngineer(selectedEngineer);
+      const success = await updateEngineer(selectedEngineer.id, transformedData);
+      if (success) {
+        setIsEditOpen(false);
+      }
+    }
   };
+
+  // Handle creating new engineer
+  const handleCreateEngineer = async (formData: NewEngineerType) => {
+    const transformedData = transformUIToDatabaseEngineer(formData);
+    const result = await createEngineer(transformedData);
+    return result !== null;
+  };
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -161,7 +184,7 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
           
           <TabsContent value="list" contextId={tabContextId} className="w-full">
             <CandidateList 
-              engineers={mockEngineers}
+              engineers={engineers}
               onViewDetails={handleViewDetails}
               onEditEngineer={handleEditEngineer}
               onDeleteEngineer={handleDeleteEngineer}
@@ -173,9 +196,13 @@ export function Candidates({ companyType = 'own' }: CandidatesProps) {
           
           <TabsContent value="add" contextId={tabContextId}>
             <CandidateForm 
-              initialData={initialCandidateData}
+              initialData={{
+                ...initialCandidateData,
+                companyType: effectiveCompanyType === 'own' ? '自社' : '他社'
+              }}
               onSubmit={handleSubmit}
               onDataChange={handleDataChange}
+              onCreateEngineer={handleCreateEngineer}
               recommendationTemplate={recommendationTemplate}
               recommendationText={recommendationText}
               onRecommendationTemplateChange={setRecommendationTemplate}
