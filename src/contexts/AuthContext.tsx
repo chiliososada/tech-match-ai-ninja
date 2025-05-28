@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -141,8 +142,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(basicProfile);
         }
       } else if (profileData) {
-        setProfile(profileData);
-        console.log('プロファイル設定完了:', profileData);
+        // Convert database profile to UserProfile format
+        const convertedProfile: UserProfile = {
+          id: profileData.id,
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          avatar_url: profileData.avatar_url,
+          job_title: profileData.job_title,
+          company: profileData.company,
+          role: profileData.role as 'owner' | 'admin' | 'member' | 'viewer' | 'test_user' | 'developer',
+          tenant_id: profileData.tenant_id,
+          is_test_account: profileData.is_test_account,
+          expires_at: profileData.expires_at
+        };
+        setProfile(convertedProfile);
+        console.log('プロファイル設定完了:', convertedProfile);
       }
 
       // 尝试获取租户信息
@@ -158,14 +172,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .in('id', tenantIds);
 
           if (!fullTenantsError && fullTenants) {
-            setTenants(fullTenants);
+            // Convert database tenants to Tenant format
+            const convertedTenants: Tenant[] = fullTenants.map((tenant: any) => ({
+              id: tenant.id,
+              name: tenant.name,
+              type: tenant.tenant_type as 'individual' | 'enterprise',
+              domain: tenant.domain,
+              is_active: tenant.is_active,
+              subscription_plan: tenant.subscription_plan,
+              max_users: tenant.max_users
+            }));
+            setTenants(convertedTenants);
             
             const defaultTenant = tenantsData.find((t: any) => t.is_default);
             if (defaultTenant) {
-              const currentTenantData = fullTenants.find(t => t.id === defaultTenant.tenant_id);
+              const currentTenantData = convertedTenants.find(t => t.id === defaultTenant.tenant_id);
               setCurrentTenant(currentTenantData || null);
-            } else if (fullTenants.length > 0) {
-              setCurrentTenant(fullTenants[0]);
+            } else if (convertedTenants.length > 0) {
+              setCurrentTenant(convertedTenants[0]);
             }
           }
         }
@@ -349,7 +373,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('tenants')
         .insert({
           name,
-          type,
+          tenant_type: type, // Use tenant_type to match database schema
           domain,
         })
         .select()
