@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,6 +30,12 @@ import { toast } from '@/hooks/use-toast';
 export function StructuredCaseForm() {
   const { createProject, loading } = useProjects();
   const { currentTenant } = useAuth();
+  const location = useLocation();
+
+  // Determine company type from route
+  const getCompanyType = () => {
+    return location.pathname.includes('/company/other') ? '他社' : '自社';
+  };
 
   const [caseData, setCaseData] = useState({
     title: '',
@@ -102,7 +109,8 @@ export function StructuredCaseForm() {
       interview_count: caseData.interview_count,
       processes: caseData.processes,
       description: caseData.description || undefined,
-      detail_description: caseData.detail_description || undefined
+      detail_description: caseData.detail_description || undefined,
+      company_type: getCompanyType() // Set company_type based on current route
     };
 
     const result = await createProject(projectData);

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -89,33 +88,38 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const pageTitle = effectiveCompanyType === 'own' ? '自社案件管理' : '他社案件管理';
   
   // Convert Supabase projects to the format expected by existing components
+  // Filter by company_type from database instead of using route logic
   const normalizedCaseData = React.useMemo(() => {
-    return projects.map(project => ({
-      id: project.id,
-      title: project.title,
-      company: project.client_company || '',
-      manager: project.manager_name || '',
-      managerEmail: project.manager_email || '',
-      skills: project.skills || [],
-      experience: project.experience || '',
-      location: project.location || '',
-      workType: project.work_type || '',
-      duration: project.duration || '',
-      budget: project.budget || '',
-      desiredBudget: project.desired_budget || '',
-      japanese: project.japanese_level || '',
-      priority: project.priority || '',
-      status: normalizeStatus(project.status || ''),
-      startDate: project.start_date || '',
-      foreignerAccepted: project.foreigner_accepted || false,
-      freelancerAccepted: project.freelancer_accepted || false,
-      interviewCount: project.interview_count || '1',
-      processes: project.processes || [],
-      detailDescription: project.detail_description || '',
-      description: project.description || '',
-      // Add company type for filtering
-      companyType: effectiveCompanyType
-    }));
+    const targetCompanyType = effectiveCompanyType === 'own' ? '自社' : '他社';
+    
+    return projects
+      .filter(project => project.company_type === targetCompanyType)
+      .map(project => ({
+        id: project.id,
+        title: project.title,
+        company: project.client_company || '',
+        manager: project.manager_name || '',
+        managerEmail: project.manager_email || '',
+        skills: project.skills || [],
+        experience: project.experience || '',
+        location: project.location || '',
+        workType: project.work_type || '',
+        duration: project.duration || '',
+        budget: project.budget || '',
+        desiredBudget: project.desired_budget || '',
+        japanese: project.japanese_level || '',
+        priority: project.priority || '',
+        status: normalizeStatus(project.status || ''),
+        startDate: project.start_date || '',
+        foreignerAccepted: project.foreigner_accepted || false,
+        freelancerAccepted: project.freelancer_accepted || false,
+        interviewCount: project.interview_count || '1',
+        processes: project.processes || [],
+        detailDescription: project.detail_description || '',
+        description: project.description || '',
+        // Use the actual database company_type field
+        companyType: effectiveCompanyType
+      }));
   }, [projects, effectiveCompanyType]);
 
   const {

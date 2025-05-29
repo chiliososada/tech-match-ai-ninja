@@ -1574,6 +1574,7 @@ export type Database = {
           application_deadline: string | null
           budget: string | null
           client_company: string | null
+          company_type: string
           created_at: string | null
           created_by: string | null
           description: string | null
@@ -1614,6 +1615,7 @@ export type Database = {
           application_deadline?: string | null
           budget?: string | null
           client_company?: string | null
+          company_type?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -1654,6 +1656,7 @@ export type Database = {
           application_deadline?: string | null
           budget?: string | null
           client_company?: string | null
+          company_type?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
