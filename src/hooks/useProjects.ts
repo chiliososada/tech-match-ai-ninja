@@ -28,7 +28,8 @@ export interface Project {
   interview_count?: string;
   description?: string;
   detail_description?: string;
-  company_type: string; // Added company_type field
+  company_type: string;
+  is_active?: boolean; // Added missing is_active property
   tenant_id: string;
   created_at?: string;
   updated_at?: string;
