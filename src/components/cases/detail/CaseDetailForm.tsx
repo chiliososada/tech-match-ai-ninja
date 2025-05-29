@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,16 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
     handleEditChange('processes', newProcesses);
   };
 
+  // Helper function to get boolean value as string for Select component
+  const getBooleanAsString = (value: boolean | undefined, fallback: boolean = false) => {
+    return (value ?? fallback) ? "true" : "false";
+  };
+
+  // Helper function to get the current value with proper fallback
+  const getCurrentValue = (field: keyof MailCase, fallback: any = '') => {
+    return editingCaseData?.[field] ?? selectedCase[field] ?? fallback;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
@@ -60,7 +71,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           案件名
         </label>
         <Input 
-          value={editingCaseData?.title || selectedCase.title} 
+          value={getCurrentValue('title')} 
           onChange={(e) => handleEditChange('title', e.target.value)} 
           className="border-primary/30 focus:border-primary"
         />
@@ -72,7 +83,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
         </label>
         <Input 
           type="date"
-          value={editingCaseData?.startDate || selectedCase.startDate || ''} 
+          value={getCurrentValue('startDate')} 
           onChange={(e) => handleEditChange('startDate', e.target.value)}
           className="border-primary/30 focus:border-primary"
         />
@@ -83,7 +94,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           勤務地
         </label>
         <Input 
-          value={editingCaseData?.location || selectedCase.location} 
+          value={getCurrentValue('location')} 
           onChange={(e) => handleEditChange('location', e.target.value)}
           className="border-primary/30 focus:border-primary"
         />
@@ -94,7 +105,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           単価
         </label>
         <Input 
-          value={editingCaseData?.budget || selectedCase.budget} 
+          value={getCurrentValue('budget')} 
           onChange={(e) => handleEditChange('budget', e.target.value)}
           className="border-primary/30 focus:border-primary"
         />
@@ -105,7 +116,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           希望単価
         </label>
         <Input 
-          value={editingCaseData?.desiredBudget || selectedCase.desiredBudget || ''} 
+          value={getCurrentValue('desiredBudget')} 
           onChange={(e) => handleEditChange('desiredBudget', e.target.value)}
           className="border-primary/30 focus:border-primary"
         />
@@ -118,7 +129,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
         <Input 
           type="number"
           min="1"
-          value={editingCaseData?.interviewCount || selectedCase.interviewCount || '1'} 
+          value={getCurrentValue('interviewCount', '1')} 
           onChange={(e) => handleEditChange('interviewCount', e.target.value)}
           className="border-primary/30 focus:border-primary"
         />
@@ -129,7 +140,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           ステータス
         </label>
         <Select 
-          value={editingCaseData?.status || selectedCase.status}
+          value={getCurrentValue('status')}
           onValueChange={(value) => handleEditChange('status', value)}
         >
           <SelectTrigger className="border-primary/30 focus:border-primary">
@@ -147,7 +158,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           外国人採用
         </label>
         <Select 
-          value={(editingCaseData?.foreignerAccepted || selectedCase.foreignerAccepted) ? "true" : "false"}
+          value={getBooleanAsString(getCurrentValue('foreignerAccepted', false))}
           onValueChange={(value) => handleEditChange('foreignerAccepted', value === "true")}
         >
           <SelectTrigger className="border-primary/30 focus:border-primary">
@@ -165,7 +176,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           個人事業者
         </label>
         <Select 
-          value={(editingCaseData?.freelancerAccepted || selectedCase.freelancerAccepted) ? "true" : "false"}
+          value={getBooleanAsString(getCurrentValue('freelancerAccepted', false))}
           onValueChange={(value) => handleEditChange('freelancerAccepted', value === "true")}
         >
           <SelectTrigger className="border-primary/30 focus:border-primary">
@@ -184,7 +195,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           スキル要件（カンマ区切り）
         </label>
         <Input 
-          value={(editingCaseData?.skills || selectedCase.skills).join(', ')} 
+          value={(getCurrentValue('skills', [])).join(', ')} 
           onChange={(e) => handleEditChange('skills', e.target.value.split(',').map(s => s.trim()))}
           className="border-primary/30 focus:border-primary"
         />
@@ -200,7 +211,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
             <div key={process} className="flex items-center space-x-2">
               <Checkbox 
                 id={`process-${process}`} 
-                checked={(editingCaseData?.processes || selectedCase.processes || []).includes(process)}
+                checked={(getCurrentValue('processes', [])).includes(process)}
                 onCheckedChange={() => toggleProcess(process)}
               />
               <Label htmlFor={`process-${process}`} className="text-sm japanese-text">
@@ -217,7 +228,7 @@ export const CaseDetailForm: React.FC<CaseDetailFormProps> = ({
           案件詳細
         </label>
         <Textarea 
-          value={editingCaseData?.detailDescription || selectedCase.detailDescription || ''} 
+          value={getCurrentValue('detailDescription')} 
           onChange={(e) => handleEditChange('detailDescription', e.target.value)}
           rows={8}
           className="border-primary/30 focus:border-primary"
