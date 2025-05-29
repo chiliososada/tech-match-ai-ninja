@@ -1,3 +1,4 @@
+
 import { MailCase } from "../email/types";
 import { parse, isValid } from 'date-fns';
 
@@ -23,12 +24,11 @@ export const filterCases = (
   return cases.filter((item, index) => {
     console.log(`\n--- Checking case ${index + 1}: "${item.title}" ---`);
     
-    // Filter by company type using some mock logic
-    const matchesCompanyType = companyType === 'own' 
-      ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
-      : parseInt(item.id) % 2 === 0;  // even IDs for 他社
+    // Remove the mock company type filtering logic since cases are already filtered by company_type
+    // The cases coming into this function are already filtered by company_type in the parent component
+    const matchesCompanyType = true; // Always true since pre-filtered
     
-    console.log(`Company type check: ${matchesCompanyType} (ID: ${item.id}, companyType: ${companyType})`);
+    console.log(`Company type check: ${matchesCompanyType} (already pre-filtered by company_type)`);
     
     const matchesStatus = statusFilter === "all" || item.status === statusFilter;
     console.log(`Status check: ${matchesStatus} (filter: ${statusFilter}, item status: ${item.status})`);
