@@ -33,6 +33,17 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
   console.log('Paginated cases received (titles):', paginatedCases.map(c => ({ id: c.id, title: c.title })));
   console.log('Selected case:', selectedCase ? { id: selectedCase.id, title: selectedCase.title } : null);
 
+  // Check if there's a mismatch between the selected case and the case data in the list
+  if (selectedCase) {
+    const caseInList = paginatedCases.find(c => c.id === selectedCase.id);
+    if (caseInList) {
+      console.log('=== DEBUG: Data comparison for selected case ===');
+      console.log('Selected case title (right side):', selectedCase.title);
+      console.log('Same case in list title (left side):', caseInList.title);
+      console.log('Titles match:', selectedCase.title === caseInList.title);
+    }
+  }
+
   // Handler for clicking on a sortable column header
   const handleSortClick = (field: string) => {
     if (!onSort) return;
