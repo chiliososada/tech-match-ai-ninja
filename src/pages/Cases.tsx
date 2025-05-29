@@ -36,7 +36,7 @@ interface CasesProps {
 
 export function Cases({ companyType = 'own' }: CasesProps) {
   // Get projects from Supabase
-  const { projects, loading: projectsLoading } = useProjects();
+  const { projects, loading: projectsLoading, fetchProjects } = useProjects();
   const { archives } = useProjectArchives();
 
   // Use custom hooks for state management
@@ -286,6 +286,12 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     );
   }
 
+  // Add callback function to refresh data after archive operation
+  const handleArchiveSuccess = async () => {
+    console.log('Archive operation completed, refreshing data...');
+    await fetchProjects(); // Refresh the projects data
+  };
+
   return (
     <MainLayout>
       <div className="flex-1 space-y-8 p-8 pt-6">
@@ -345,7 +351,11 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
           {/* Archive Tab using ONLY ACTIVE archive candidates */}
           <TabsContent contextId={effectiveCompanyType} value="archive" className="space-y-6">
-            <CaseArchiveTab cases={archiveCandidates} companyType={effectiveCompanyType} />
+            <CaseArchiveTab 
+              cases={archiveCandidates} 
+              companyType={effectiveCompanyType}
+              onArchiveSuccess={handleArchiveSuccess}
+            />
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}

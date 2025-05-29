@@ -56,9 +56,14 @@ import { useProjects } from '@/hooks/useProjects';
 interface CaseArchiveTabProps {
   cases: MailCase[];
   companyType: 'own' | 'other';
+  onArchiveSuccess?: () => void; // Add callback prop
 }
 
-export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyType }) => {
+export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ 
+  cases, 
+  companyType, 
+  onArchiveSuccess 
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedCases, setSelectedCases] = useState<string[]>([]);
@@ -210,6 +215,11 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
       // Reset selected cases
       setSelectedCases([]);
       setConfirmDelete(false);
+      
+      // Trigger data refresh in parent component
+      if (onArchiveSuccess) {
+        onArchiveSuccess();
+      }
     } catch (error) {
       console.error('Archive error:', error);
       toast({
