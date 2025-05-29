@@ -61,7 +61,6 @@ interface CaseArchiveTabProps {
 export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyType }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [showOnlyDeletable, setShowOnlyDeletable] = useState(false);
   const [selectedCases, setSelectedCases] = useState<string[]>([]);
   const [confirmDelete, setConfirmDelete] = useState(false);
   // Show the info tooltip by default
@@ -75,7 +74,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   // Reset selection when filter changes
   useEffect(() => {
     setSelectedCases([]);
-  }, [searchTerm, statusFilter, showOnlyDeletable, startDateRange]);
+  }, [searchTerm, statusFilter, startDateRange]);
 
   // Get the reference date - current month
   const getCurrentReferenceDate = () => {
@@ -106,26 +105,6 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
     
     return false;
   };
-  
-  // A case is deletable if it meets archive conditions
-  const isDeletableCandidate = (item: MailCase) => {
-    const currentMonthStart = getCurrentReferenceDate();
-    
-    // 条件1: 参画开始日が当前年月より前的案件
-    if (item.startDate) {
-      const startDate = new Date(item.startDate);
-      if (startDate < currentMonthStart) {
-        return true;
-      }
-    }
-    
-    // 条件2: ステータスが「募集完了」的案件
-    if (item.status === '募集完了') {
-      return true;
-    }
-    
-    return false;
-  }
   
   // Filter cases based on user filters (removing company type filtering since cases are already pre-filtered)
   const filteredCases = cases.filter(item => {
@@ -171,10 +150,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
       }
     }
     
-    // Only apply deletable candidates filter if the toggle is on
-    const matchesDeletable = !showOnlyDeletable || isDeletableCandidate(item);
-    
-    const finalResult = matchesSearch && matchesStatus && matchesDateRange && matchesDeletable;
+    const finalResult = matchesSearch && matchesStatus && matchesDateRange;
     console.log('Filter result for', item.title, ':', finalResult);
     
     return finalResult;
@@ -244,9 +220,6 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
     }
   };
   
-  // Get count of cases that can be deleted
-  const deletableCasesCount = cases.filter(item => isDeletableCandidate(item)).length;
-  
   return (
     <Card className="shadow-sm">
       <CardHeader className="space-y-1.5">
@@ -299,7 +272,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
             </div>
           )}
           
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
               <div className="space-y-1.5">
                 <Label htmlFor="search" className="text-sm japanese-text">案件名・会社名</Label>
@@ -332,32 +305,13 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
               </div>
             </div>
             
-            <div className="md:col-span-2">
+            <div>
               <div className="space-y-1.5">
                 <Label htmlFor="dateRange" className="text-sm japanese-text">参画開始日範囲</Label>
                 <DatePickerWithRange 
                   dateRange={startDateRange}
                   onDateRangeChange={setStartDateRange}
                 />
-              </div>
-            </div>
-            
-            <div>
-              <div className="space-y-1.5">
-                <Label className="text-sm japanese-text opacity-0">フィルター</Label>
-                <div className="flex items-center space-x-2 bg-muted/15 rounded-md p-2">
-                  <Checkbox 
-                    id="deletableOnly" 
-                    checked={showOnlyDeletable}
-                    onCheckedChange={(checked) => setShowOnlyDeletable(!!checked)}
-                  />
-                  <Label 
-                    htmlFor="deletableOnly" 
-                    className="japanese-text text-sm cursor-pointer flex-1"
-                  >
-                    削除対象のみ表示 ({deletableCasesCount})
-                  </Label>
-                </div>
               </div>
             </div>
           </div>
