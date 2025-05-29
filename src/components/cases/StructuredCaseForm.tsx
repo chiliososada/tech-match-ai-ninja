@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -103,8 +102,7 @@ export function StructuredCaseForm() {
       interview_count: caseData.interview_count,
       processes: caseData.processes,
       description: caseData.description || undefined,
-      detail_description: caseData.detail_description || undefined,
-      tenant_id: currentTenant.id
+      detail_description: caseData.detail_description || undefined
     };
 
     const result = await createProject(projectData);
