@@ -1,56 +1,79 @@
+// Status utilities for case management
 
 import React from 'react';
-import { Mail as MailIcon, FileText as FileTextIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Clock, AlertTriangle, XCircle } from 'lucide-react';
 
-// 案件のステータスに応じた色を返す関数
-export const getStatusBadgeColor = (status: string) => {
+// Status badge component for consistent status display
+export const StatusBadge = ({ status }: { status: string }) => {
   switch (status) {
-    case "募集中":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "募集終了":
-      return "bg-amber-100 text-amber-800 border-amber-200";
+    case '募集中':
+      return (
+        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 flex items-center">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          <span className="japanese-text">募集中</span>
+        </Badge>
+      );
+    case '募集終了':
+      return (
+        <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200">
+          <span className="japanese-text">募集終了</span>
+        </Badge>
+      );
+    case '保留中':
+      return (
+        <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200 flex items-center">
+          <Clock className="h-3 w-3 mr-1" />
+          <span className="japanese-text">保留中</span>
+        </Badge>
+      );
+    case '要確認':
+      return (
+        <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200 flex items-center">
+          <AlertTriangle className="h-3 w-3 mr-1" />
+          <span className="japanese-text">要確認</span>
+        </Badge>
+      );
+    case 'アーカイブ済':
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200 flex items-center">
+          <XCircle className="h-3 w-3 mr-1" />
+          <span className="japanese-text">アーカイブ済</span>
+        </Badge>
+      );
     default:
-      // Default to 募集中 for any other values
-      return "bg-green-100 text-green-800 border-green-200";
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
+          <span className="japanese-text">{status || '不明'}</span>
+        </Badge>
+      );
   }
 };
 
-// 案件のソースに応じたアイコンを返す関数
-export const getSourceIcon = (source: string) => {
-  if (source === "mail") {
-    return <MailIcon className="h-4 w-4 mr-1 text-blue-600" />;
-  } else {
-    return <FileTextIcon className="h-4 w-4 mr-1 text-purple-600" />;
-  }
+// Get all available statuses for filtering
+export const getAvailableStatuses = () => [
+  { value: 'all', label: '全て' },
+  { value: '募集中', label: '募集中' },
+  { value: '募集終了', label: '募集終了' },
+  { value: '保留中', label: '保留中' },
+  { value: '要確認', label: '要確認' },
+];
+
+// 正规化数据库状态到显示状态的映射
+export const normalizeStatus = (dbStatus: string): string => {
+  const statusMap: Record<string, string> = {
+    '募集中': '募集中',
+    '募集完了': '募集終了', // 数据库中的'募集完了'映射到UI显示的'募集終了'
+    'アーカイブ済': 'アーカイブ済',
+    '保留中': '保留中',
+    '要確認': '要確認',
+    '': '不明'
+  };
+  
+  return statusMap[dbStatus] || dbStatus;
 };
 
-// 工程データの初期値を設定する関数
-export const getDefaultProcesses = () => {
-  return [
-    "要件定義", 
-    "基本設計", 
-    "詳細設計", 
-    "製造／開発", 
-    "単体テスト", 
-    "結合テスト", 
-    "総合テスト／システムテスト", 
-    "UAT／受け入れテスト", 
-    "運用・保守",
-    "アジャイル開発"
-  ];
-};
-
-// 有効なステータス値を取得する関数
-export const getValidStatusValues = () => {
-  return ["募集中", "募集終了"];
-};
-
-// ステータス値を正規化する関数（有効でない値を有効な値に変換）
-export const normalizeStatus = (status: string) => {
-  const validStatuses = getValidStatusValues();
-  if (validStatuses.includes(status)) {
-    return status;
-  }
-  // Default to "募集中" for invalid statuses
-  return "募集中";
+// 检查是否为已归档状态
+export const isArchivedStatus = (status: string): boolean => {
+  return status === 'アーカイブ済';
 };

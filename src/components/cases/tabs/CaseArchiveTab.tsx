@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -51,6 +50,7 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
 import { DateRange } from 'react-day-picker';
+import { useProjects } from '@/hooks/useProjects';
 
 interface CaseArchiveTabProps {
   cases: MailCase[];
@@ -67,6 +67,9 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   const [showInfoTooltip, setShowInfoTooltip] = useState(true);
   // Add date range filter state
   const [startDateRange, setStartDateRange] = useState<DateRange | undefined>(undefined);
+  
+  // 使用useProjects hook来进行实际的归档操作
+  const { archiveProject } = useProjects();
   
   // Reset selection when filter changes
   useEffect(() => {
@@ -103,23 +106,20 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
     return false;
   };
   
-  // A case is deletable if:
-  // 1. Its start date is before the current month OR
-  // 2. Its status is "募集終了"
+  // A case is deletable if it meets archive conditions
   const isDeletableCandidate = (item: MailCase) => {
     const currentMonthStart = getCurrentReferenceDate();
     
-    // Changed logic to OR instead of AND
+    // 条件1: 参画开始日が当前年月より前的案件
     if (item.startDate) {
       const startDate = new Date(item.startDate);
-      // Start date is before current month
       if (startDate < currentMonthStart) {
         return true;
       }
     }
     
-    // Status is "募集終了"
-    if (item.status === '募集終了') {
+    // 条件2: ステータスが「募集完了」的案件
+    if (item.status === '募集完了') {
       return true;
     }
     
@@ -194,23 +194,45 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
   };
   
   // Handle delete selected
-  const handleDeleteSelected = () => {
-    // In a real app, this would call an API to delete the selected cases
-    console.log('Deleting cases:', selectedCases);
-    
-    // Mock delete by removing from local state
-    // In a real app, you'd call an API and then refresh the data
-    
-    // Show toast notification
-    toast({
-      title: "削除完了",
-      description: `${selectedCases.length}件の案件を削除しました`,
-      variant: "default",
-    });
-    
-    // Reset selected cases
-    setSelectedCases([]);
-    setConfirmDelete(false);
+  const handleDeleteSelected = async () => {
+    try {
+      // 批量归档选中的案件
+      const archivePromises = selectedCases.map(async (caseId) => {
+        const success = await archiveProject(caseId, '案件アーカイブ管理より手動削除');
+        return { caseId, success };
+      });
+      
+      const results = await Promise.all(archivePromises);
+      const successCount = results.filter(r => r.success).length;
+      const failCount = results.length - successCount;
+      
+      if (successCount > 0) {
+        toast({
+          title: "アーカイブ完了",
+          description: `${successCount}件の案件をアーカイブしました${failCount > 0 ? `（${failCount}件失敗）` : ''}`,
+          variant: "default",
+        });
+      }
+      
+      if (failCount > 0) {
+        toast({
+          title: "一部エラー",
+          description: `${failCount}件の案件のアーカイブに失敗しました`,
+          variant: "destructive",
+        });
+      }
+      
+      // Reset selected cases
+      setSelectedCases([]);
+      setConfirmDelete(false);
+    } catch (error) {
+      console.error('Archive error:', error);
+      toast({
+        title: "エラー",
+        description: "案件のアーカイブに失敗しました",
+        variant: "destructive",
+      });
+    }
   };
   
   // Get count of cases that can be deleted
@@ -224,7 +246,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
           案件アーカイブ管理
         </CardTitle>
         <CardDescription className="japanese-text">
-          古い案件や完了した案件の削除や管理ができます
+          古い案件や完了した案件をアーカイブできます（削除ではなくアーカイブ処理されます）
         </CardDescription>
       </CardHeader>
       
@@ -255,13 +277,14 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
           {showInfoTooltip && (
             <div className="mb-3">
               <Alert className="bg-blue-50 border-blue-200">
-                <AlertTitle className="japanese-text font-medium">削除対象の条件</AlertTitle>
+                <AlertTitle className="japanese-text font-medium">アーカイブ対象の条件</AlertTitle>
                 <AlertDescription className="japanese-text text-sm">
                   <ul className="list-disc pl-5 space-y-1 mt-2">
                     <li>参画開始日が{formatDateForDisplay(referenceDate)}より前の案件</li>
-                    <li>ステータスが「募集終了」の案件</li>
+                    <li>ステータスが「募集完了」の案件</li>
                   </ul>
-                  <p className="mt-2">上記の条件のいずれかを満たす案件が削除対象として表示されます。</p>
+                  <p className="mt-2">上記の条件のいずれかを満たす案件がアーカイブ対象として表示されます。</p>
+                  <p className="mt-1 text-amber-700">※ 削除ではなくアーカイブ処理が行われ、データはproject_archivesテーブルに保存されます。</p>
                 </AlertDescription>
               </Alert>
             </div>
@@ -353,14 +376,14 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
                     className="japanese-text"
                   >
                     <Trash2 className="h-4 w-4 mr-1.5" />
-                    選択した案件を削除
+                    選択した案件をアーカイブ
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="japanese-text">案件削除の確認</AlertDialogTitle>
+                    <AlertDialogTitle className="japanese-text">案件アーカイブの確認</AlertDialogTitle>
                     <AlertDialogDescription className="japanese-text">
-                      選択した{selectedCases.length}件の案件を削除します。この操作は元に戻せません。
+                      選択した{selectedCases.length}件の案件をアーカイブします。アーカイブされた案件はproject_archivesテーブルに保存され、メイン一覧からは非表示になります。
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -370,7 +393,7 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
                       onClick={handleDeleteSelected}
                       className="japanese-text"
                     >
-                      削除する
+                      アーカイブする
                     </Button>
                   </AlertDialogFooter>
                 </AlertDialogContent>

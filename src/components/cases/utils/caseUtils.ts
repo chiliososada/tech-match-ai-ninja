@@ -1,19 +1,21 @@
+
 import { MailCase } from "../email/types";
 import { parse, isValid } from 'date-fns';
 
-// Archive conditions function
+// Archive conditions function - 更新归档条件
 export const isArchiveCandidate = (caseItem: MailCase): boolean => {
-  // 条件1: 参画开始日が2025年5月より前の案件
+  // 条件1: 参画开始日が当前年月より前の案件
   if (caseItem.startDate) {
     const startDate = new Date(caseItem.startDate);
-    const cutoffDate = new Date('2025-05-01');
-    if (startDate < cutoffDate) {
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (startDate < currentMonthStart) {
       return true;
     }
   }
   
-  // 条件2: ステータスが「募集終了」の案件
-  if (caseItem.status === '募集終了') {
+  // 条件2: ステータスが「募集完了」の案件（数据库中的实际状态）
+  if (caseItem.status === '募集完了') {
     return true;
   }
   
