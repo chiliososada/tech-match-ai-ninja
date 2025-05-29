@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -126,14 +127,15 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
     return false;
   }
   
-  // Filter cases based on company type and user filters
+  // Filter cases based on user filters (removing company type filtering since cases are already pre-filtered)
   const filteredCases = cases.filter(item => {
-    // Filter by company type using the companyType prop instead of item properties
-    // For 'own' company type, filter by cases that don't have a specified company or match certain criteria
-    // For 'other' company type, filter by cases that have a company specified
-    const matchesCompanyType = companyType === 'own' 
-      ? !item.company || item.company === '自社' 
-      : item.company && item.company !== '自社';
+    console.log('=== CaseArchiveTab Filter Debug ===');
+    console.log('Company type prop:', companyType);
+    console.log('Item title:', item.title);
+    console.log('Item company:', item.company);
+    
+    // Remove company type filtering since cases are already filtered by companyType in the parent component
+    // The cases passed to this component are already filtered by company type
     
     // Search term filter (search in title and company)
     const matchesSearch = searchTerm === '' || 
@@ -172,8 +174,15 @@ export const CaseArchiveTab: React.FC<CaseArchiveTabProps> = ({ cases, companyTy
     // Only apply deletable candidates filter if the toggle is on
     const matchesDeletable = !showOnlyDeletable || isDeletableCandidate(item);
     
-    return matchesCompanyType && matchesSearch && matchesStatus && matchesDateRange && matchesDeletable;
+    const finalResult = matchesSearch && matchesStatus && matchesDateRange && matchesDeletable;
+    console.log('Filter result for', item.title, ':', finalResult);
+    
+    return finalResult;
   });
+  
+  console.log('=== CaseArchiveTab Final Results ===');
+  console.log('Input cases:', cases.length);
+  console.log('Filtered cases:', filteredCases.length);
   
   // Handle select all
   const handleSelectAll = () => {
