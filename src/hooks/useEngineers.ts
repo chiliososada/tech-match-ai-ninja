@@ -1,5 +1,4 @@
 
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -172,35 +171,72 @@ export const useEngineers = (companyType: 'own' | 'other') => {
   // 更新engineer
   const updateEngineer = async (id: string, engineerData: any) => {
     try {
+      console.log('Updating engineer with data:', engineerData);
+
+      // 处理状态值 - 确保使用正确的数据库状态值
+      let dbStatus = '提案中'; // 默认状态
+      if (engineerData.current_status) {
+        dbStatus = engineerData.current_status;
+      } else if (engineerData.status) {
+        if (Array.isArray(engineerData.status) && engineerData.status.length > 0) {
+          dbStatus = engineerData.status[0];
+        } else if (typeof engineerData.status === 'string') {
+          dbStatus = engineerData.status;
+        }
+      }
+      
       // 确保状态值符合数据库约束
-      let dbStatus = engineerData.current_status || '提案中';
       const validStatuses = ['提案中', '事前面談', '面談', '結果待ち', '契約中', '営業終了', 'アーカイブ'];
       if (!validStatuses.includes(dbStatus)) {
         dbStatus = '提案中';
       }
 
+      // 准备更新数据，确保所有空字符串转为 null
       const updatedEngineer = {
-        ...engineerData,
-        current_status: dbStatus,
+        name: engineerData.name,
         skills: ensureArray(engineerData.skills),
+        japanese_level: engineerData.japanese_level === '' ? null : engineerData.japanese_level,
+        english_level: engineerData.english_level === '' ? null : engineerData.english_level,
+        experience: engineerData.experience,
+        availability: engineerData.availability === '' ? null : engineerData.availability,
+        current_status: dbStatus,
+        remarks: engineerData.remarks === '' ? null : engineerData.remarks,
+        company_name: engineerData.company_name === '' ? null : engineerData.company_name,
         technical_keywords: ensureArray(engineerData.technical_keywords),
+        self_promotion: engineerData.self_promotion === '' ? null : engineerData.self_promotion,
+        work_scope: engineerData.work_scope === '' ? null : engineerData.work_scope,
+        work_experience: engineerData.work_experience === '' ? null : engineerData.work_experience,
+        nationality: engineerData.nationality === '' ? null : engineerData.nationality,
+        age: engineerData.age === '' ? null : engineerData.age,
+        gender: engineerData.gender === '' ? null : engineerData.gender,
+        nearest_station: engineerData.nearest_station === '' ? null : engineerData.nearest_station,
+        education: engineerData.education === '' ? null : engineerData.education,
+        arrival_year: engineerData.arrival_year === '' ? null : engineerData.arrival_year,
         certifications: ensureArray(engineerData.certifications),
+        email: engineerData.email === '' ? null : engineerData.email,
+        phone: engineerData.phone === '' ? null : engineerData.phone,
         updated_at: new Date().toISOString()
       };
+
+      console.log('Processed engineer data for update:', updatedEngineer);
 
       const { error } = await supabase
         .from('engineers')
         .update(updatedEngineer)
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database update error:', error);
+        throw error;
+      }
       
+      console.log('Successfully updated engineer');
       await fetchEngineers(); // 重新获取数据
       toast.success('技術者情報を更新しました');
       return true;
     } catch (error: any) {
       console.error('Error updating engineer:', error);
-      toast.error('技術者情報の更新に失敗しました');
+      toast.error('技術者情報の更新に失敗しました: ' + error.message);
       return false;
     }
   };
@@ -240,4 +276,3 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     refetch: fetchEngineers
   };
 };
-

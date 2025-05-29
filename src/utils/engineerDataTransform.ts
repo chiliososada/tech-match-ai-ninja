@@ -12,6 +12,12 @@ const ensureArray = (value: any): string[] => {
   return [];
 };
 
+// Helper function to convert empty strings to null for database constraints
+const emptyStringToNull = (value: string | undefined | null): string | null => {
+  if (!value || value.trim() === '') return null;
+  return value;
+};
+
 // 将数据库engineer转换为UI engineer格式
 export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Engineer => {
   return {
@@ -22,7 +28,7 @@ export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Eng
     englishLevel: dbEngineer.english_level || '',
     experience: dbEngineer.experience,
     availability: dbEngineer.availability || '',
-    status: dbEngineer.current_status ? [dbEngineer.current_status] : ['available'],
+    status: dbEngineer.current_status ? [dbEngineer.current_status] : ['提案中'],
     remarks: dbEngineer.remarks || '',
     companyType: dbEngineer.company_type,
     companyName: dbEngineer.company_name || '',
@@ -47,28 +53,38 @@ export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Eng
 
 // 将UI engineer转换为数据库格式
 export const transformUIToDatabaseEngineer = (uiEngineer: any) => {
+  // 处理状态值 - 确保使用正确的数据库状态值
+  let dbStatus = '提案中'; // 默认状态
+  if (uiEngineer.status) {
+    if (Array.isArray(uiEngineer.status) && uiEngineer.status.length > 0) {
+      dbStatus = uiEngineer.status[0];
+    } else if (typeof uiEngineer.status === 'string') {
+      dbStatus = uiEngineer.status;
+    }
+  }
+  
   return {
     name: uiEngineer.name,
     skills: ensureArray(uiEngineer.skills),
-    japanese_level: uiEngineer.japaneseLevel,
-    english_level: uiEngineer.englishLevel,
+    japanese_level: emptyStringToNull(uiEngineer.japaneseLevel),
+    english_level: emptyStringToNull(uiEngineer.englishLevel),
     experience: uiEngineer.experience,
-    availability: uiEngineer.availability,
-    current_status: uiEngineer.status,
-    remarks: uiEngineer.remarks,
-    company_name: uiEngineer.companyName,
+    availability: emptyStringToNull(uiEngineer.availability),
+    current_status: dbStatus,
+    remarks: emptyStringToNull(uiEngineer.remarks),
+    company_name: emptyStringToNull(uiEngineer.companyName),
     technical_keywords: ensureArray(uiEngineer.technicalKeywords),
-    self_promotion: uiEngineer.selfPromotion,
-    work_scope: uiEngineer.workScope,
-    work_experience: uiEngineer.workExperience,
-    nationality: uiEngineer.nationality,
-    age: uiEngineer.age,
-    gender: uiEngineer.gender,
-    nearest_station: uiEngineer.nearestStation,
-    education: uiEngineer.education,
-    arrival_year: uiEngineer.arrivalYear,
+    self_promotion: emptyStringToNull(uiEngineer.selfPromotion),
+    work_scope: emptyStringToNull(uiEngineer.workScope),
+    work_experience: emptyStringToNull(uiEngineer.workExperience),
+    nationality: emptyStringToNull(uiEngineer.nationality),
+    age: emptyStringToNull(uiEngineer.age),
+    gender: emptyStringToNull(uiEngineer.gender),
+    nearest_station: emptyStringToNull(uiEngineer.nearestStation),
+    education: emptyStringToNull(uiEngineer.education),
+    arrival_year: emptyStringToNull(uiEngineer.arrivalYear),
     certifications: ensureArray(uiEngineer.certifications),
-    email: uiEngineer.email,
-    phone: uiEngineer.phone
+    email: emptyStringToNull(uiEngineer.email),
+    phone: emptyStringToNull(uiEngineer.phone)
   };
 };
