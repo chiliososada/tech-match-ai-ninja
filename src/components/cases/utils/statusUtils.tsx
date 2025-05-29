@@ -1,3 +1,4 @@
+
 // Status utilities for case management
 
 import React from 'react';
@@ -50,6 +51,24 @@ export const StatusBadge = ({ status }: { status: string }) => {
   }
 };
 
+// Get status badge color classes for consistent styling
+export const getStatusBadgeColor = (status: string): string => {
+  switch (status) {
+    case '募集中':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case '募集終了':
+      return 'bg-amber-100 text-amber-800 border-amber-200';
+    case '保留中':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case '要確認':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
+    case 'アーカイブ済':
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+};
+
 // Get all available statuses for filtering
 export const getAvailableStatuses = () => [
   { value: 'all', label: '全て' },
@@ -57,6 +76,16 @@ export const getAvailableStatuses = () => [
   { value: '募集終了', label: '募集終了' },
   { value: '保留中', label: '保留中' },
   { value: '要確認', label: '要確認' },
+];
+
+// Get default process options for case management
+export const getDefaultProcesses = (): string[] => [
+  '要件定義',
+  '基本設計',
+  '詳細設計',
+  '実装',
+  'テスト',
+  '運用・保守'
 ];
 
 // 正规化数据库状态到显示状态的映射
