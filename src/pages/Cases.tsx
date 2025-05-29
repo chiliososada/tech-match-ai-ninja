@@ -98,26 +98,19 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     console.log('Target company type:', targetCompanyType);
     console.log('Effective company type:', effectiveCompanyType);
     
-    // Log all projects with their company_type
-    projects.forEach((project, index) => {
-      console.log(`Project ${index + 1}:`, {
-        id: project.id,
-        title: project.title,
-        company_type: project.company_type,
-        status: project.status,
-        start_date: project.start_date
-      });
-    });
-    
+    // Filter by company_type and ensure is_active = true
     const filteredByCompanyType = projects.filter(project => {
-      const matches = project.company_type === targetCompanyType;
+      const matchesCompanyType = project.company_type === targetCompanyType;
+      const isActive = project.is_active === true; // Explicitly check for active projects
+      const matches = matchesCompanyType && isActive;
+      
       if (!matches) {
-        console.log(`Filtered out project "${project.title}" - company_type: "${project.company_type}" (expected: "${targetCompanyType}")`);
+        console.log(`Filtered out project "${project.title}" - company_type: "${project.company_type}" (expected: "${targetCompanyType}"), is_active: ${project.is_active}`);
       }
       return matches;
     });
     
-    console.log('After company_type filter:', filteredByCompanyType.length);
+    console.log('After company_type and is_active filter:', filteredByCompanyType.length);
     
     return filteredByCompanyType.map(project => ({
       id: project.id,
@@ -203,14 +196,14 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     foreignerFilter
   ]);
 
-  // Get archive candidates for the archive tab - use ALL normalizedCaseData, not filtered
+  // Get active archive candidates for the archive tab - use ONLY ACTIVE normalizedCaseData
   const archiveCandidates = React.useMemo(() => {
-    console.log('=== DEBUG: Getting archive candidates ===');
-    console.log('All normalized case data:', normalizedCaseData.length);
+    console.log('=== DEBUG: Getting archive candidates from ACTIVE projects ===');
+    console.log('All normalized case data (active only):', normalizedCaseData.length);
     console.log('Sample case data for debugging:', normalizedCaseData.slice(0, 2));
     
     const candidates = getArchiveCandidates(normalizedCaseData);
-    console.log('Archive candidates found:', candidates.length);
+    console.log('Archive candidates found from active projects:', candidates.length);
     console.log('Archive candidates details:', candidates.map(c => ({
       id: c.id,
       title: c.title,
@@ -350,7 +343,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseUploadTab />
           </TabsContent>
 
-          {/* Archive Tab using filtered archive candidates */}
+          {/* Archive Tab using ONLY ACTIVE archive candidates */}
           <TabsContent contextId={effectiveCompanyType} value="archive" className="space-y-6">
             <CaseArchiveTab cases={archiveCandidates} companyType={effectiveCompanyType} />
           </TabsContent>

@@ -19,26 +19,26 @@ export const useProjectArchives = () => {
   const [loading, setLoading] = useState(false);
   const { currentTenant, user } = useAuth();
 
-  // Fetch projects from the projects table that meet archive criteria
+  // Fetch only active projects from the projects table that meet archive criteria
   const fetchArchives = async () => {
     if (!currentTenant?.id) return;
     
     setLoading(true);
     try {
-      // Fetch all active projects from the projects table
+      // Fetch only ACTIVE projects from the projects table (is_active = true)
       const { data: projects, error } = await supabase
         .from('projects')
         .select('*')
         .eq('tenant_id', currentTenant.id)
-        .eq('is_active', true)
+        .eq('is_active', true) // Only fetch active projects
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      console.log('=== DEBUG: Projects fetched for archives ===');
-      console.log('Total projects:', projects?.length || 0);
+      console.log('=== DEBUG: Active projects fetched for archive candidates ===');
+      console.log('Total active projects:', projects?.length || 0);
 
-      // Convert projects to archive format for compatibility
+      // Convert active projects to archive format for compatibility
       const archiveData = (projects || []).map(project => ({
         id: project.id,
         original_project_id: project.id,
@@ -49,10 +49,10 @@ export const useProjectArchives = () => {
         tenant_id: project.tenant_id
       }));
 
-      console.log('Converted archive data:', archiveData.length);
+      console.log('Active projects converted to archive format:', archiveData.length);
       setArchives(archiveData);
     } catch (error) {
-      console.error('Error fetching projects for archives:', error);
+      console.error('Error fetching active projects for archives:', error);
       toast({
         title: "エラー",
         description: "案件の取得に失敗しました",
