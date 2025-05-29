@@ -56,6 +56,23 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   }, [editMode, selectedCase, editingCaseData]);
 
+  // Update selectedCase when caseData changes (after fetchProjects)
+  useEffect(() => {
+    if (selectedCase && caseData.length > 0) {
+      console.log("Checking if selectedCase needs to be updated with fresh data...");
+      const updatedCase = caseData.find(item => item.id === selectedCase.id);
+      if (updatedCase) {
+        console.log("Found updated case data, updating selectedCase:", updatedCase.title);
+        const caseWithProcesses = {
+          ...updatedCase,
+          processes: updatedCase.processes || [],
+          interviewCount: updatedCase.interviewCount || '1'
+        };
+        setSelectedCase(caseWithProcesses);
+      }
+    }
+  }, [caseData, selectedCase?.id]);
+
   // Toggle edit mode handler
   const toggleEditMode = () => {
     const newEditMode = !editMode;
@@ -150,21 +167,13 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         if (result) {
           console.log("Project updated successfully, refreshing data...");
           
-          // Update the selected case with the new data immediately
-          setSelectedCase(editingCaseData);
+          // Exit edit mode first
           setEditMode(false);
           setEditingCaseData(null);
           
-          // Force refresh the projects list with a slight delay to ensure database consistency
+          // Force refresh the projects list to get the latest data
           console.log("Calling fetchProjects to refresh the list...");
           await fetchProjects();
-          
-          // Add a second fetch with a delay to ensure data consistency
-          setTimeout(async () => {
-            console.log("Secondary fetchProjects call for data consistency...");
-            await fetchProjects();
-          }, 500);
-          
           console.log("fetchProjects completed");
           
           toast({
