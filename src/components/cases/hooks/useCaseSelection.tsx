@@ -56,9 +56,9 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   }, [editMode, selectedCase, editingCaseData]);
 
-  // Update selectedCase when caseData changes (after fetchProjects)
+  // Update selectedCase when caseData changes (after fetchProjects) - but only if not in edit mode
   useEffect(() => {
-    if (selectedCase && caseData.length > 0) {
+    if (selectedCase && caseData.length > 0 && !editMode) {
       console.log("Checking if selectedCase needs to be updated with fresh data...");
       const updatedCase = caseData.find(item => item.id === selectedCase.id);
       if (updatedCase) {
@@ -71,7 +71,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         setSelectedCase(caseWithProcesses);
       }
     }
-  }, [caseData, selectedCase?.id]);
+  }, [caseData, selectedCase?.id, editMode]);
 
   // Toggle edit mode handler
   const toggleEditMode = () => {
@@ -167,7 +167,10 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         if (result) {
           console.log("Project updated successfully, refreshing data...");
           
-          // Exit edit mode first
+          // Update the selectedCase with the edited data first
+          setSelectedCase(editingCaseData);
+          
+          // Exit edit mode
           setEditMode(false);
           setEditingCaseData(null);
           
