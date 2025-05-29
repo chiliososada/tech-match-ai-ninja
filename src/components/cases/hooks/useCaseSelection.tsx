@@ -2,11 +2,13 @@
 import { useState, useEffect } from 'react';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
+import { useProjects } from '@/hooks/useProjects';
 
 export const useCaseSelection = (caseData: MailCase[]) => {
   const [selectedCase, setSelectedCase] = useState<MailCase | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editingCaseData, setEditingCaseData] = useState<MailCase | null>(null);
+  const { updateProject } = useProjects();
 
   // Handler function to select a case
   const handleCaseSelect = (caseItem: MailCase) => {
@@ -109,18 +111,58 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   };
 
-  // Save edit handler
-  const handleSaveEdit = () => {
-    if (editingCaseData) {
+  // Save edit handler with database update
+  const handleSaveEdit = async () => {
+    if (editingCaseData && selectedCase) {
       console.log("Saving edited data:", editingCaseData);
       
-      toast({
-        title: "案件情報が更新されました",
-        description: "変更が保存されました"
-      });
-      setSelectedCase(editingCaseData);
-      setEditMode(false);
-      setEditingCaseData(null);
+      try {
+        // Update the project in the database
+        const updateData = {
+          title: editingCaseData.title,
+          client_company: editingCaseData.company,
+          manager_name: editingCaseData.manager,
+          manager_email: editingCaseData.managerEmail,
+          skills: editingCaseData.skills,
+          experience: editingCaseData.experience,
+          location: editingCaseData.location,
+          work_type: editingCaseData.workType,
+          duration: editingCaseData.duration,
+          budget: editingCaseData.budget,
+          desired_budget: editingCaseData.desiredBudget,
+          japanese_level: editingCaseData.japanese,
+          priority: editingCaseData.priority,
+          status: editingCaseData.status,
+          start_date: editingCaseData.startDate,
+          foreigner_accepted: editingCaseData.foreignerAccepted,
+          freelancer_accepted: editingCaseData.freelancerAccepted,
+          interview_count: editingCaseData.interviewCount,
+          processes: editingCaseData.processes,
+          detail_description: editingCaseData.detailDescription,
+          description: editingCaseData.description
+        };
+
+        const result = await updateProject(selectedCase.id, updateData);
+        
+        if (result) {
+          // Update the selected case with the new data
+          setSelectedCase(editingCaseData);
+          setEditMode(false);
+          setEditingCaseData(null);
+          
+          toast({
+            title: "案件情報が更新されました",
+            description: "変更が正常に保存されました"
+          });
+        }
+      } catch (error) {
+        console.error('Error updating case:', error);
+        toast({
+          title: "エラー",
+          description: "案件の更新に失敗しました",
+          variant: "destructive"
+        });
+      }
     }
   };
 
