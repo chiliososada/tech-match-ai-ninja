@@ -12,6 +12,8 @@ export const useCaseSelection = (caseData: MailCase[]) => {
   
   // Use ref to track recently saved case to prevent race condition
   const recentlySavedCaseRef = useRef<string | null>(null);
+  // Add a ref to store the most recent saved data to ensure consistency
+  const recentSaveDataRef = useRef<MailCase | null>(null);
 
   // Handler function to select a case
   const handleCaseSelect = (caseItem: MailCase) => {
@@ -66,9 +68,19 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       const isRecentlySaved = recentlySavedCaseRef.current === selectedCase.id;
       
       if (isRecentlySaved) {
-        console.log("Skipping selectedCase update - case was recently saved");
-        // Clear the recently saved flag after preventing the overwrite
+        console.log("Case was recently saved - using saved data for consistency");
+        // Use the saved data to update selectedCase to ensure consistency
+        if (recentSaveDataRef.current && recentSaveDataRef.current.id === selectedCase.id) {
+          console.log("Updating selectedCase with recently saved data:", recentSaveDataRef.current.title);
+          setSelectedCase({
+            ...recentSaveDataRef.current,
+            processes: recentSaveDataRef.current.processes || [],
+            interviewCount: recentSaveDataRef.current.interviewCount || '1'
+          });
+        }
+        // Clear the recently saved flags after using the saved data
         recentlySavedCaseRef.current = null;
+        recentSaveDataRef.current = null;
         return;
       }
       
@@ -151,6 +163,12 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       try {
         // Mark this case as recently saved to prevent state overwrites
         recentlySavedCaseRef.current = selectedCase.id;
+        // Store the editing data to use for consistency
+        recentSaveDataRef.current = {
+          ...editingCaseData,
+          processes: editingCaseData.processes || [],
+          interviewCount: editingCaseData.interviewCount || '1'
+        };
         
         // Update the project in the database
         const updateData = {
@@ -200,7 +218,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           });
           
           // Run fetchProjects in background to refresh the left side list
-          // This won't interfere with the selectedCase state due to our race condition prevention
+          // The race condition prevention will ensure consistency
           console.log("Starting background refresh of projects list...");
           fetchProjects().then(() => {
             console.log("Background projects refresh completed");
@@ -209,13 +227,15 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           });
         } else {
           console.error("Project update failed - no result returned");
-          // Clear the recently saved flag if update failed
+          // Clear the recently saved flags if update failed
           recentlySavedCaseRef.current = null;
+          recentSaveDataRef.current = null;
         }
       } catch (error) {
         console.error('Error updating case:', error);
-        // Clear the recently saved flag if update failed
+        // Clear the recently saved flags if update failed
         recentlySavedCaseRef.current = null;
+        recentSaveDataRef.current = null;
         toast({
           title: "エラー",
           description: "案件の更新に失敗しました",
