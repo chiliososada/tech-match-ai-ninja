@@ -1,4 +1,3 @@
-
 import { MailCase } from "../email/types";
 import { parse, isValid } from 'date-fns';
 
@@ -223,8 +222,7 @@ export const getArchiveCandidates = (cases: MailCase[]): MailCase[] => {
     const isCandidate = isArchiveCandidate(caseItem);
     console.log(`Case "${caseItem.title}": isArchiveCandidate = ${isCandidate}`, {
       startDate: caseItem.startDate,
-      status: caseItem.status,
-      companyType: caseItem.companyType
+      status: caseItem.status
     });
     return isCandidate;
   });
