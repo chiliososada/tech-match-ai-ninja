@@ -8,7 +8,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
   const [selectedCase, setSelectedCase] = useState<MailCase | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editingCaseData, setEditingCaseData] = useState<MailCase | null>(null);
-  const { updateProject } = useProjects();
+  const { updateProject, fetchProjects } = useProjects();
 
   // Handler function to select a case
   const handleCaseSelect = (caseItem: MailCase) => {
@@ -149,6 +149,9 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           setSelectedCase(editingCaseData);
           setEditMode(false);
           setEditingCaseData(null);
+          
+          // Refresh the projects list to update the left sidebar
+          await fetchProjects();
           
           toast({
             title: "案件情報が更新されました",
