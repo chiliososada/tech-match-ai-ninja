@@ -12,6 +12,8 @@ export const useCaseSelection = (caseData: MailCase[]) => {
 
   // Handler function to select a case
   const handleCaseSelect = (caseItem: MailCase) => {
+    console.log('Selecting case:', caseItem.id, caseItem.title);
+    
     // Find the matching case with full data structure from our original caseData
     const fullCaseData = caseData.find(item => item.id === caseItem.id);
     
@@ -142,21 +144,28 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           description: editingCaseData.description
         };
 
+        console.log("Updating project with data:", updateData);
         const result = await updateProject(selectedCase.id, updateData);
         
         if (result) {
-          // Update the selected case with the new data
+          console.log("Project updated successfully, refreshing data...");
+          
+          // Update the selected case with the new data immediately
           setSelectedCase(editingCaseData);
           setEditMode(false);
           setEditingCaseData(null);
           
           // Refresh the projects list to update the left sidebar
+          console.log("Calling fetchProjects to refresh the list...");
           await fetchProjects();
+          console.log("fetchProjects completed");
           
           toast({
             title: "案件情報が更新されました",
             description: "変更が正常に保存されました"
           });
+        } else {
+          console.error("Project update failed - no result returned");
         }
       } catch (error) {
         console.error('Error updating case:', error);
@@ -166,6 +175,8 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           variant: "destructive"
         });
       }
+    } else {
+      console.error("Cannot save - missing editingCaseData or selectedCase");
     }
   };
 

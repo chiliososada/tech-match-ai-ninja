@@ -43,8 +43,12 @@ export const useProjects = () => {
 
   // Fetch projects for current tenant
   const fetchProjects = async () => {
-    if (!currentTenant?.id) return;
+    if (!currentTenant?.id) {
+      console.log("No current tenant, skipping fetch");
+      return;
+    }
     
+    console.log("Fetching projects for tenant:", currentTenant.id);
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -55,6 +59,8 @@ export const useProjects = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      console.log("Fetched projects from database:", data?.length || 0, "projects");
       setProjects(data || []);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -112,8 +118,13 @@ export const useProjects = () => {
 
   // Update project
   const updateProject = async (id: string, projectData: Partial<Project>) => {
-    if (!currentTenant?.id) return null;
+    if (!currentTenant?.id) {
+      console.error("No current tenant for update");
+      return null;
+    }
 
+    console.log("Updating project in database:", id, projectData);
+    
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -125,12 +136,14 @@ export const useProjects = () => {
 
       if (error) throw error;
 
+      console.log("Project updated successfully in database:", data);
+
       toast({
         title: "成功",
         description: "案件が正常に更新されました",
       });
 
-      await fetchProjects(); // Refresh the list
+      // Don't call fetchProjects here - let the calling component handle it
       return data;
     } catch (error) {
       console.error('Error updating project:', error);
