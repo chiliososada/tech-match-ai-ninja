@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -97,6 +98,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     console.log('Total projects from DB:', projects.length);
     console.log('Target company type:', targetCompanyType);
     console.log('Effective company type:', effectiveCompanyType);
+    console.log('Projects data:', projects.map(p => ({ id: p.id, title: p.title, updated_at: p.updated_at })));
     
     // Filter by company_type and ensure is_active = true
     const filteredByCompanyType = projects.filter(project => {
@@ -112,7 +114,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     
     console.log('After company_type and is_active filter:', filteredByCompanyType.length);
     
-    return filteredByCompanyType.map(project => ({
+    const normalized = filteredByCompanyType.map(project => ({
       id: project.id,
       title: project.title,
       company: project.client_company || '',
@@ -139,7 +141,10 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       // Use the actual database company_type field
       companyType: effectiveCompanyType
     }));
-  }, [projects, effectiveCompanyType]);
+    
+    console.log('Normalized case data:', normalized.map(n => ({ id: n.id, title: n.title, location: n.location })));
+    return normalized;
+  }, [projects, effectiveCompanyType, projects.length]); // Add projects.length to force re-computation
 
   const {
     selectedCase,
