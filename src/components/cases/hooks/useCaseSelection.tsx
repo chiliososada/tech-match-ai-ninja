@@ -155,9 +155,16 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           setEditMode(false);
           setEditingCaseData(null);
           
-          // Refresh the projects list to update the left sidebar
+          // Force refresh the projects list with a slight delay to ensure database consistency
           console.log("Calling fetchProjects to refresh the list...");
           await fetchProjects();
+          
+          // Add a second fetch with a delay to ensure data consistency
+          setTimeout(async () => {
+            console.log("Secondary fetchProjects call for data consistency...");
+            await fetchProjects();
+          }, 500);
+          
           console.log("fetchProjects completed");
           
           toast({
