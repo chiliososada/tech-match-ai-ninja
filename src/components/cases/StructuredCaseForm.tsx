@@ -110,7 +110,7 @@ export function StructuredCaseForm() {
       processes: caseData.processes,
       description: caseData.description || undefined,
       detail_description: caseData.detail_description || undefined,
-      company_type: getCompanyType() // Set company_type based on current route
+      company_type: getCompanyType() // Now this should work with the updated type
     };
 
     const result = await createProject(projectData);
