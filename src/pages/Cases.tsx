@@ -207,9 +207,16 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const archiveCandidates = React.useMemo(() => {
     console.log('=== DEBUG: Getting archive candidates ===');
     console.log('All normalized case data:', normalizedCaseData.length);
+    console.log('Sample case data for debugging:', normalizedCaseData.slice(0, 2));
     
     const candidates = getArchiveCandidates(normalizedCaseData);
     console.log('Archive candidates found:', candidates.length);
+    console.log('Archive candidates details:', candidates.map(c => ({
+      id: c.id,
+      title: c.title,
+      status: c.status,
+      startDate: c.startDate
+    })));
     
     return candidates;
   }, [normalizedCaseData]);

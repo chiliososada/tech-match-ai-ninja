@@ -1,23 +1,39 @@
+
 import { MailCase } from "../email/types";
 import { parse, isValid } from 'date-fns';
 
 // Archive conditions function - 更新归档条件
 export const isArchiveCandidate = (caseItem: MailCase): boolean => {
+  const currentMonthStart = new Date();
+  currentMonthStart.setDate(1);
+  currentMonthStart.setHours(0, 0, 0, 0);
+  
+  console.log('=== isArchiveCandidate DEBUG ===');
+  console.log(`Checking case: "${caseItem.title}"`);
+  console.log(`Current month start: ${currentMonthStart.toISOString()}`);
+  console.log(`Case start date: ${caseItem.startDate}`);
+  console.log(`Case status: ${caseItem.status}`);
+  
   // 条件1: 参画开始日が当前年月より前の案件
   if (caseItem.startDate) {
     const startDate = new Date(caseItem.startDate);
-    const now = new Date();
-    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    console.log(`Start date parsed: ${startDate.toISOString()}`);
+    console.log(`Is start date before current month? ${startDate < currentMonthStart}`);
+    
     if (startDate < currentMonthStart) {
+      console.log('✓ Archive candidate: start date is before current month');
       return true;
     }
   }
   
   // 条件2: ステータスが「募集終了」の案件（UI显示状态，对应数据库中的'募集完了'）
-  if (caseItem.status === '募集終了') {
+  // 检查两种可能的状态值
+  if (caseItem.status === '募集終了' || caseItem.status === '募集完了') {
+    console.log('✓ Archive candidate: status is 募集終了 or 募集完了');
     return true;
   }
   
+  console.log('✗ Not an archive candidate');
   return false;
 };
 
