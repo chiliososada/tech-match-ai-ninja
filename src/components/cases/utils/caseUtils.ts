@@ -1,6 +1,24 @@
-
 import { MailCase } from "../email/types";
 import { parse, isValid } from 'date-fns';
+
+// Archive conditions function
+export const isArchiveCandidate = (caseItem: MailCase): boolean => {
+  // 条件1: 参画开始日が2025年5月より前の案件
+  if (caseItem.startDate) {
+    const startDate = new Date(caseItem.startDate);
+    const cutoffDate = new Date('2025-05-01');
+    if (startDate < cutoffDate) {
+      return true;
+    }
+  }
+  
+  // 条件2: ステータスが「募集終了」の案件
+  if (caseItem.status === '募集終了') {
+    return true;
+  }
+  
+  return false;
+};
 
 // Filter cases based on various criteria
 export const filterCases = (
@@ -9,7 +27,8 @@ export const filterCases = (
   statusFilter: string,
   searchTerm: string,
   dateRange: string,
-  foreignerFilter: string
+  foreignerFilter: string,
+  excludeArchiveCandidates: boolean = true // 新增参数：是否排除归档候选案件
 ) => {
   console.log('=== filterCases DEBUG ===');
   console.log('Input parameters:', {
@@ -18,7 +37,8 @@ export const filterCases = (
     statusFilter,
     searchTerm,
     dateRange,
-    foreignerFilter
+    foreignerFilter,
+    excludeArchiveCandidates
   });
 
   return cases.filter((item, index) => {
@@ -76,7 +96,12 @@ export const filterCases = (
       (foreignerFilter === "notAccepted" && !item.foreignerAccepted);
     console.log(`Foreigner check: ${matchesForeigner} (filter: ${foreignerFilter}, item foreignerAccepted: ${item.foreignerAccepted})`);
 
-    const finalResult = matchesCompanyType && matchesStatus && matchesSearch && matchesDate && matchesForeigner;
+    // Archive candidate check
+    const isArchive = isArchiveCandidate(item);
+    const matchesArchiveFilter = excludeArchiveCandidates ? !isArchive : true;
+    console.log(`Archive check: ${matchesArchiveFilter} (excludeArchiveCandidates: ${excludeArchiveCandidates}, isArchiveCandidate: ${isArchive})`);
+
+    const finalResult = matchesCompanyType && matchesStatus && matchesSearch && matchesDate && matchesForeigner && matchesArchiveFilter;
     console.log(`Final result for "${item.title}": ${finalResult}`);
     
     if (!finalResult) {
@@ -85,7 +110,8 @@ export const filterCases = (
         matchesStatus,
         matchesSearch,
         matchesDate,
-        matchesForeigner
+        matchesForeigner,
+        matchesArchiveFilter
       });
     }
 
@@ -184,4 +210,9 @@ export const processEmailStats = (filteredMailCases: MailCase[]) => {
     senders: senderCounts,
     dates: dateCounts
   };
+};
+
+// Get archive candidates - cases that meet deletion criteria
+export const getArchiveCandidates = (cases: MailCase[]): MailCase[] => {
+  return cases.filter(caseItem => isArchiveCandidate(caseItem));
 };

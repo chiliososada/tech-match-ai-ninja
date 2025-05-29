@@ -25,7 +25,8 @@ import {
   filterMailCases, 
   getPaginatedData, 
   calculateTotalPages,
-  processEmailStats 
+  processEmailStats,
+  getArchiveCandidates
 } from '@/components/cases/utils/caseUtils';
 import { getCompanyList } from '@/components/cases/data/caseData';
 import { normalizeStatus } from '@/components/cases/utils/statusUtils';
@@ -161,7 +162,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   // Get company list
   const companyList = getCompanyList();
   
-  // Filtered cases for the list view - this is our MAIN source of truth
+  // Filtered cases for the list view - exclude archive candidates by default
   const filteredCases = React.useMemo(() => {
     console.log('=== DEBUG: Cases filtering ===');
     console.log('Before filterCases:', normalizedCaseData.length);
@@ -176,7 +177,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       statusFilter,
       searchTerm,
       dateRange,
-      foreignerFilter
+      foreignerFilter,
+      true // excludeArchiveCandidates = true for normal list
     );
     
     console.log('After filterCases:', result.length);
@@ -199,6 +201,11 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     dateRange,
     foreignerFilter
   ]);
+
+  // Get archive candidates for the archive tab
+  const archiveCandidates = React.useMemo(() => {
+    return getArchiveCandidates(normalizedCaseData);
+  }, [normalizedCaseData]);
 
   // Handle sorting
   const handleSort = (field: string, direction: 'asc' | 'desc') => {
@@ -329,9 +336,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseUploadTab />
           </TabsContent>
 
-          {/* Archive Tab using real data */}
+          {/* Archive Tab using filtered archive candidates */}
           <TabsContent contextId={effectiveCompanyType} value="archive" className="space-y-6">
-            <CaseArchiveTab cases={archives} companyType={effectiveCompanyType} />
+            <CaseArchiveTab cases={archiveCandidates} companyType={effectiveCompanyType} />
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}
