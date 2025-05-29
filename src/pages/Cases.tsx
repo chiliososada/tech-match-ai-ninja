@@ -98,7 +98,12 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     console.log('Total projects from DB:', projects.length);
     console.log('Target company type:', targetCompanyType);
     console.log('Effective company type:', effectiveCompanyType);
-    console.log('Projects data:', projects.map(p => ({ id: p.id, title: p.title, updated_at: p.updated_at })));
+    console.log('Projects data (first 3):', projects.slice(0, 3).map(p => ({ 
+      id: p.id, 
+      title: p.title, 
+      updated_at: p.updated_at,
+      company_type: p.company_type 
+    })));
     
     // Filter by company_type and ensure is_active = true
     const filteredByCompanyType = projects.filter(project => {
@@ -142,7 +147,12 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       companyType: effectiveCompanyType
     }));
     
-    console.log('Normalized case data:', normalized.map(n => ({ id: n.id, title: n.title, location: n.location })));
+    console.log('Final normalized case data (first 3):', normalized.slice(0, 3).map(n => ({ 
+      id: n.id, 
+      title: n.title, 
+      location: n.location 
+    })));
+    
     return normalized;
   }, [projects, effectiveCompanyType, projects.length]); // Add projects.length to force re-computation
 
@@ -181,6 +191,10 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     );
     
     console.log('After filterCases:', result.length);
+    console.log('Filtered cases (first 3):', result.slice(0, 3).map(r => ({ 
+      id: r.id, 
+      title: r.title 
+    })));
     
     if (result.length !== normalizedCaseData.length) {
       console.log('Some cases were filtered out by filterCases function');
@@ -246,6 +260,13 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   // Paginated cases for the list view
   const paginatedCases = getPaginatedData(sortedCases, casesCurrentPage, itemsPerPage);
+  
+  // Debug log for paginated cases to see what's being passed to CaseList
+  React.useEffect(() => {
+    console.log('=== DEBUG: Paginated cases for CaseList ===');
+    console.log('Paginated cases length:', paginatedCases.length);
+    console.log('Paginated cases (titles):', paginatedCases.map(c => ({ id: c.id, title: c.title })));
+  }, [paginatedCases]);
   
   // For email sender and stats - use the same filteredCases as the main source of truth
   // but apply additional email-specific filters
