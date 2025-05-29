@@ -154,7 +154,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     })));
     
     return normalized;
-  }, [projects, effectiveCompanyType, projects.length]); // Add projects.length to force re-computation
+  }, [projects, effectiveCompanyType]);
 
   const {
     selectedCase,
@@ -175,6 +175,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const filteredCases = React.useMemo(() => {
     console.log('=== DEBUG: Cases filtering ===');
     console.log('Before filterCases:', normalizedCaseData.length);
+    console.log('Normalized case data titles:', normalizedCaseData.map(c => ({ id: c.id, title: c.title })));
     console.log('Status filter:', statusFilter);
     console.log('Search term:', searchTerm);
     console.log('Date range:', dateRange);
@@ -241,9 +242,16 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   // Apply sorting to the filtered cases
   const sortedCases = React.useMemo(() => {
-    if (sortField !== "start_date") return filteredCases;
+    console.log('=== DEBUG: Sorting cases ===');
+    console.log('Sort field:', sortField, 'Sort direction:', sortDirection);
+    console.log('Filtered cases before sorting (titles):', filteredCases.map(c => ({ id: c.id, title: c.title })));
     
-    return [...filteredCases].sort((a, b) => {
+    if (sortField !== "start_date") {
+      console.log('No sorting applied, returning filtered cases as is');
+      return filteredCases;
+    }
+    
+    const sorted = [...filteredCases].sort((a, b) => {
       const dateA = a.startDate || '';
       const dateB = b.startDate || '';
       
@@ -254,12 +262,24 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       const comparison = dateA.localeCompare(dateB);
       return sortDirection === 'asc' ? comparison : -comparison;
     });
+    
+    console.log('Sorted cases (titles):', sorted.map(c => ({ id: c.id, title: c.title })));
+    return sorted;
   }, [filteredCases, sortField, sortDirection]);
 
   const totalCasesPages = calculateTotalPages(filteredCases.length, itemsPerPage);
 
   // Paginated cases for the list view
-  const paginatedCases = getPaginatedData(sortedCases, casesCurrentPage, itemsPerPage);
+  const paginatedCases = React.useMemo(() => {
+    console.log('=== DEBUG: Creating paginated cases ===');
+    console.log('Sorted cases input (titles):', sortedCases.map(c => ({ id: c.id, title: c.title })));
+    console.log('Current page:', casesCurrentPage, 'Items per page:', itemsPerPage);
+    
+    const paginated = getPaginatedData(sortedCases, casesCurrentPage, itemsPerPage);
+    
+    console.log('Paginated cases output (titles):', paginated.map(c => ({ id: c.id, title: c.title })));
+    return paginated;
+  }, [sortedCases, casesCurrentPage, itemsPerPage]);
   
   // Debug log for paginated cases to see what's being passed to CaseList
   React.useEffect(() => {
