@@ -165,13 +165,20 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         const result = await updateProject(selectedCase.id, updateData);
         
         if (result) {
-          console.log("Project updated successfully, refreshing data...");
+          console.log("Project updated successfully, updating UI immediately...");
           
-          // Exit edit mode first
+          // Immediately update the selectedCase with the edited data to show changes
+          setSelectedCase({
+            ...editingCaseData,
+            processes: editingCaseData.processes || [],
+            interviewCount: editingCaseData.interviewCount || '1'
+          });
+          
+          // Exit edit mode
           setEditMode(false);
           setEditingCaseData(null);
           
-          // Force refresh the projects list to get the latest data
+          // Force refresh the projects list to get the latest data for the left side
           console.log("Calling fetchProjects to refresh the list...");
           await fetchProjects();
           console.log("fetchProjects completed");
