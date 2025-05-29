@@ -19,25 +19,43 @@ export const useProjectArchives = () => {
   const [loading, setLoading] = useState(false);
   const { currentTenant, user } = useAuth();
 
-  // Fetch archived projects for current tenant
+  // Fetch projects from the projects table that meet archive criteria
   const fetchArchives = async () => {
     if (!currentTenant?.id) return;
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('project_archives')
+      // Fetch all active projects from the projects table
+      const { data: projects, error } = await supabase
+        .from('projects')
         .select('*')
         .eq('tenant_id', currentTenant.id)
-        .order('archived_at', { ascending: false });
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setArchives(data || []);
+
+      console.log('=== DEBUG: Projects fetched for archives ===');
+      console.log('Total projects:', projects?.length || 0);
+
+      // Convert projects to archive format for compatibility
+      const archiveData = (projects || []).map(project => ({
+        id: project.id,
+        original_project_id: project.id,
+        project_data: project,
+        archive_reason: undefined,
+        archived_by: undefined,
+        archived_at: project.created_at,
+        tenant_id: project.tenant_id
+      }));
+
+      console.log('Converted archive data:', archiveData.length);
+      setArchives(archiveData);
     } catch (error) {
-      console.error('Error fetching archived projects:', error);
+      console.error('Error fetching projects for archives:', error);
       toast({
         title: "エラー",
-        description: "アーカイブ案件の取得に失敗しました",
+        description: "案件の取得に失敗しました",
         variant: "destructive",
       });
     } finally {
