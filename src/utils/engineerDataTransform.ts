@@ -42,7 +42,7 @@ export const transformDatabaseToUIEngineer = (dbEngineer: DatabaseEngineer): Eng
     gender: dbEngineer.gender || '',
     nearestStation: dbEngineer.nearest_station || '',
     education: dbEngineer.education || '',
-    arrivalYear: dbEngineer.arrival_year || '',
+    arrivalYear: dbEngineer.arrival_year_japan || '',
     certifications: ensureArray(dbEngineer.certifications),
     email: dbEngineer.email || '',
     phone: dbEngineer.phone || '',
@@ -82,7 +82,7 @@ export const transformUIToDatabaseEngineer = (uiEngineer: any) => {
     gender: emptyStringToNull(uiEngineer.gender),
     nearest_station: emptyStringToNull(uiEngineer.nearestStation),
     education: emptyStringToNull(uiEngineer.education),
-    arrival_year: emptyStringToNull(uiEngineer.arrivalYear),
+    arrival_year_japan: emptyStringToNull(uiEngineer.arrivalYear),
     certifications: ensureArray(uiEngineer.certifications),
     email: emptyStringToNull(uiEngineer.email),
     phone: emptyStringToNull(uiEngineer.phone)

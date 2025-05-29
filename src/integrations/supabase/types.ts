@@ -883,7 +883,7 @@ export type Database = {
         Row: {
           age: string | null
           ai_extracted_data: Json | null
-          arrival_year: string | null
+          arrival_year_japan: string | null
           availability: string | null
           business_trip_available: boolean | null
           certifications: string[] | null
@@ -933,7 +933,7 @@ export type Database = {
         Insert: {
           age?: string | null
           ai_extracted_data?: Json | null
-          arrival_year?: string | null
+          arrival_year_japan?: string | null
           availability?: string | null
           business_trip_available?: boolean | null
           certifications?: string[] | null
@@ -983,7 +983,7 @@ export type Database = {
         Update: {
           age?: string | null
           ai_extracted_data?: Json | null
-          arrival_year?: string | null
+          arrival_year_japan?: string | null
           availability?: string | null
           business_trip_available?: boolean | null
           certifications?: string[] | null

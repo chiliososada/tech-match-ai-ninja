@@ -26,7 +26,7 @@ export interface DatabaseEngineer {
   gender: string | null;
   nearest_station: string | null;
   education: string | null;
-  arrival_year: string | null;
+  arrival_year_japan: string | null;
   certifications: string[] | null;
   email: string | null;
   phone: string | null;
@@ -137,7 +137,7 @@ export const useEngineers = (companyType: 'own' | 'other') => {
         gender: engineerData.gender || null,
         nearest_station: engineerData.nearestStation || null,
         education: engineerData.education || null,
-        arrival_year: engineerData.arrivalYear || null,
+        arrival_year_japan: engineerData.arrivalYear || null,
         certifications: ensureArray(engineerData.certifications),
         email: engineerData.email || null,
         phone: engineerData.phone || null,
@@ -211,7 +211,7 @@ export const useEngineers = (companyType: 'own' | 'other') => {
         gender: engineerData.gender === '' ? null : engineerData.gender,
         nearest_station: engineerData.nearest_station === '' ? null : engineerData.nearest_station,
         education: engineerData.education === '' ? null : engineerData.education,
-        arrival_year: engineerData.arrival_year === '' ? null : engineerData.arrival_year,
+        arrival_year_japan: engineerData.arrival_year_japan === '' ? null : engineerData.arrival_year_japan,
         certifications: ensureArray(engineerData.certifications),
         email: engineerData.email === '' ? null : engineerData.email,
         phone: engineerData.phone === '' ? null : engineerData.phone,
