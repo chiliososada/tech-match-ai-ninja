@@ -167,10 +167,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         if (result) {
           console.log("Project updated successfully, refreshing data...");
           
-          // Update the selectedCase with the edited data first
-          setSelectedCase(editingCaseData);
-          
-          // Exit edit mode
+          // Exit edit mode first
           setEditMode(false);
           setEditingCaseData(null);
           
