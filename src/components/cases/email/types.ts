@@ -77,6 +77,7 @@ export interface Engineer {
   workExperience?: string;
   registeredAt?: string;
   updatedAt?: string;
+  isActive?: boolean; // Add the isActive property to match database structure
 }
 
 // Define EmailTemplate interface
