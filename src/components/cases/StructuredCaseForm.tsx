@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,39 +23,119 @@ import {
   FileCode
 } from 'lucide-react';
 import { getDefaultProcesses } from './utils/statusUtils';
+import { useProjects, Project } from '@/hooks/useProjects';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 export function StructuredCaseForm() {
+  const { createProject, loading } = useProjects();
+  const { currentTenant } = useAuth();
+
   const [caseData, setCaseData] = useState({
-    title: 'Java開発エンジニア',
-    company: '株式会社テック',
-    manager: '山田太郎',
-    managerEmail: 'yamada@example.com',
-    skills: ['Java', 'Spring Boot', 'SQL'],
-    experience: '5年以上',
-    location: '東京都',
-    workType: 'リモート可（週3出社）',
-    duration: '6ヶ月〜',
-    budget: '60万円〜80万円',
-    desiredBudget: '65万円〜',
-    japanese: 'ビジネスレベル',
-    priority: '高',
+    title: '',
+    client_company: '',
+    partner_company: '',
+    manager_name: '',
+    manager_email: '',
+    skills: [] as string[],
+    experience: '不問',
+    location: '',
+    work_type: '',
+    duration: '',
+    budget: '',
+    desired_budget: '',
+    japanese_level: '不問',
+    priority: '中',
     status: '募集中',
-    startDate: '2025-06-01',
-    foreignerAccepted: true,
-    freelancerAccepted: true,
-    interviewCount: '1',
-    processes: ['要件定義', '基本設計'],
-    detailDescription: '金融系システムの新規開発プロジェクト...'
+    start_date: '',
+    foreigner_accepted: false,
+    freelancer_accepted: false,
+    interview_count: '1',
+    processes: [] as string[],
+    description: '',
+    detail_description: ''
   });
 
   const handleChange = (field: string, value: any) => {
     setCaseData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Case data saved:', caseData);
-    // Here you would usually save this to your database
+    
+    if (!currentTenant?.id) {
+      toast({
+        title: "エラー",
+        description: "テナント情報が不足しています",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!caseData.title.trim()) {
+      toast({
+        title: "エラー",
+        description: "案件タイトルは必須です",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const projectData: Omit<Project, 'id' | 'tenant_id' | 'created_at' | 'updated_at' | 'created_by'> = {
+      title: caseData.title,
+      client_company: caseData.client_company || undefined,
+      partner_company: caseData.partner_company || undefined,
+      manager_name: caseData.manager_name || undefined,
+      manager_email: caseData.manager_email || undefined,
+      skills: caseData.skills,
+      experience: caseData.experience,
+      location: caseData.location || undefined,
+      work_type: caseData.work_type || undefined,
+      duration: caseData.duration || undefined,
+      budget: caseData.budget || undefined,
+      desired_budget: caseData.desired_budget || undefined,
+      japanese_level: caseData.japanese_level,
+      priority: caseData.priority,
+      status: caseData.status,
+      start_date: caseData.start_date || undefined,
+      foreigner_accepted: caseData.foreigner_accepted,
+      freelancer_accepted: caseData.freelancer_accepted,
+      interview_count: caseData.interview_count,
+      processes: caseData.processes,
+      description: caseData.description || undefined,
+      detail_description: caseData.detail_description || undefined,
+      tenant_id: currentTenant.id
+    };
+
+    const result = await createProject(projectData);
+    
+    if (result) {
+      // Reset form after successful creation
+      setCaseData({
+        title: '',
+        client_company: '',
+        partner_company: '',
+        manager_name: '',
+        manager_email: '',
+        skills: [],
+        experience: '不問',
+        location: '',
+        work_type: '',
+        duration: '',
+        budget: '',
+        desired_budget: '',
+        japanese_level: '不問',
+        priority: '中',
+        status: '募集中',
+        start_date: '',
+        foreigner_accepted: false,
+        freelancer_accepted: false,
+        interview_count: '1',
+        processes: [],
+        description: '',
+        detail_description: ''
+      });
+    }
   };
 
   // Helper function to toggle process selection
@@ -79,12 +160,13 @@ export function StructuredCaseForm() {
             <Briefcase className="h-4 w-4 text-primary" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="title" className="text-sm font-medium mb-1 japanese-text">案件タイトル</Label>
+            <Label htmlFor="title" className="text-sm font-medium mb-1 japanese-text">案件タイトル *</Label>
             <Input 
               id="title" 
               value={caseData.title} 
               onChange={(e) => handleChange('title', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
+              required
             />
           </div>
         </div>
@@ -94,11 +176,11 @@ export function StructuredCaseForm() {
             <Briefcase className="h-4 w-4 text-primary" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="company" className="text-sm font-medium mb-1 japanese-text">会社名</Label>
+            <Label htmlFor="client_company" className="text-sm font-medium mb-1 japanese-text">クライアント会社名</Label>
             <Input 
-              id="company" 
-              value={caseData.company} 
-              onChange={(e) => handleChange('company', e.target.value)} 
+              id="client_company" 
+              value={caseData.client_company} 
+              onChange={(e) => handleChange('client_company', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
             />
           </div>
@@ -109,11 +191,11 @@ export function StructuredCaseForm() {
             <User className="h-4 w-4 text-cyan-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="manager" className="text-sm font-medium mb-1 japanese-text">担当者</Label>
+            <Label htmlFor="manager_name" className="text-sm font-medium mb-1 japanese-text">担当者名</Label>
             <Input 
-              id="manager" 
-              value={caseData.manager} 
-              onChange={(e) => handleChange('manager', e.target.value)} 
+              id="manager_name" 
+              value={caseData.manager_name} 
+              onChange={(e) => handleChange('manager_name', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
             />
           </div>
@@ -124,11 +206,12 @@ export function StructuredCaseForm() {
             <Users className="h-4 w-4 text-blue-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="managerEmail" className="text-sm font-medium mb-1 japanese-text">連絡先</Label>
+            <Label htmlFor="manager_email" className="text-sm font-medium mb-1 japanese-text">担当者メール</Label>
             <Input 
-              id="managerEmail" 
-              value={caseData.managerEmail} 
-              onChange={(e) => handleChange('managerEmail', e.target.value)} 
+              id="manager_email" 
+              type="email"
+              value={caseData.manager_email} 
+              onChange={(e) => handleChange('manager_email', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
             />
           </div>
@@ -160,12 +243,13 @@ export function StructuredCaseForm() {
             <Briefcase className="h-4 w-4 text-purple-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="workType" className="text-sm font-medium mb-1 japanese-text">勤務形態</Label>
+            <Label htmlFor="work_type" className="text-sm font-medium mb-1 japanese-text">勤務形態</Label>
             <Input 
-              id="workType" 
-              value={caseData.workType} 
-              onChange={(e) => handleChange('workType', e.target.value)} 
+              id="work_type" 
+              value={caseData.work_type} 
+              onChange={(e) => handleChange('work_type', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
+              placeholder="例：リモート可（週3出社）"
             />
           </div>
         </div>
@@ -181,6 +265,7 @@ export function StructuredCaseForm() {
               value={caseData.duration} 
               onChange={(e) => handleChange('duration', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
+              placeholder="例：6ヶ月〜"
             />
           </div>
         </div>
@@ -190,8 +275,8 @@ export function StructuredCaseForm() {
             <Languages className="h-4 w-4 text-emerald-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="japanese" className="text-sm font-medium mb-1 japanese-text">日本語レベル</Label>
-            <Select value={caseData.japanese} onValueChange={(value) => handleChange('japanese', value)}>
+            <Label htmlFor="japanese_level" className="text-sm font-medium mb-1 japanese-text">日本語レベル</Label>
+            <Select value={caseData.japanese_level} onValueChange={(value) => handleChange('japanese_level', value)}>
               <SelectTrigger className="japanese-text border-primary/30 focus:border-primary mt-1">
                 <SelectValue placeholder="日本語レベルを選択" />
               </SelectTrigger>
@@ -236,6 +321,7 @@ export function StructuredCaseForm() {
               value={caseData.location} 
               onChange={(e) => handleChange('location', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
+              placeholder="例：東京都"
             />
           </div>
         </div>
@@ -245,12 +331,12 @@ export function StructuredCaseForm() {
             <Calendar className="h-4 w-4 text-blue-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="startDate" className="text-sm font-medium mb-1 japanese-text">参画開始日</Label>
+            <Label htmlFor="start_date" className="text-sm font-medium mb-1 japanese-text">参画開始日</Label>
             <Input 
-              id="startDate" 
+              id="start_date" 
               type="date"
-              value={caseData.startDate} 
-              onChange={(e) => handleChange('startDate', e.target.value)} 
+              value={caseData.start_date} 
+              onChange={(e) => handleChange('start_date', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
             />
           </div>
@@ -261,13 +347,13 @@ export function StructuredCaseForm() {
             <MessageSquare className="h-4 w-4 text-amber-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="interviewCount" className="text-sm font-medium mb-1 japanese-text">面談回数</Label>
+            <Label htmlFor="interview_count" className="text-sm font-medium mb-1 japanese-text">面談回数</Label>
             <Input 
-              id="interviewCount"
+              id="interview_count"
               type="number"
               min="1" 
-              value={caseData.interviewCount} 
-              onChange={(e) => handleChange('interviewCount', e.target.value)} 
+              value={caseData.interview_count} 
+              onChange={(e) => handleChange('interview_count', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
             />
           </div>
@@ -284,6 +370,7 @@ export function StructuredCaseForm() {
               value={caseData.budget} 
               onChange={(e) => handleChange('budget', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
+              placeholder="例：60万円〜80万円"
             />
           </div>
         </div>
@@ -293,25 +380,26 @@ export function StructuredCaseForm() {
             <CircleDollarSign className="h-4 w-4 text-purple-700" />
           </div>
           <div className="flex-1">
-            <Label htmlFor="desiredBudget" className="text-sm font-medium mb-1 japanese-text">希望単価</Label>
+            <Label htmlFor="desired_budget" className="text-sm font-medium mb-1 japanese-text">希望単価</Label>
             <Input 
-              id="desiredBudget" 
-              value={caseData.desiredBudget} 
-              onChange={(e) => handleChange('desiredBudget', e.target.value)} 
+              id="desired_budget" 
+              value={caseData.desired_budget} 
+              onChange={(e) => handleChange('desired_budget', e.target.value)} 
               className="japanese-text border-primary/30 focus:border-primary mt-1"
+              placeholder="例：65万円〜"
             />
           </div>
         </div>
 
         <div className="flex space-x-2">
-          <div className={`${caseData.foreignerAccepted ? 'bg-green-100' : 'bg-red-100'} p-2 rounded-md mt-1`}>
-            <Users className={`h-4 w-4 ${caseData.foreignerAccepted ? 'text-green-700' : 'text-red-700'}`} />
+          <div className={`${caseData.foreigner_accepted ? 'bg-green-100' : 'bg-red-100'} p-2 rounded-md mt-1`}>
+            <Users className={`h-4 w-4 ${caseData.foreigner_accepted ? 'text-green-700' : 'text-red-700'}`} />
           </div>
           <div className="flex-1">
-            <Label htmlFor="foreignerAccepted" className="text-sm font-medium mb-1 japanese-text">外国人採用</Label>
+            <Label htmlFor="foreigner_accepted" className="text-sm font-medium mb-1 japanese-text">外国人採用</Label>
             <Select 
-              value={caseData.foreignerAccepted ? "true" : "false"}
-              onValueChange={(value) => handleChange('foreignerAccepted', value === "true")}
+              value={caseData.foreigner_accepted ? "true" : "false"}
+              onValueChange={(value) => handleChange('foreigner_accepted', value === "true")}
             >
               <SelectTrigger className="japanese-text border-primary/30 focus:border-primary mt-1">
                 <SelectValue />
@@ -325,14 +413,14 @@ export function StructuredCaseForm() {
         </div>
 
         <div className="flex space-x-2">
-          <div className={`${caseData.freelancerAccepted ? 'bg-green-100' : 'bg-red-100'} p-2 rounded-md mt-1`}>
-            <User className={`h-4 w-4 ${caseData.freelancerAccepted ? 'text-green-700' : 'text-red-700'}`} />
+          <div className={`${caseData.freelancer_accepted ? 'bg-green-100' : 'bg-red-100'} p-2 rounded-md mt-1`}>
+            <User className={`h-4 w-4 ${caseData.freelancer_accepted ? 'text-green-700' : 'text-red-700'}`} />
           </div>
           <div className="flex-1">
-            <Label htmlFor="freelancerAccepted" className="text-sm font-medium mb-1 japanese-text">個人事業者</Label>
+            <Label htmlFor="freelancer_accepted" className="text-sm font-medium mb-1 japanese-text">個人事業者</Label>
             <Select 
-              value={caseData.freelancerAccepted ? "true" : "false"}
-              onValueChange={(value) => handleChange('freelancerAccepted', value === "true")}
+              value={caseData.freelancer_accepted ? "true" : "false"}
+              onValueChange={(value) => handleChange('freelancer_accepted', value === "true")}
             >
               <SelectTrigger className="japanese-text border-primary/30 focus:border-primary mt-1">
                 <SelectValue />
@@ -354,9 +442,9 @@ export function StructuredCaseForm() {
         <Input 
           id="skills" 
           value={caseData.skills.join(', ')} 
-          onChange={(e) => handleChange('skills', e.target.value.split(',').map(s => s.trim()))} 
+          onChange={(e) => handleChange('skills', e.target.value.split(',').map(s => s.trim()).filter(s => s))} 
           className="japanese-text border-primary/30 focus:border-primary mt-1"
-          placeholder="カンマ区切りで入力"
+          placeholder="例：Java, Spring Boot, SQL"
         />
       </div>
       
@@ -384,19 +472,37 @@ export function StructuredCaseForm() {
       <div className="mt-4">
         <div className="flex items-center space-x-2">
           <FileText className="h-4 w-4 mr-1 text-gray-600" />
-          <Label htmlFor="detailDescription" className="text-sm font-medium mb-1 japanese-text">案件詳細</Label>
+          <Label htmlFor="description" className="text-sm font-medium mb-1 japanese-text">案件概要</Label>
         </div>
         <Textarea 
-          id="detailDescription" 
-          value={caseData.detailDescription}
-          onChange={(e) => handleChange('detailDescription', e.target.value)}
+          id="description" 
+          value={caseData.description}
+          onChange={(e) => handleChange('description', e.target.value)}
+          rows={3}
+          className="japanese-text border-primary/30 focus:border-primary mt-1"
+          placeholder="案件の概要を入力してください"
+        />
+      </div>
+
+      <div className="mt-4">
+        <div className="flex items-center space-x-2">
+          <FileText className="h-4 w-4 mr-1 text-gray-600" />
+          <Label htmlFor="detail_description" className="text-sm font-medium mb-1 japanese-text">案件詳細</Label>
+        </div>
+        <Textarea 
+          id="detail_description" 
+          value={caseData.detail_description}
+          onChange={(e) => handleChange('detail_description', e.target.value)}
           rows={5}
           className="japanese-text border-primary/30 focus:border-primary mt-1"
+          placeholder="案件の詳細情報を入力してください"
         />
       </div>
 
       <div className="flex justify-end mt-6">
-        <Button type="submit" className="japanese-text">案件を保存</Button>
+        <Button type="submit" className="japanese-text" disabled={loading}>
+          {loading ? '保存中...' : '案件を保存'}
+        </Button>
       </div>
     </form>
   );

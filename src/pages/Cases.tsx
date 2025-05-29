@@ -12,7 +12,14 @@ import { EmailSenderContainer } from '@/components/cases/EmailSenderContainer';
 import { CasesHeader } from '@/components/cases/CasesHeader';
 import { CaseArchiveTab } from '@/components/cases/tabs/CaseArchiveTab';
 
-// Import utilities and hooks
+// Import hooks
+import { useProjects } from '@/hooks/useProjects';
+import { useProjectArchives } from '@/hooks/useProjectArchives';
+import { useCaseFilters } from '@/components/cases/hooks/useCaseFilters';
+import { usePagination } from '@/components/cases/hooks/usePagination';
+import { useCaseSelection } from '@/components/cases/hooks/useCaseSelection';
+
+// Import utilities
 import { 
   filterCases, 
   filterMailCases, 
@@ -20,10 +27,7 @@ import {
   calculateTotalPages,
   processEmailStats 
 } from '@/components/cases/utils/caseUtils';
-import { useCaseFilters } from '@/components/cases/hooks/useCaseFilters';
-import { usePagination } from '@/components/cases/hooks/usePagination';
-import { useCaseSelection } from '@/components/cases/hooks/useCaseSelection';
-import { caseData, getCompanyList } from '@/components/cases/data/caseData';
+import { getCompanyList } from '@/components/cases/data/caseData';
 import { normalizeStatus } from '@/components/cases/utils/statusUtils';
 
 interface CasesProps {
@@ -31,6 +35,10 @@ interface CasesProps {
 }
 
 export function Cases({ companyType = 'own' }: CasesProps) {
+  // Get projects from Supabase
+  const { projects, loading: projectsLoading } = useProjects();
+  const { archives } = useProjectArchives();
+
   // Use custom hooks for state management
   const {
     filter,
@@ -68,16 +76,47 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   } = usePagination();
 
   // Add state for sorting
-  const [sortField, setSortField] = React.useState("startDate");
+  const [sortField, setSortField] = React.useState("start_date");
   const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
 
-  // Normalize case statuses in the data
+  const location = useLocation();
+  
+  // Company type from URL for backward compatibility
+  const urlCompanyType = location.pathname.includes('/company/other') ? 'other' : 'own';
+  const effectiveCompanyType = urlCompanyType || companyType;
+  
+  // Page title based on company type
+  const pageTitle = effectiveCompanyType === 'own' ? '自社案件管理' : '他社案件管理';
+  
+  // Convert Supabase projects to the format expected by existing components
   const normalizedCaseData = React.useMemo(() => {
-    return caseData.map(item => ({
-      ...item,
-      status: normalizeStatus(item.status)
+    return projects.map(project => ({
+      id: project.id,
+      title: project.title,
+      company: project.client_company || '',
+      manager: project.manager_name || '',
+      managerEmail: project.manager_email || '',
+      skills: project.skills || [],
+      experience: project.experience || '',
+      location: project.location || '',
+      workType: project.work_type || '',
+      duration: project.duration || '',
+      budget: project.budget || '',
+      desiredBudget: project.desired_budget || '',
+      japanese: project.japanese_level || '',
+      priority: project.priority || '',
+      status: normalizeStatus(project.status || ''),
+      startDate: project.start_date || '',
+      foreignerAccepted: project.foreigner_accepted || false,
+      freelancerAccepted: project.freelancer_accepted || false,
+      interviewCount: project.interview_count || '1',
+      processes: project.processes || [],
+      detailDescription: project.detail_description || '',
+      description: project.description || '',
+      // Add company type for filtering
+      companyType: effectiveCompanyType
     }));
-  }, [caseData]);
+  }, [projects, effectiveCompanyType]);
 
   const {
     selectedCase,
@@ -90,20 +129,6 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     handleEditChange,
     handleSaveEdit
   } = useCaseSelection(normalizedCaseData);
-
-  const location = useLocation();
-  
-  // Company type from URL for backward compatibility
-  const urlCompanyType = location.pathname.includes('/company/other') ? 'other' : 'own';
-  const effectiveCompanyType = urlCompanyType || companyType;
-  
-  // Page title based on company type
-  const pageTitle = effectiveCompanyType === 'own' ? '自社案件管理' : '他社案件管理';
-  
-  // Add logging to help debug
-  console.log('Cases component rendering with path:', location.pathname);
-  console.log('Company type from URL:', urlCompanyType);
-  console.log('Effective company type:', effectiveCompanyType);
   
   // Get company list
   const companyList = getCompanyList();
@@ -135,7 +160,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
 
   // Apply sorting to the filtered cases
   const sortedCases = React.useMemo(() => {
-    if (sortField !== "startDate") return filteredCases;
+    if (sortField !== "start_date") return filteredCases;
     
     return [...filteredCases].sort((a, b) => {
       const dateA = a.startDate || '';
@@ -188,6 +213,16 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     });
     return Array.from(dates).sort();
   }, [filteredCases]);
+
+  if (projectsLoading) {
+    return (
+      <MainLayout>
+        <div className="flex-1 space-y-8 p-8 pt-6">
+          <div className="text-center">案件データを読み込んでいます...</div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -246,9 +281,9 @@ export function Cases({ companyType = 'own' }: CasesProps) {
             <CaseUploadTab />
           </TabsContent>
 
-          {/* New Archive Tab */}
+          {/* Archive Tab using real data */}
           <TabsContent contextId={effectiveCompanyType} value="archive" className="space-y-6">
-            <CaseArchiveTab cases={normalizedCaseData} companyType={effectiveCompanyType} />
+            <CaseArchiveTab cases={archives} companyType={effectiveCompanyType} />
           </TabsContent>
           
           {/* Only show the stats and send tabs for other company */}
