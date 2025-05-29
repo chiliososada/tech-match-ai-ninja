@@ -14,8 +14,8 @@ export const isArchiveCandidate = (caseItem: MailCase): boolean => {
     }
   }
   
-  // 条件2: ステータスが「募集完了」の案件（数据库中的实际状态）
-  if (caseItem.status === '募集完了') {
+  // 条件2: ステータスが「募集終了」の案件（UI显示状态，对应数据库中的'募集完了'）
+  if (caseItem.status === '募集終了') {
     return true;
   }
   
@@ -216,5 +216,19 @@ export const processEmailStats = (filteredMailCases: MailCase[]) => {
 
 // Get archive candidates - cases that meet deletion criteria
 export const getArchiveCandidates = (cases: MailCase[]): MailCase[] => {
-  return cases.filter(caseItem => isArchiveCandidate(caseItem));
+  console.log('=== getArchiveCandidates DEBUG ===');
+  console.log('Total cases to check:', cases.length);
+  
+  const candidates = cases.filter(caseItem => {
+    const isCandidate = isArchiveCandidate(caseItem);
+    console.log(`Case "${caseItem.title}": isArchiveCandidate = ${isCandidate}`, {
+      startDate: caseItem.startDate,
+      status: caseItem.status,
+      companyType: caseItem.companyType
+    });
+    return isCandidate;
+  });
+  
+  console.log('Archive candidates found:', candidates.length);
+  return candidates;
 };

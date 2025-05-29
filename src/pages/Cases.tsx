@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -105,7 +104,8 @@ export function Cases({ companyType = 'own' }: CasesProps) {
         id: project.id,
         title: project.title,
         company_type: project.company_type,
-        is_active: project.status // assuming this maps to is_active
+        status: project.status,
+        start_date: project.start_date
       });
     });
     
@@ -142,6 +142,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       processes: project.processes || [],
       detailDescription: project.detail_description || '',
       description: project.description || '',
+      createdAt: project.created_at || '',
       // Use the actual database company_type field
       companyType: effectiveCompanyType
     }));
@@ -202,9 +203,15 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     foreignerFilter
   ]);
 
-  // Get archive candidates for the archive tab
+  // Get archive candidates for the archive tab - use ALL normalizedCaseData, not filtered
   const archiveCandidates = React.useMemo(() => {
-    return getArchiveCandidates(normalizedCaseData);
+    console.log('=== DEBUG: Getting archive candidates ===');
+    console.log('All normalized case data:', normalizedCaseData.length);
+    
+    const candidates = getArchiveCandidates(normalizedCaseData);
+    console.log('Archive candidates found:', candidates.length);
+    
+    return candidates;
   }, [normalizedCaseData]);
 
   // Handle sorting
