@@ -1,4 +1,3 @@
-
 import { MailCase } from "../email/types";
 import { parse, isValid } from 'date-fns';
 
@@ -11,23 +10,41 @@ export const filterCases = (
   dateRange: string,
   foreignerFilter: string
 ) => {
-  return cases.filter(item => {
+  console.log('=== filterCases DEBUG ===');
+  console.log('Input parameters:', {
+    totalCases: cases.length,
+    companyType,
+    statusFilter,
+    searchTerm,
+    dateRange,
+    foreignerFilter
+  });
+
+  return cases.filter((item, index) => {
+    console.log(`\n--- Checking case ${index + 1}: "${item.title}" ---`);
+    
     // Filter by company type using some mock logic
     const matchesCompanyType = companyType === 'own' 
       ? parseInt(item.id) % 2 === 1  // odd IDs for 自社
       : parseInt(item.id) % 2 === 0;  // even IDs for 他社
     
+    console.log(`Company type check: ${matchesCompanyType} (ID: ${item.id}, companyType: ${companyType})`);
+    
     const matchesStatus = statusFilter === "all" || item.status === statusFilter;
+    console.log(`Status check: ${matchesStatus} (filter: ${statusFilter}, item status: ${item.status})`);
     
     const matchesSearch = searchTerm === "" || 
       item.title.toLowerCase().includes(searchTerm.toLowerCase());
+    console.log(`Search check: ${matchesSearch} (searchTerm: "${searchTerm}", title: "${item.title}")`);
     
     // Improved date matching
     let matchesDate = true;
     if (dateRange) {
+      console.log(`Date range filter applied: ${dateRange}`);
       // If dateRange is specified, check if the startDate exists
       if (!item.startDate) {
         matchesDate = false;
+        console.log('Date check: false (no startDate)');
       } else {
         // Parse both dates to compare them
         try {
@@ -37,23 +54,42 @@ export const filterCases = (
           if (isValid(filterDate) && isValid(itemDate)) {
             // For "immediate" and "thisMonth", cases on or after the specified date should match
             matchesDate = itemDate >= filterDate;
+            console.log(`Date check: ${matchesDate} (item date: ${item.startDate}, filter date: ${dateRange})`);
           } else {
             // If date parsing fails, fall back to string comparison
             matchesDate = item.startDate >= dateRange;
+            console.log(`Date check (string): ${matchesDate} (item date: ${item.startDate}, filter date: ${dateRange})`);
           }
         } catch (e) {
           // If parsing fails, use string comparison as fallback
           matchesDate = item.startDate >= dateRange;
+          console.log(`Date check (fallback): ${matchesDate} (item date: ${item.startDate}, filter date: ${dateRange})`);
         }
       }
+    } else {
+      console.log('Date check: true (no date filter)');
     }
 
     // Filter by foreigner acceptance
     const matchesForeigner = foreignerFilter === "all" || 
       (foreignerFilter === "accepted" && item.foreignerAccepted) ||
       (foreignerFilter === "notAccepted" && !item.foreignerAccepted);
+    console.log(`Foreigner check: ${matchesForeigner} (filter: ${foreignerFilter}, item foreignerAccepted: ${item.foreignerAccepted})`);
 
-    return matchesCompanyType && matchesStatus && matchesSearch && matchesDate && matchesForeigner;
+    const finalResult = matchesCompanyType && matchesStatus && matchesSearch && matchesDate && matchesForeigner;
+    console.log(`Final result for "${item.title}": ${finalResult}`);
+    
+    if (!finalResult) {
+      console.log(`❌ Case "${item.title}" was filtered out because:`, {
+        matchesCompanyType,
+        matchesStatus,
+        matchesSearch,
+        matchesDate,
+        matchesForeigner
+      });
+    }
+
+    return finalResult;
   });
 };
 
