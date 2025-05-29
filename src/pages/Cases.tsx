@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -92,34 +93,57 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   const normalizedCaseData = React.useMemo(() => {
     const targetCompanyType = effectiveCompanyType === 'own' ? '自社' : '他社';
     
-    return projects
-      .filter(project => project.company_type === targetCompanyType)
-      .map(project => ({
+    console.log('=== DEBUG: Projects filtering ===');
+    console.log('Total projects from DB:', projects.length);
+    console.log('Target company type:', targetCompanyType);
+    console.log('Effective company type:', effectiveCompanyType);
+    
+    // Log all projects with their company_type
+    projects.forEach((project, index) => {
+      console.log(`Project ${index + 1}:`, {
         id: project.id,
         title: project.title,
-        company: project.client_company || '',
-        manager: project.manager_name || '',
-        managerEmail: project.manager_email || '',
-        skills: project.skills || [],
-        experience: project.experience || '',
-        location: project.location || '',
-        workType: project.work_type || '',
-        duration: project.duration || '',
-        budget: project.budget || '',
-        desiredBudget: project.desired_budget || '',
-        japanese: project.japanese_level || '',
-        priority: project.priority || '',
-        status: normalizeStatus(project.status || ''),
-        startDate: project.start_date || '',
-        foreignerAccepted: project.foreigner_accepted || false,
-        freelancerAccepted: project.freelancer_accepted || false,
-        interviewCount: project.interview_count || '1',
-        processes: project.processes || [],
-        detailDescription: project.detail_description || '',
-        description: project.description || '',
-        // Use the actual database company_type field
-        companyType: effectiveCompanyType
-      }));
+        company_type: project.company_type,
+        is_active: project.status // assuming this maps to is_active
+      });
+    });
+    
+    const filteredByCompanyType = projects.filter(project => {
+      const matches = project.company_type === targetCompanyType;
+      if (!matches) {
+        console.log(`Filtered out project "${project.title}" - company_type: "${project.company_type}" (expected: "${targetCompanyType}")`);
+      }
+      return matches;
+    });
+    
+    console.log('After company_type filter:', filteredByCompanyType.length);
+    
+    return filteredByCompanyType.map(project => ({
+      id: project.id,
+      title: project.title,
+      company: project.client_company || '',
+      manager: project.manager_name || '',
+      managerEmail: project.manager_email || '',
+      skills: project.skills || [],
+      experience: project.experience || '',
+      location: project.location || '',
+      workType: project.work_type || '',
+      duration: project.duration || '',
+      budget: project.budget || '',
+      desiredBudget: project.desired_budget || '',
+      japanese: project.japanese_level || '',
+      priority: project.priority || '',
+      status: normalizeStatus(project.status || ''),
+      startDate: project.start_date || '',
+      foreignerAccepted: project.foreigner_accepted || false,
+      freelancerAccepted: project.freelancer_accepted || false,
+      interviewCount: project.interview_count || '1',
+      processes: project.processes || [],
+      detailDescription: project.detail_description || '',
+      description: project.description || '',
+      // Use the actual database company_type field
+      companyType: effectiveCompanyType
+    }));
   }, [projects, effectiveCompanyType]);
 
   const {
@@ -139,7 +163,14 @@ export function Cases({ companyType = 'own' }: CasesProps) {
   
   // Filtered cases for the list view - this is our MAIN source of truth
   const filteredCases = React.useMemo(() => {
-    return filterCases(
+    console.log('=== DEBUG: Cases filtering ===');
+    console.log('Before filterCases:', normalizedCaseData.length);
+    console.log('Status filter:', statusFilter);
+    console.log('Search term:', searchTerm);
+    console.log('Date range:', dateRange);
+    console.log('Foreigner filter:', foreignerFilter);
+    
+    const result = filterCases(
       normalizedCaseData,
       effectiveCompanyType,
       statusFilter,
@@ -147,6 +178,19 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       dateRange,
       foreignerFilter
     );
+    
+    console.log('After filterCases:', result.length);
+    
+    if (result.length !== normalizedCaseData.length) {
+      console.log('Some cases were filtered out by filterCases function');
+      // Log which cases were filtered out
+      const filteredOutCases = normalizedCaseData.filter(caseItem => 
+        !result.some(resultCase => resultCase.id === caseItem.id)
+      );
+      console.log('Filtered out cases:', filteredOutCases.map(c => ({ id: c.id, title: c.title, status: c.status })));
+    }
+    
+    return result;
   }, [
     normalizedCaseData,
     effectiveCompanyType,
