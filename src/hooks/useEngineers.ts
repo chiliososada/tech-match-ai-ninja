@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,7 +55,7 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     return [];
   };
 
-  // 获取engineers数据
+  // 获取engineers数据 - 只获取 is_active = true 的记录
   const fetchEngineers = async () => {
     if (!currentTenant) {
       console.log('No current tenant, skipping engineer fetch');
@@ -74,6 +73,7 @@ export const useEngineers = (companyType: 'own' | 'other') => {
         .select('*')
         .eq('tenant_id', currentTenant.id)
         .eq('company_type', companyTypeMapping[companyType])
+        .eq('is_active', true) // 只获取活跃的记录
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -241,16 +241,25 @@ export const useEngineers = (companyType: 'own' | 'other') => {
     }
   };
 
-  // 删除engineer
+  // 软删除engineer - 设置 is_active = false
   const deleteEngineer = async (id: string) => {
     try {
+      console.log('Soft deleting engineer with id:', id);
+      
       const { error } = await supabase
         .from('engineers')
-        .delete()
+        .update({ 
+          is_active: false,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error soft deleting engineer:', error);
+        throw error;
+      }
       
+      console.log('Successfully soft deleted engineer');
       await fetchEngineers(); // 重新获取数据
       toast.success('技術者を削除しました');
       return true;

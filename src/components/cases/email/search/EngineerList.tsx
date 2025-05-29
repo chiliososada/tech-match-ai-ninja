@@ -36,9 +36,15 @@ export const EngineerList: React.FC<EngineerListProps> = ({
     return skills;
   };
   
+  // Filter out inactive engineers - only show active ones
+  const activeEngineers = paginatedEngineers.filter(engineer => {
+    // 如果工程师数据中没有 isActive 字段，默认显示；如果有该字段，只显示 isActive 为 true 的
+    return engineer.isActive !== false;
+  });
+  
   return (
     <div className="space-y-2">
-      {paginatedEngineers.map(engineer => {
+      {activeEngineers.map(engineer => {
         const isSelected = selectedEngineers.some(e => e.id === engineer.id);
         const badgeVariant = getBadgeVariant(engineer.status || '');
         
@@ -79,7 +85,7 @@ export const EngineerList: React.FC<EngineerListProps> = ({
         );
       })}
       
-      {filteredEngineersLength === 0 && (
+      {activeEngineers.length === 0 && filteredEngineersLength === 0 && (
         <div className="text-center py-8">
           <p className="text-muted-foreground japanese-text">検索条件に一致する技術者がいません</p>
         </div>
