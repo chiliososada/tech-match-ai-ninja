@@ -29,8 +29,9 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
   // Make sure we correctly detect the other company view
   const isOtherCompany = location.pathname.includes('/company/other');
   
-  console.log('Current path:', location.pathname);
-  console.log('Is other company view:', isOtherCompany);
+  console.log('=== DEBUG: CaseListTable render ===');
+  console.log('Paginated cases received (titles):', paginatedCases.map(c => ({ id: c.id, title: c.title })));
+  console.log('Selected case:', selectedCase ? { id: selectedCase.id, title: selectedCase.title } : null);
 
   // Handler for clicking on a sortable column header
   const handleSortClick = (field: string) => {
@@ -90,6 +91,10 @@ export const CaseListTable: React.FC<CaseListTableProps> = ({
           {paginatedCases.map((item) => {
             // Ensure the case status is one of the valid values
             const normalizedStatus = normalizeStatus(item.status);
+            
+            console.log(`=== DEBUG: Rendering table row for case ${item.id} ===`);
+            console.log(`Title: "${item.title}"`);
+            console.log(`Is selected: ${selectedCase?.id === item.id}`);
             
             return (
               <TableRow 
