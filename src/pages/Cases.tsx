@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -165,24 +164,26 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     setEditingCaseData,
     toggleEditMode,
     handleEditChange,
-    handleSaveEdit
+    handleSaveEdit,
+    localCaseData // 获取本地数据状态
   } = useCaseSelection(normalizedCaseData);
   
   // Get company list
   const companyList = getCompanyList();
   
   // Filtered cases for the list view - exclude archive candidates by default
+  // 使用 localCaseData 作为数据源而不是 normalizedCaseData
   const filteredCases = React.useMemo(() => {
     console.log('=== DEBUG: Cases filtering ===');
-    console.log('Before filterCases:', normalizedCaseData.length);
-    console.log('Normalized case data titles:', normalizedCaseData.map(c => ({ id: c.id, title: c.title })));
+    console.log('Before filterCases:', localCaseData.length);
+    console.log('Local case data titles:', localCaseData.map(c => ({ id: c.id, title: c.title })));
     console.log('Status filter:', statusFilter);
     console.log('Search term:', searchTerm);
     console.log('Date range:', dateRange);
     console.log('Foreigner filter:', foreignerFilter);
     
     const result = filterCases(
-      normalizedCaseData,
+      localCaseData, // 使用本地数据
       effectiveCompanyType,
       statusFilter,
       searchTerm,
@@ -197,10 +198,10 @@ export function Cases({ companyType = 'own' }: CasesProps) {
       title: r.title 
     })));
     
-    if (result.length !== normalizedCaseData.length) {
+    if (result.length !== localCaseData.length) {
       console.log('Some cases were filtered out by filterCases function');
       // Log which cases were filtered out
-      const filteredOutCases = normalizedCaseData.filter(caseItem => 
+      const filteredOutCases = localCaseData.filter(caseItem => 
         !result.some(resultCase => resultCase.id === caseItem.id)
       );
       console.log('Filtered out cases:', filteredOutCases.map(c => ({ id: c.id, title: c.title, status: c.status })));
@@ -208,7 +209,7 @@ export function Cases({ companyType = 'own' }: CasesProps) {
     
     return result;
   }, [
-    normalizedCaseData,
+    localCaseData, // 依赖本地数据
     effectiveCompanyType,
     statusFilter,
     searchTerm,

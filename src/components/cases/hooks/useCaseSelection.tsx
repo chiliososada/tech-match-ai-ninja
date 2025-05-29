@@ -8,21 +8,28 @@ export const useCaseSelection = (caseData: MailCase[]) => {
   const [selectedCase, setSelectedCase] = useState<MailCase | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editingCaseData, setEditingCaseData] = useState<MailCase | null>(null);
+  // 添加本地数据状态管理
+  const [localCaseData, setLocalCaseData] = useState<MailCase[]>([]);
   const { updateProject, fetchProjects } = useProjects();
   
   // Use ref to track recently saved case to prevent race condition
   const recentlySavedCaseRef = useRef<string | null>(null);
-  // Add a ref to store the most recent saved data to ensure consistency
-  const recentSaveDataRef = useRef<MailCase | null>(null);
+
+  // 初始化本地数据
+  useEffect(() => {
+    console.log('Initializing local case data with:', caseData.length, 'cases');
+    setLocalCaseData(caseData);
+  }, [caseData]);
 
   // Handler function to select a case
   const handleCaseSelect = (caseItem: MailCase) => {
     console.log('Selecting case:', caseItem.id, caseItem.title);
     
-    // Find the matching case with full data structure from our original caseData
-    const fullCaseData = caseData.find(item => item.id === caseItem.id);
+    // Find the matching case from localCaseData first, fallback to original caseData
+    const fullCaseData = localCaseData.find(item => item.id === caseItem.id) || 
+                         caseData.find(item => item.id === caseItem.id);
     
-    // If found in our original data, use it; otherwise use the passed item as is
+    // If found, use it; otherwise use the passed item as is
     if (fullCaseData) {
       // Ensure the processes field exists
       const caseWithProcesses = {
@@ -68,19 +75,9 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       const isRecentlySaved = recentlySavedCaseRef.current === selectedCase.id;
       
       if (isRecentlySaved) {
-        console.log("Case was recently saved - using saved data for consistency");
-        // Use the saved data to update selectedCase to ensure consistency
-        if (recentSaveDataRef.current && recentSaveDataRef.current.id === selectedCase.id) {
-          console.log("Updating selectedCase with recently saved data:", recentSaveDataRef.current.title);
-          setSelectedCase({
-            ...recentSaveDataRef.current,
-            processes: recentSaveDataRef.current.processes || [],
-            interviewCount: recentSaveDataRef.current.interviewCount || '1'
-          });
-        }
-        // Clear the recently saved flags after using the saved data
+        console.log("Skipping selectedCase update - case was recently saved");
+        // Clear the recently saved flag after preventing the overwrite
         recentlySavedCaseRef.current = null;
-        recentSaveDataRef.current = null;
         return;
       }
       
@@ -114,7 +111,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   };
 
-  // Edit change handler - Fix: properly update the state
+  // Edit change handler
   const handleEditChange = (field: string, value: any) => {
     if (editingCaseData) {
       console.log(`Editing field: ${field}, new value:`, value);
@@ -155,7 +152,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   };
 
-  // Save edit handler with race condition prevention
+  // Save edit handler with immediate local update
   const handleSaveEdit = async () => {
     if (editingCaseData && selectedCase) {
       console.log("Saving edited data:", editingCaseData);
@@ -163,12 +160,6 @@ export const useCaseSelection = (caseData: MailCase[]) => {
       try {
         // Mark this case as recently saved to prevent state overwrites
         recentlySavedCaseRef.current = selectedCase.id;
-        // Store the editing data to use for consistency
-        recentSaveDataRef.current = {
-          ...editingCaseData,
-          processes: editingCaseData.processes || [],
-          interviewCount: editingCaseData.interviewCount || '1'
-        };
         
         // Update the project in the database
         const updateData = {
@@ -199,14 +190,23 @@ export const useCaseSelection = (caseData: MailCase[]) => {
         const result = await updateProject(selectedCase.id, updateData);
         
         if (result) {
-          console.log("Project updated successfully, updating UI immediately...");
+          console.log("Project updated successfully, updating local state immediately...");
           
-          // Immediately update the selectedCase with the edited data to show changes
-          setSelectedCase({
+          const updatedCase = {
             ...editingCaseData,
             processes: editingCaseData.processes || [],
             interviewCount: editingCaseData.interviewCount || '1'
-          });
+          };
+          
+          // 1. 立即更新 selectedCase（右侧详情）
+          setSelectedCase(updatedCase);
+          
+          // 2. 立即更新 localCaseData（左侧列表数据源）
+          setLocalCaseData(prevData => 
+            prevData.map(item => 
+              item.id === selectedCase.id ? updatedCase : item
+            )
+          );
           
           // Exit edit mode
           setEditMode(false);
@@ -217,8 +217,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
             description: "変更が正常に保存されました"
           });
           
-          // Run fetchProjects in background to refresh the left side list
-          // The race condition prevention will ensure consistency
+          // 3. 后台异步刷新数据库数据（保持长期一致性）
           console.log("Starting background refresh of projects list...");
           fetchProjects().then(() => {
             console.log("Background projects refresh completed");
@@ -227,15 +226,13 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           });
         } else {
           console.error("Project update failed - no result returned");
-          // Clear the recently saved flags if update failed
+          // Clear the recently saved flag if update failed
           recentlySavedCaseRef.current = null;
-          recentSaveDataRef.current = null;
         }
       } catch (error) {
         console.error('Error updating case:', error);
-        // Clear the recently saved flags if update failed
+        // Clear the recently saved flag if update failed
         recentlySavedCaseRef.current = null;
-        recentSaveDataRef.current = null;
         toast({
           title: "エラー",
           description: "案件の更新に失敗しました",
@@ -256,6 +253,7 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     setEditingCaseData,
     toggleEditMode,
     handleEditChange,
-    handleSaveEdit
+    handleSaveEdit,
+    localCaseData // 暴露本地数据状态
   };
 };
