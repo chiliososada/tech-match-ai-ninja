@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MailCase } from '../email/types';
 import { toast } from '@/hooks/toast';
 import { useProjects } from '@/hooks/useProjects';
@@ -9,6 +9,9 @@ export const useCaseSelection = (caseData: MailCase[]) => {
   const [editMode, setEditMode] = useState(false);
   const [editingCaseData, setEditingCaseData] = useState<MailCase | null>(null);
   const { updateProject, fetchProjects } = useProjects();
+  
+  // Use ref to track recently saved case to prevent race condition
+  const recentlySavedCaseRef = useRef<string | null>(null);
 
   // Handler function to select a case
   const handleCaseSelect = (caseItem: MailCase) => {
@@ -56,9 +59,19 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   }, [editMode, selectedCase, editingCaseData]);
 
-  // Update selectedCase when caseData changes (after fetchProjects) - but only if not in edit mode
+  // Update selectedCase when caseData changes (after fetchProjects) - but only if not in edit mode and not recently saved
   useEffect(() => {
     if (selectedCase && caseData.length > 0 && !editMode) {
+      // Check if this case was recently saved to prevent overwriting the updated state
+      const isRecentlySaved = recentlySavedCaseRef.current === selectedCase.id;
+      
+      if (isRecentlySaved) {
+        console.log("Skipping selectedCase update - case was recently saved");
+        // Clear the recently saved flag after preventing the overwrite
+        recentlySavedCaseRef.current = null;
+        return;
+      }
+      
       console.log("Checking if selectedCase needs to be updated with fresh data...");
       const updatedCase = caseData.find(item => item.id === selectedCase.id);
       if (updatedCase) {
@@ -130,12 +143,15 @@ export const useCaseSelection = (caseData: MailCase[]) => {
     }
   };
 
-  // Save edit handler with database update
+  // Save edit handler with race condition prevention
   const handleSaveEdit = async () => {
     if (editingCaseData && selectedCase) {
       console.log("Saving edited data:", editingCaseData);
       
       try {
+        // Mark this case as recently saved to prevent state overwrites
+        recentlySavedCaseRef.current = selectedCase.id;
+        
         // Update the project in the database
         const updateData = {
           title: editingCaseData.title,
@@ -178,20 +194,28 @@ export const useCaseSelection = (caseData: MailCase[]) => {
           setEditMode(false);
           setEditingCaseData(null);
           
-          // Force refresh the projects list to get the latest data for the left side
-          console.log("Calling fetchProjects to refresh the list...");
-          await fetchProjects();
-          console.log("fetchProjects completed");
-          
           toast({
             title: "案件情報が更新されました",
             description: "変更が正常に保存されました"
           });
+          
+          // Run fetchProjects in background to refresh the left side list
+          // This won't interfere with the selectedCase state due to our race condition prevention
+          console.log("Starting background refresh of projects list...");
+          fetchProjects().then(() => {
+            console.log("Background projects refresh completed");
+          }).catch((error) => {
+            console.error("Background projects refresh failed:", error);
+          });
         } else {
           console.error("Project update failed - no result returned");
+          // Clear the recently saved flag if update failed
+          recentlySavedCaseRef.current = null;
         }
       } catch (error) {
         console.error('Error updating case:', error);
+        // Clear the recently saved flag if update failed
+        recentlySavedCaseRef.current = null;
         toast({
           title: "エラー",
           description: "案件の更新に失敗しました",
