@@ -200,13 +200,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "ai_matching_history_executed_by_fkey"
-            columns: ["executed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "ai_matching_history_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -455,6 +448,7 @@ export type Database = {
       }
       email_sending_logs: {
         Row: {
+          attachment_transfer_log: Json | null
           bounce_reason: string | null
           bounce_type: string | null
           clicked_at: string | null
@@ -467,11 +461,15 @@ export type Database = {
           opened_at: string | null
           queue_id: string | null
           replied_at: string | null
+          response_time_ms: number | null
+          send_end_time: string | null
+          send_start_time: string | null
           smtp_response: string | null
           tenant_id: string
           unsubscribed_at: string | null
         }
         Insert: {
+          attachment_transfer_log?: Json | null
           bounce_reason?: string | null
           bounce_type?: string | null
           clicked_at?: string | null
@@ -484,11 +482,15 @@ export type Database = {
           opened_at?: string | null
           queue_id?: string | null
           replied_at?: string | null
+          response_time_ms?: number | null
+          send_end_time?: string | null
+          send_start_time?: string | null
           smtp_response?: string | null
           tenant_id: string
           unsubscribed_at?: string | null
         }
         Update: {
+          attachment_transfer_log?: Json | null
           bounce_reason?: string | null
           bounce_type?: string | null
           clicked_at?: string | null
@@ -501,6 +503,9 @@ export type Database = {
           opened_at?: string | null
           queue_id?: string | null
           replied_at?: string | null
+          response_time_ms?: number | null
+          send_end_time?: string | null
+          send_start_time?: string | null
           smtp_response?: string | null
           tenant_id?: string
           unsubscribed_at?: string | null
@@ -532,15 +537,16 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           current_retry_count: number | null
+          email_metadata: Json | null
           error_message: string | null
           id: string
           last_attempt_at: string | null
           max_retry_count: number | null
-          metadata: Json | null
           priority: number | null
           related_engineer_id: string | null
           related_project_id: string | null
           scheduled_at: string | null
+          send_duration_ms: number | null
           sent_at: string | null
           smtp_setting_id: string | null
           status: string | null
@@ -559,15 +565,16 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_retry_count?: number | null
+          email_metadata?: Json | null
           error_message?: string | null
           id?: string
           last_attempt_at?: string | null
           max_retry_count?: number | null
-          metadata?: Json | null
           priority?: number | null
           related_engineer_id?: string | null
           related_project_id?: string | null
           scheduled_at?: string | null
+          send_duration_ms?: number | null
           sent_at?: string | null
           smtp_setting_id?: string | null
           status?: string | null
@@ -586,15 +593,16 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_retry_count?: number | null
+          email_metadata?: Json | null
           error_message?: string | null
           id?: string
           last_attempt_at?: string | null
           max_retry_count?: number | null
-          metadata?: Json | null
           priority?: number | null
           related_engineer_id?: string | null
           related_project_id?: string | null
           scheduled_at?: string | null
+          send_duration_ms?: number | null
           sent_at?: string | null
           smtp_setting_id?: string | null
           status?: string | null
@@ -610,27 +618,6 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_sending_queue_related_engineer_id_fkey"
-            columns: ["related_engineer_id"]
-            isOneToOne: false
-            referencedRelation: "engineers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_sending_queue_related_project_id_fkey"
-            columns: ["related_project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_sending_queue_smtp_setting_id_fkey"
-            columns: ["smtp_setting_id"]
-            isOneToOne: false
-            referencedRelation: "email_smtp_settings"
             referencedColumns: ["id"]
           },
           {
@@ -883,6 +870,8 @@ export type Database = {
         Row: {
           age: string | null
           ai_extracted_data: Json | null
+          ai_match_embedding: string | null
+          ai_match_paraphrase: string | null
           arrival_year_japan: string | null
           availability: string | null
           business_trip_available: boolean | null
@@ -933,6 +922,8 @@ export type Database = {
         Insert: {
           age?: string | null
           ai_extracted_data?: Json | null
+          ai_match_embedding?: string | null
+          ai_match_paraphrase?: string | null
           arrival_year_japan?: string | null
           availability?: string | null
           business_trip_available?: boolean | null
@@ -983,6 +974,8 @@ export type Database = {
         Update: {
           age?: string | null
           ai_extracted_data?: Json | null
+          ai_match_embedding?: string | null
+          ai_match_paraphrase?: string | null
           arrival_year_japan?: string | null
           availability?: string | null
           business_trip_available?: boolean | null
@@ -1031,13 +1024,6 @@ export type Database = {
           work_scope?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "engineers_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "engineers_tenant_id_fkey"
             columns: ["tenant_id"]
@@ -1202,6 +1188,53 @@ export type Database = {
           },
           {
             foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oauth_clients: {
+        Row: {
+          client_id: string
+          client_name: string
+          client_secret: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          redirect_uris: string[] | null
+          scopes: string[] | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          client_name: string
+          client_secret: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          redirect_uris?: string[] | null
+          scopes?: string[] | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          client_name?: string
+          client_secret?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          redirect_uris?: string[] | null
+          scopes?: string[] | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_clients_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1469,31 +1502,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_engineer_matches_engineer_id_fkey"
-            columns: ["engineer_id"]
-            isOneToOne: false
-            referencedRelation: "engineers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "project_engineer_matches_matching_history_id_fkey"
             columns: ["matching_history_id"]
             isOneToOne: false
             referencedRelation: "ai_matching_history"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_engineer_matches_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_engineer_matches_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1570,6 +1582,8 @@ export type Database = {
       projects: {
         Row: {
           ai_extracted_project_data: Json | null
+          ai_match_embedding: string | null
+          ai_match_paraphrase: string | null
           ai_processed: boolean | null
           application_deadline: string | null
           budget: string | null
@@ -1611,6 +1625,8 @@ export type Database = {
         }
         Insert: {
           ai_extracted_project_data?: Json | null
+          ai_match_embedding?: string | null
+          ai_match_paraphrase?: string | null
           ai_processed?: boolean | null
           application_deadline?: string | null
           budget?: string | null
@@ -1652,6 +1668,8 @@ export type Database = {
         }
         Update: {
           ai_extracted_project_data?: Json | null
+          ai_match_embedding?: string | null
+          ai_match_paraphrase?: string | null
           ai_processed?: boolean | null
           application_deadline?: string | null
           budget?: string | null
@@ -2405,6 +2423,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
       get_user_tenant_ids: {
         Args: Record<PropertyKey, never>
         Returns: string[]
@@ -2419,12 +2441,64 @@ export type Database = {
           is_default: boolean
         }[]
       }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
       has_tenant_permission: {
         Args: {
           _tenant_id: string
           _permission: Database["public"]["Enums"]["user_role"]
         }
         Returns: boolean
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
       }
       reset_daily_ai_usage: {
         Args: Record<PropertyKey, never>
@@ -2434,9 +2508,45 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
       test_ai_configuration: {
         Args: { config_id: string }
         Returns: Json
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {
